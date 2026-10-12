@@ -2,7 +2,7 @@ import { DurableObject } from "cloudflare:workers";
 import { initialState } from "../../bot/engine.js";
 
 // SIMULATION ONLY: no Kraken private API, no authentication credentials, no orders.
-const VERSION = "1.3.3";
+const VERSION = "1.3.4";
 const KRAKEN_TICKER = "https://api.kraken.com/0/public/Ticker?pair=XBTGBP";
 
 async function getPrice() {
@@ -48,7 +48,8 @@ export class BitcoinGrowerState extends DurableObject {
     }
     let state = await this.ctx.storage.get("state");
     if (!state) state = initialState(price);
-    const result = step(state, price, checkedAt.slice(0, 10), DEFAULT_RULES);
+
+
     // In this release simulation is hard-locked PAUSED until a reviewed control is added.
     // Record price checks only; never run the trade engine automatically.
     await this.ctx.storage.put("lastCheck", { checkedAt, price, reason: "Simulation paused" });
