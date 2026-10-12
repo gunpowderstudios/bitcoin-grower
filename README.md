@@ -49,3 +49,6 @@ Public historical BTC/GBP daily-close backtest at `time-machine.html`, with adju
 
 ### v1.8.1 Time Machine delight
 Subtle SVG plant/coin animations, optional Web Audio synthesised chimes for harvests and stage growth. Sound off by default, enabled via a user click. No downloaded audio or additional third-party dependencies. Browser reduced-motion preferences respected. Playback simulation only.
+
+### v1.8.2 simple Time Machine
+Beginner-first flow: amount, historical start date, Play. Defaults to latest available historical end date; advanced strategy controls remain optional. Shows large profit/loss and percentage as journey proceeds, with plain-language replay buttons.
