@@ -1,8 +1,9 @@
+import { DASHBOARD_HTML } from "./dashboard.js";
 import { DurableObject } from "cloudflare:workers";
 import { initialState, step, DEFAULT_RULES } from "../../bot/engine.js";
 
 // SIMULATION ONLY: no Kraken private API, no authentication credentials, no orders.
-const VERSION = "1.4.0";
+const VERSION = "1.5.0";
 const KRAKEN_TICKER = "https://api.kraken.com/0/public/Ticker?pair=XBTGBP";
 
 async function getPrice() {
@@ -63,6 +64,13 @@ export class BitcoinGrowerState extends DurableObject {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (request.method === "GET" && url.pathname === "/dashboard") {
+      return new Response(DASHBOARD_HTML, { headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-store",
+        "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
+      } });
+    }
     if (request.method !== "GET" || url.pathname !== "/") {
       return new Response("Not found", { status: 404 });
     }
