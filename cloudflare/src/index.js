@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import { initialState, step, DEFAULT_RULES } from "../bot/engine.js";
+import { initialState } from "../../bot/engine.js";
 
 // SIMULATION ONLY: no Kraken private API, no authentication credentials, no orders.
 const VERSION = "1.3.0";
