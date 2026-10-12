@@ -3,7 +3,7 @@ import { DurableObject } from "cloudflare:workers";
 import { initialState, step, DEFAULT_RULES } from "../../bot/engine.js";
 
 // SIMULATION ONLY: no Kraken private API, no authentication credentials, no orders.
-const VERSION = "1.5.0";
+const VERSION = "1.6.0";
 const KRAKEN_TICKER = "https://api.kraken.com/0/public/Ticker?pair=XBTGBP";
 
 async function getPrice() {
@@ -29,9 +29,10 @@ export class BitcoinGrowerState extends DurableObject {
     if (request.method === "GET" && pathname === "/internal/status") {
       const state = await this.ctx.storage.get("state");
       const last = await this.ctx.storage.get("lastCheck");
+      const history = await this.ctx.storage.get("history") || [];
       return Response.json({
         version: VERSION, mode: "SIMULATION", tradingEnabled: false,
-        state: state || null, lastCheck: last || null,
+        state: state || null, lastCheck: last || null, history,
       }, { headers: { "Cache-Control": "no-store" } });
     }
     if (request.method !== "POST" || pathname !== "/internal/tick") {
@@ -53,6 +54,11 @@ export class BitcoinGrowerState extends DurableObject {
 
     // Only a virtual ledger: the step() function cannot contact Kraken or place orders.
     const result = step(state, price, checkedAt.slice(0, 10), DEFAULT_RULES);
+    const history = await this.ctx.storage.get("history") || [];
+    history.push({ at: checkedAt, price, valueGBP: result.state.cashGBP + result.state.btc * price,
+      action: result.action?.side || null });
+    if (history.length > 2016) history.splice(0, history.length - 2016);
+    await this.ctx.storage.put("history", history);
     await this.ctx.storage.put("state", result.state);
     await this.ctx.storage.put("lastCheck", {
       checkedAt, price, reason: result.reason, action: result.action?.side || null
@@ -83,12 +89,13 @@ export default {
       app: "Bitcoin Grower", version: VERSION,
       mode: "SIMULATION", tradingEnabled: false,
       status: "SIMULATING", lastMarketCheck: info.lastCheck || null,
+      history: (info.history || []).slice(-2016),
       virtual: info.state ? {
         initialGBP: 100,
         cashGBP: info.state.cashGBP,
         bitcoinBTC: info.state.btc,
         estimatedTotalGBP: info.lastCheck ? info.state.cashGBP + info.state.btc * info.lastCheck.price : null,
-        trades: info.state.trades?.slice(-10) || [],
+        trades: info.state.trades?.slice(-100) || [],
         nextBuyGBP: info.state.lot ? null : info.state.buyReference * (1 - DEFAULT_RULES.dipPct / 100),
         nextSellGBP: info.state.lot ? info.state.lot.price * (1 + DEFAULT_RULES.reboundPct / 100) : null
       } : null,
