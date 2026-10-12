@@ -1,4 +1,4 @@
-// Bitcoin Grower Time Machine — the living plant (v1.9.1).
+// Bitcoin Grower Time Machine — the living plant (v1.10.0).
 // One persistent SVG: parts grow, fade and sway with CSS transitions instead of being redrawn.
 // The picture is driven only by stage (0-6) and droop (0-1), both derived from the pot's real value.
 const NS = 'http://www.w3.org/2000/svg';

@@ -1,7 +1,7 @@
-// Bitcoin Grower Time Machine — pure simulation logic (v1.9.1).
+// Bitcoin Grower Time Machine — pure simulation logic (v1.10.0).
 // No DOM, no network, no credentials, no exchange access: this module only does
 // arithmetic on historical prices so it can be tested in Node and reused by the page.
-export const VERSION = '1.9.1';
+export const VERSION = '1.10.0';
 
 export const DEFAULTS = Object.freeze({
   amount: 100,   // £ planted at the start
@@ -83,6 +83,29 @@ export function validateSettings(input = {}) {
   if (bad('sellPct', 1, 100)) throw new Error('"Harvest this much" must be between 1% and 100%.');
   if (bad('feePct', 0, 10)) throw new Error('The fee must be between 0% and 10%.');
   return s;
+}
+
+// ---------- pruning styles ----------
+/**
+ * Three ready-made styles. Only the share sold at each harvest changes ("how hard to prune"); the buy/harvest
+ * steps stay at 5% down / 10% up so there is always something to watch. Medium equals DEFAULTS.
+ */
+export const PRESETS = Object.freeze({
+  light: Object.freeze({ key: 'light', emoji: '🌿', name: 'Light pruning', dipPct: 5, risePct: 10, sellPct: 25,
+    blurb: 'Sells a quarter of each purchase and keeps most of it growing. Bigger gains in good times, bigger dips in bad.' }),
+  medium: Object.freeze({ key: 'medium', emoji: '✂️', name: 'Medium pruning', dipPct: 5, risePct: 10, sellPct: 50,
+    blurb: 'Sells half of each purchase and keeps half growing. A balanced middle path.' }),
+  heavy: Object.freeze({ key: 'heavy', emoji: '🪓', name: 'Heavy pruning', dipPct: 5, risePct: 10, sellPct: 100,
+    blurb: 'Sells all of each purchase after it rises. Steadiest ride, but smaller gains.' })
+});
+
+/** Run every pruning style over the same journey, using the visitor's amount, buy size and fee. */
+export function compareAll(steps, base = {}) {
+  const out = {};
+  for (const [k, p] of Object.entries(PRESETS)) {
+    out[k] = simulate(steps, { ...base, dipPct: p.dipPct, risePct: p.risePct, sellPct: p.sellPct }).summary;
+  }
+  return out;
 }
 
 // ---------- choosing the journey ----------

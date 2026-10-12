@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor,
-  addDays, addYears, isRealDate, signedGBP, signedPct, formatGBP
+  addDays, addYears, isRealDate, signedGBP, signedPct, formatGBP, PRESETS, compareAll
 } from '../time-machine-engine.js';
 
 const near = (a, b, eps = 1e-9) => assert.ok(Math.abs(a - b) <= eps, `${a} is not within ${eps} of ${b}`);
@@ -202,14 +202,14 @@ test('signed money and percentages use real plus/minus signs', () => {
 
 // ---------- project hygiene ----------
 const read = f => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
-test('version is 1.9.1 everywhere it should be', () => {
-  assert.equal(VERSION, '1.9.1');
-  assert.equal(JSON.parse(read('version.json')).version, '1.9.1');
-  assert.equal(JSON.parse(read('package.json')).version, '1.9.1');
-  assert.equal(JSON.parse(read('bot/package.json')).version, '1.9.1');
-  assert.match(read('time-machine.html'), /id="version">v1\.9\.1</);
-  assert.match(read('README.md'), /1\.9\.1/);
-  assert.match(read('index.html'), /id="version">v1\.9\.1</);
+test('version is 1.10.0 everywhere it should be', () => {
+  assert.equal(VERSION, '1.10.0');
+  assert.equal(JSON.parse(read('version.json')).version, '1.10.0');
+  assert.equal(JSON.parse(read('package.json')).version, '1.10.0');
+  assert.equal(JSON.parse(read('bot/package.json')).version, '1.10.0');
+  assert.match(read('time-machine.html'), /id="version">v1\.10\.0</);
+  assert.match(read('README.md'), /1\.10\.0/);
+  assert.match(read('index.html'), /id="version">v1\.10\.0</);
 });
 test('every element id the page script uses exists in the HTML', () => {
   for (const [page, script] of [['time-machine.html', 'time-machine.js'], ['index.html', 'garden.js']]) {
@@ -233,4 +233,29 @@ test('time machine code has no secrets, exchange APIs or order placement', () =>
 test('optional bundled price file, if present, is valid daily BTC/GBP', { skip: !fs.existsSync(new URL('../data/btc-gbp-daily.csv', import.meta.url)) }, () => {
   const { points } = parseCSV(read('data/btc-gbp-daily.csv'));
   assert.ok(describeData(points).maxGap <= 3);
+});
+
+// ---------- pruning styles ----------
+test('pruning styles: medium equals the default strategy, only the share sold differs, all valid', () => {
+  assert.deepEqual(['light', 'medium', 'heavy'], Object.keys(PRESETS));
+  assert.equal(PRESETS.medium.dipPct, DEFAULTS.dipPct); assert.equal(PRESETS.medium.risePct, DEFAULTS.risePct); assert.equal(PRESETS.medium.sellPct, DEFAULTS.sellPct);
+  assert.deepEqual([25, 50, 100], Object.values(PRESETS).map(p => p.sellPct));
+  assert.ok(Object.values(PRESETS).every(p => p.dipPct === 5 && p.risePct === 10 && p.name && p.blurb));
+  for (const p of Object.values(PRESETS)) validateSettings({ dipPct: p.dipPct, risePct: p.risePct, sellPct: p.sellPct });
+});
+test('compareAll matches individual simulations, keeps the visitor\'s amount and fee, and orders sensibly', () => {
+  const steps = series(Array.from({ length: 300 }, (_, i) => 100 + 30 * Math.sin(i / 5) + i * 0.2));
+  const base = { amount: 250, buyPct: 20, feePct: 0.8 };
+  const all = compareAll(steps, base);
+  for (const k of ['light', 'medium', 'heavy']) {
+    const one = simulate(steps, { ...base, dipPct: 5, risePct: 10, sellPct: PRESETS[k].sellPct }).summary;
+    assert.deepEqual(all[k], one); assert.equal(all[k].start, 250);
+  }
+  assert.deepEqual(all.medium, simulate(steps, base).summary);
+});
+test('heavy pruning sells everything it harvests; light keeps most of it', () => {
+  const steps = series([100, 100, 94, 94, 103.4, 103.4]);
+  const all = compareAll(steps, {});
+  near(all.heavy.btc, 0, 1e-12);
+  assert.ok(all.light.btc > all.medium.btc && all.medium.btc > all.heavy.btc);
 });

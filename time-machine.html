@@ -6,14 +6,14 @@
 <title>Bitcoin Grower — Time Machine</title>
 <meta name="description" content="Plant an imaginary £100 in the past and watch it grow through real Bitcoin history. A friendly simulation — no real money, no real trades.">
 <meta name="theme-color" content="#0c1d14">
-<link rel="stylesheet" href="./time-machine.css?v=1.9.1">
+<link rel="stylesheet" href="./time-machine.css?v=1.10.0">
 </head>
 <body>
 <a class="skip" href="#plant-heading">Skip to the plant</a>
 <main>
 <header>
   <div>
-    <div class="sub">🌱 BITCOIN GROWER <span class="vtag" id="version">v1.9.1</span></div>
+    <div class="sub">🌱 BITCOIN GROWER <span class="vtag" id="version">v1.10.0</span></div>
     <h1>Time Machine ⏳</h1>
     <div class="sub">Plant some pretend money in the past, then travel forward and watch it grow (or wilt!) through real Bitcoin history.</div>
   </div>
@@ -44,6 +44,12 @@
     </div>
     <div class="step">
       <div class="num" aria-hidden="true">3</div>
+      <div class="lbl" id="pruneLabel">How much would you like to prune?</div>
+      <p class="hint">“Pruning” means selling some of what your plant has gained. Pick a style — we’ll also compare all three at the end.</p>
+      <div class="presets" id="styles" role="group" aria-labelledby="pruneLabel"></div>
+    </div>
+    <div class="step">
+      <div class="num" aria-hidden="true">4</div>
       <button class="go" id="go" type="button" disabled>🌱 Plant my money &amp; travel forward!</button>
       <p class="hint" id="goHint">Loading Bitcoin's history…</p>
     </div>
@@ -58,10 +64,11 @@
       <div><label for="buyPct">Spend per buy (% of your pot)</label><input id="buyPct" type="number" inputmode="decimal" value="10" min="1" max="100" step="any"><p class="hint">Each buy spends this share of what you planted.</p></div>
       <div><label for="dipPct">Buy after the price falls (%)</label><input id="dipPct" type="number" inputmode="decimal" value="5" min="0.5" max="90" step="any"><p class="hint">Measured from the last price we bought or sold at.</p></div>
       <div><label for="risePct">Harvest after the price rises (%)</label><input id="risePct" type="number" inputmode="decimal" value="10" min="0.5" max="500" step="any"><p class="hint">Measured from the price we bought at.</p></div>
-      <div><label for="sellPct">Harvest this much of the buy (%)</label><input id="sellPct" type="number" inputmode="decimal" value="50" min="1" max="100" step="any"><p class="hint">The rest is kept and keeps growing.</p></div>
+      <div><label for="sellPct">Pruning: harvest this much of the buy (%)</label><input id="sellPct" type="number" inputmode="decimal" value="50" min="1" max="100" step="any"><p class="hint">The rest is kept and keeps growing.</p></div>
       <div><label for="feePct">Cost of each trade (%)</label><input id="feePct" type="number" inputmode="decimal" value="0.4" min="0" max="10" step="any"><p class="hint">Real exchanges charge a small fee.</p></div>
       <div><label for="to">Stop travelling at (optional)</label><input id="to" type="date"><p class="hint">Leave empty to travel to the newest price.</p></div>
     </div>
+    <p class="custom" id="customNote" hidden>You’ve changed the settings by hand, so no pruning style is highlighted.</p>
     <button class="btn" id="defaults" type="button">Put the usual settings back</button>
   </details>
 </section>
@@ -128,6 +135,9 @@
     <div class="fig"><small>📦 Just buying &amp; holding</small><strong id="vsHold"></strong><span class="pct" id="vsHoldPct"></span></div>
   </div>
   <p id="vsText"></p>
+  <h3>All three pruning styles, same dates</h3>
+  <div class="scroll"><table class="cmp"><thead><tr><th>Style</th><th>Final pot</th><th>Gain</th><th>Buys / harvests</th><th>Biggest fall</th><th></th></tr></thead><tbody id="cmpBody"></tbody></table></div>
+  <p class="fine" id="cmpText"></p>
   <p class="fine" id="sumFine"></p>
   <p class="fine"><b>Remember:</b> this is a history lesson, not a promise. What happened in the past is no guide to what will happen next, and Bitcoin can lose a lot of its value.</p>
   <div class="actions"><button class="btn primary" id="again" type="button">↑ Try another date</button><button class="btn" id="replay" type="button">↺ Watch it again</button></div>
@@ -155,6 +165,6 @@
   <b>Please read:</b> Time Machine is a simulation using past daily closing prices. It never touches real money, exchange accounts or API keys, and it cannot place real trades. Past results are not forecasts and nothing here is financial advice. Real life has costs this simulation leaves out — price differences between buying and selling, delays, minimum order sizes, and tax on any gains. Bitcoin prices from its earliest years are thin and less reliable. Bitcoin can lose most of its value.
 </div>
 </main>
-<script type="module" src="./time-machine.js?v=1.9.1"></script>
+<script type="module" src="./time-machine.js?v=1.10.0"></script>
 </body>
 </html>

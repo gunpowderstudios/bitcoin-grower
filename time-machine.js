@@ -1,11 +1,11 @@
 // Bitcoin Grower Time Machine — page controller (v1.8.3). Simulation only: no accounts, keys or trading.
 import {
-  VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
+  VERSION, DEFAULTS, PRESETS, compareAll, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.9.1';
-import { createPlant } from './time-machine-plant.js?v=1.9.1';
-import { createSound } from './time-machine-sound.js?v=1.9.1';
-import { loadHistory } from './price-data.js?v=1.9.1';
+} from './time-machine-engine.js?v=1.10.0';
+import { createPlant } from './time-machine-plant.js?v=1.10.0';
+import { createSound } from './time-machine-sound.js?v=1.10.0';
+import { loadHistory } from './price-data.js?v=1.10.0';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -17,7 +17,7 @@ const plant = createPlant($('plant'));
 const sound = createSound();
 sound.enableWhenAllowed(); // sound is on by default; it starts with the visitor's first click or tap
 const S = {
-  data: null, sourceNote: '', steps: null, sim: null, cursor: 0, state: 'idle', speed: 'normal',
+  preset: 'medium', data: null, sourceNote: '', steps: null, sim: null, cursor: 0, state: 'idle', speed: 'normal',
   raf: 0, last: 0, acc: 0, lastYear: '', lastStage: 0, droopMark: { t: 0, v: 0 }, lastPerk: 0, lastToast: 0,
   shownLog: -1, chart: null, markers: 0, lastFast: false
 };
@@ -98,7 +98,29 @@ function readSettings() {
 $('from').addEventListener('input', () => { showError(''); syncPresets(); updateDateHint(); });
 $('to').addEventListener('input', () => { showError(''); updateDateHint(); });
 $('amount').addEventListener('input', () => { showError(''); if (S.state === 'idle') showIdleFigures(); });
-$('defaults').onclick = () => { for (const k of ['buyPct', 'dipPct', 'risePct', 'sellPct', 'feePct']) $(k).value = DEFAULTS[k]; showError(''); };
+$('defaults').onclick = () => { for (const k of ['buyPct', 'dipPct', 'risePct', 'sellPct', 'feePct']) $(k).value = DEFAULTS[k]; showError(''); choosePreset('medium'); };
+
+// ---------------------------------------------------------------- pruning styles
+function choosePreset(key) {
+  S.preset = key;
+  const p = PRESETS[key];
+  if (p) { $('dipPct').value = p.dipPct; $('risePct').value = p.risePct; $('sellPct').value = p.sellPct; }
+  for (const b of $('styles').children) b.setAttribute('aria-pressed', String(b.dataset.preset === key));
+  $('customNote').hidden = key !== 'custom';
+}
+(function buildStyles() {
+  const box = $('styles');
+  for (const p of Object.values(PRESETS)) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'style'; b.dataset.preset = p.key; b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = '<span class="em" aria-hidden="true">' + p.emoji + '</span><span class="tx"><b></b><small></small></span>';
+    b.querySelector('b').textContent = p.name; b.querySelector('small').textContent = p.blurb;
+    b.onclick = () => { choosePreset(p.key); showError(''); };
+    box.appendChild(b);
+  }
+  for (const id of ['dipPct', 'risePct', 'sellPct']) $(id).addEventListener('input', () => choosePreset('custom'));
+  choosePreset('medium');
+})();
 
 // ---------------------------------------------------------------- idle (nothing running yet)
 function showIdleFigures() {
@@ -399,7 +421,27 @@ function complete(instant = false) {
   sm.scrollIntoView({ behavior: reduceMotion() || instant ? 'auto' : 'smooth', block: 'start' });
   $('sum-heading').focus({ preventScroll: true });
 }
+function renderCompare() {
+  const body = $('cmpBody'); body.replaceChildren();
+  const s = S.sim.settings, base = { amount: s.amount, buyPct: s.buyPct, feePct: s.feePct };
+  const all = compareAll(S.steps, base), mine = S.sim.summary;
+  const rows = Object.values(PRESETS).map(p => ({ key: p.key, label: p.emoji + ' ' + p.name, r: all[p.key] }));
+  if (S.preset === 'custom') rows.push({ key: 'custom', label: '⚙️ Your custom settings', r: mine });
+  rows.push({ key: 'hold', label: '📦 Just buy & hold', hold: true, r: mine });
+  for (const row of rows) {
+    const tr = body.insertRow(); if (row.key === S.preset) tr.className = 'played';
+    const end = row.hold ? mine.hold : row.r.end, pct = row.hold ? mine.holdPct : row.r.pct;
+    const cells = [row.label + (row.key === S.preset ? ' (you watched this)' : ''), formatGBP(end), signedPct(pct), row.hold ? '1 / 0' : row.r.buys + ' / ' + row.r.sells, row.hold ? '—' : row.r.maxDrawdown.toFixed(0) + '%'];
+    for (const v of cells) tr.insertCell().textContent = v;
+    const last = tr.insertCell();
+    if (PRESETS[row.key] && row.key !== S.preset) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = '▶ Watch'; b.onclick = () => { choosePreset(row.key); begin(true); }; last.appendChild(b); }
+  }
+  const L = all.light, M = all.medium, H = all.heavy;
+  const best = Object.values(PRESETS).reduce((a, p) => (all[p.key].end > all[a.key].end ? p : a), PRESETS.light);
+  $('cmpText').textContent = 'Over this journey ' + best.name.toLowerCase() + ' finished top of the three. The trade-off to notice: the lighter the pruning, the more of your plant is left in Bitcoin, so the bigger the dips on the way (biggest fall: light ' + L.maxDrawdown.toFixed(0) + '%, medium ' + M.maxDrawdown.toFixed(0) + '%, heavy ' + H.maxDrawdown.toFixed(0) + '%). A different period could rank them differently.';
+}
 function showSummary() {
+  renderCompare();
   const s = S.sim.summary, up = s.profit > 0.004, down = s.profit < -0.004;
   const years = s.days / 365.25, span = years >= 1.5 ? years.toFixed(1) + ' years' : Math.round(s.days / 30.44) + ' months';
   const big = $('sumBig');
