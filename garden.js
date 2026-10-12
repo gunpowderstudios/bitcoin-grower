@@ -1,9 +1,9 @@
-// Bitcoin Grower — Today's Garden page controller (v1.9.0). Simulation only; read-only public price data.
-import { VERSION, plantFor, formatGBP, signedPct, addDays, dayNumber, describeData } from './time-machine-engine.js?v=1.9.0';
-import { createPlant } from './time-machine-plant.js?v=1.9.0';
-import { loadHistory } from './price-data.js?v=1.9.0';
-import { fetchLive } from './live-price.js?v=1.9.0';
-import { forecast, describe, changeSince, SINCE_CHOICES } from './forecast-engine.js?v=1.9.0';
+// Bitcoin Grower — Today's Garden page controller (v1.9.1). Simulation only; read-only public price data.
+import { VERSION, plantFor, formatGBP, signedPct, addDays, dayNumber, describeData } from './time-machine-engine.js?v=1.9.1';
+import { createPlant } from './time-machine-plant.js?v=1.9.1';
+import { loadHistory } from './price-data.js?v=1.9.1';
+import { fetchLive } from './live-price.js?v=1.9.1';
+import { forecast, describe, changeSince, SINCE_CHOICES } from './forecast-engine.js?v=1.9.1';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';

@@ -1,6 +1,6 @@
-// Bitcoin Grower — shared historical BTC/GBP price loader (v1.9.0).
+// Bitcoin Grower — shared historical BTC/GBP price loader (v1.9.1).
 // Live source first, then an optional saved copy at ./data/btc-gbp-daily.csv. Prices are never invented.
-import { parseCSV } from './time-machine-engine.js?v=1.9.0';
+import { parseCSV } from './time-machine-engine.js?v=1.9.1';
 
 export const LIVE_URL = 'https://raw.githubusercontent.com/typedcypher/historical-bitcoin-prices/main/data/daily_bitcoin_prices.csv';
 export const LOCAL_URL = './data/btc-gbp-daily.csv';

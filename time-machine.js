@@ -2,10 +2,10 @@
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.9.0';
-import { createPlant } from './time-machine-plant.js?v=1.9.0';
-import { createSound } from './time-machine-sound.js?v=1.9.0';
-import { loadHistory } from './price-data.js?v=1.9.0';
+} from './time-machine-engine.js?v=1.9.1';
+import { createPlant } from './time-machine-plant.js?v=1.9.1';
+import { createSound } from './time-machine-sound.js?v=1.9.1';
+import { loadHistory } from './price-data.js?v=1.9.1';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -15,6 +15,7 @@ const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)
 
 const plant = createPlant($('plant'));
 const sound = createSound();
+sound.enableWhenAllowed(); // sound is on by default; it starts with the visitor's first click or tap
 const S = {
   data: null, sourceNote: '', steps: null, sim: null, cursor: 0, state: 'idle', speed: 'normal',
   raf: 0, last: 0, acc: 0, lastYear: '', lastStage: 0, droopMark: { t: 0, v: 0 }, lastPerk: 0, lastToast: 0,

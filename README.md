@@ -31,7 +31,7 @@ Never put API keys into a public GitHub repository, browser JavaScript, a screen
 ## Sharing with friends
 You can share the GitHub Pages link; each visitor runs an independent simulated garden in their own browser. No account registration or access to your Kraken account is involved.
 
-Version: **1.9.0** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
+Version: **1.9.1** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
 \n## Cloudflare simulation Worker\nThe prepared v1.8.1 Worker (requires deployment with Wrangler) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its virtual trading now runs automatically and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
 ## Owner-only simulation dashboard
 After deploying the new Worker, open `https://bitcoin-grower-bot.tim-c02.workers.dev/dashboard` to view persistent virtual balances, decisions and trades. Protect the Worker using Cloudflare Access (All traffic). Public GitHub Pages is a separate, browser-only demo for friends, not this owner dashboard. No live trading is supported.
@@ -48,7 +48,7 @@ Future multi-user requirements: independently authenticated identities, separate
 Public historical BTC/GBP daily-close backtest at `time-machine.html`, with adjustable GBP starting pot, date range, step size, dip/harvest rules, accelerated replay, growing plant, trading journal, result statistics, and buy-and-hold comparison. Tries a third-party GBP CSV archive automatically; users can upload a `Date,BTC_GBP` CSV if unavailable. Dates must be covered exactly and large gaps reject the test. Historical accuracy and source coverage must be checked independently. Daily close is not proof an order could have filled, and past results do not predict future performance. Time Machine is entirely client-side and cannot trade on Kraken.
 
 ### v1.8.1 Time Machine delight
-Subtle SVG plant/coin animations, optional Web Audio synthesised chimes for harvests and stage growth. Sound off by default, enabled via a user click. No downloaded audio or additional third-party dependencies. Browser reduced-motion preferences respected. Playback simulation only.
+Subtle SVG plant/coin animations, optional Web Audio synthesised chimes for harvests and stage growth. Sound is on by default from v1.9.1 (browsers only allow audio after the first click or tap), with an obvious on/off button. No downloaded audio or additional third-party dependencies. Browser reduced-motion preferences respected. Playback simulation only.
 
 ### v1.8.2 simple Time Machine
 Beginner-first flow: amount, historical start date, Play. Defaults to latest available historical end date; advanced strategy controls remain optional. Shows large profit/loss and percentage as journey proceeds, with plain-language replay buttons.
@@ -71,3 +71,6 @@ The site's front page (`index.html`) is now **Today's Garden**, a simple, simula
 * Shared loaders: `price-data.js` (history) and `live-price.js` (live price). The Time Machine now uses `price-data.js`. Navigation across pages: My Garden / Today's Garden / Time Machine.
 * The Cloudflare Worker and My Garden dashboard are unchanged (their navigation still says "Playground", which now points at Today's Garden).
 
+
+### v1.9.1
+Time Machine sound is now **on by default** (browsers only allow audio after the first click or tap, so it starts then); the button still toggles it.

@@ -1,6 +1,6 @@
-// Bitcoin Grower Time Machine — gentle synthesised sounds (v1.9.0).
-// No audio files, no downloads, no tracking. Off by default; it can only start from a user click/tap
-// (required by Safari/iOS and Chrome). Effects are rate-limited so fast-forwarding stays pleasant.
+// Bitcoin Grower Time Machine — gentle synthesised sounds (v1.9.1).
+// No audio files, no downloads, no tracking. Sound is ON by default, but browsers (Safari/iOS, Chrome) only
+// allow audio after a click/tap, so it starts with the visitor's first click or tap anywhere on the page. Effects are rate-limited so fast-forwarding stays pleasant.
 export function createSound() {
   let ctx = null, master = null, enabled = false, noiseBuf = null;
   const lastAt = {}, recent = [];
@@ -92,6 +92,12 @@ export function createSound() {
     }
     return enabled;
   }
+  /** Mark sound as on without creating audio yet; the first click, tap or key press unlocks it. */
+  function enableWhenAllowed() {
+    enabled = true;
+    const go = () => { for (const ev of ['click', 'touchend', 'keydown']) document.removeEventListener(ev, go, true); if (enabled) unlock(); };
+    for (const ev of ['click', 'touchend', 'keydown']) document.addEventListener(ev, go, true);
+  }
   document.addEventListener('visibilitychange', () => { if (ctx && document.hidden) ctx.suspend?.().catch(() => {}); });
-  return { play, setEnabled, unlock, get enabled() { return enabled; } };
+  return { play, setEnabled, enableWhenAllowed, unlock, get enabled() { return enabled; } };
 }
