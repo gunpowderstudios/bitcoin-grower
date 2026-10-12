@@ -22,7 +22,7 @@ export function initialState(price, rules = DEFAULT_RULES) {
 }
 export function step(previous, price, day, rules = DEFAULT_RULES) {
   if (!validRules(rules) || !Number.isFinite(price) || price <= 0 ||
-      !/^\\d{4}-\\d{2}-\\d{2}$/.test(day)) throw new Error('Invalid input');
+      !/^\d{4}-\d{2}-\d{2}$/.test(day)) throw new Error('Invalid input');
   const s = structuredClone(previous);
   if (s.halted) return { state:s, action:null, reason:'Emergency stop enabled' };
   if (s.day !== day) { s.day = day; s.tradesToday = 0; }
