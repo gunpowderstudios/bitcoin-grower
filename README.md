@@ -31,5 +31,5 @@ Never put API keys into a public GitHub repository, browser JavaScript, a screen
 ## Sharing with friends
 You can share the GitHub Pages link; each visitor runs an independent simulated garden in their own browser. No account registration or access to your Kraken account is involved.
 
-Version: **1.3.1** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
-\n## Cloudflare simulation Worker\nThe prepared v1.3.1 Worker (not yet deployed) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its simulated trading remains paused and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
+Version: **1.3.2** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
+\n## Cloudflare simulation Worker\nThe prepared v1.3.2 Worker (not yet deployed) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its simulated trading remains paused and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
