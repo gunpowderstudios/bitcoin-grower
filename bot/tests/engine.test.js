@@ -1,5 +1,5 @@
 import {strict as assert} from 'node:assert';
-import {DEFAULT_RULES, initialState, step, halt, validRules} from './engine.js';
+import {DEFAULT_RULES, initialState, step, halt, validRules} from '../engine.js';
 assert(validRules(DEFAULT_RULES));
 assert(!validRules({...DEFAULT_RULES,buyGBP:11}));
 assert(!validRules({...DEFAULT_RULES,budgetGBP:1000}));
