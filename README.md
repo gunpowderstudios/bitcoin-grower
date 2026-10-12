@@ -31,10 +31,15 @@ Never put API keys into a public GitHub repository, browser JavaScript, a screen
 ## Sharing with friends
 You can share the GitHub Pages link; each visitor runs an independent simulated garden in their own browser. No account registration or access to your Kraken account is involved.
 
-Version: **1.6.0** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
-\n## Cloudflare simulation Worker\nThe prepared v1.6.0 Worker (requires deployment with Wrangler) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its virtual trading now runs automatically and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
+Version: **1.7.0** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
+\n## Cloudflare simulation Worker\nThe prepared v1.7.0 Worker (requires deployment with Wrangler) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its virtual trading now runs automatically and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
 ## Owner-only simulation dashboard
 After deploying the new Worker, open `https://bitcoin-grower-bot.tim-c02.workers.dev/dashboard` to view persistent virtual balances, decisions and trades. Protect the Worker using Cloudflare Access (All traffic). Public GitHub Pages is a separate, browser-only demo for friends, not this owner dashboard. No live trading is supported.
 
 ## v1.6 monitoring
 Protected Cloudflare dashboard adds up to seven days of stored price/portfolio snapshots, a progress indicator and up to 100 virtual trades. Real trading remains disabled.
+
+## v1.7 unified navigation and future gardens
+The public GitHub Pages app and Access-protected Cloudflare dashboard now have matching Demo Garden / My Garden navigation. This is navigation, **not a shared login or shared datastore**. Demo runs locally only while the browser tab is open and resets on reload; the single private Cloudflare Durable Object `simulation-v1` runs independent virtual checks. Do not place Cloudflare state or Kraken keys in the public app.
+
+Future multi-user requirements: independently authenticated identities, separate per-user Durable Object IDs derived server-side from verified identity (never untrusted query strings), independent per-user budgets and rules, admin/owner isolation, rate limits, lifecycle and deletion, audit logging, and server-side authorization on every private endpoint. Each future live trader should initially own their own private deployment and restricted exchange keys in a secret store; never expose or share keys through GitHub or browsers. Do not implement shared live trading without security and regulatory review.
