@@ -3,10 +3,10 @@ const $=x=>document.getElementById(x),money=x=>Number.isFinite(x)?new Intl.Numbe
 let history=[],steps=[],cursor=0,run=null,clock=null,loaded=false;
 const number=id=>Number($(id).value);
 const source='https://raw.githubusercontent.com/typedcypher/historical-bitcoin-prices/main/data/daily_bitcoin_prices.csv';
-function loadCSV(csv){const lines=csv.replace(/^\\uFEFF/,'').split(/\\r?\\n/).filter(Boolean),heads=lines.shift().replace(/^"/,'').split(',').map(s=>s.trim().replaceAll('"','').toLowerCase());
+function loadCSV(csv){const lines=csv.replace(/^\uFEFF/,'').split(/\r?\n/).filter(Boolean),heads=lines.shift().replace(/^"/,'').split(',').map(s=>s.trim().replaceAll('"','').toLowerCase());
 const dateCol=heads.findIndex(x=>x==='date'),priceCol=heads.findIndex(x=>x==='btc_gbp');
 if(dateCol<0||priceCol<0)throw Error('CSV needs Date and BTC_GBP columns');
-const points=lines.map(line=>{const parts=line.split(',');return {date:(parts[dateCol]||'').replaceAll('"','').trim().slice(0,10),price:Number((parts[priceCol]||'').replaceAll('"','').trim())}}).filter(p=>/^\\d{4}-\\d{2}-\\d{2}$/.test(p.date)&&Number.isFinite(p.price)&&p.price>0).sort((a,b)=>a.date.localeCompare(b.date));
+const points=lines.map(line=>{const parts=line.split(',');return {date:(parts[dateCol]||'').replaceAll('"','').trim().slice(0,10),price:Number((parts[priceCol]||'').replaceAll('"','').trim())}}).filter(p=>/^\d{4}-\d{2}-\d{2}$/.test(p.date)&&Number.isFinite(p.price)&&p.price>0).sort((a,b)=>a.date.localeCompare(b.date));
 const unique=points.filter((p,i)=>i===0||p.date!==points[i-1].date);
 if(unique.length<20)throw Error('Too few valid daily GBP Bitcoin prices');
 return unique;
