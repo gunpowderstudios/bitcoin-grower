@@ -1,4 +1,4 @@
-# Cloudflare Worker — Bitcoin Grower v1.6.0
+# Cloudflare Worker — Bitcoin Grower v1.7.0
 
 **Status:** Code prepared in GitHub. **Not deployed to Cloudflare yet.** SIMULATION ACTIVE; no private Kraken connections; no orders.
 
@@ -10,7 +10,7 @@ The source lives in `cloudflare/src/index.js` and uses the shared pure decision 
 2. Log in locally to Cloudflare with `npx wrangler login` — **do not send tokens or screenshots of secrets to anyone**.
 3. From the `cloudflare` directory run `npx wrangler deploy --config wrangler.toml` using the existing Worker name `bitcoin-grower-bot`.
 4. After deployment, confirm the Worker has a Durable Object binding named `GROWER_STATE` and a five-minute Cron Trigger.
-5. Visit the authenticated Worker URL. Its response should show `version: 1.6.0`, `mode: SIMULATION`, `tradingEnabled: false`, `status: PAUSED`. Wait five minutes for `lastMarketCheck`.
+5. Visit the authenticated Worker URL. Its response should show `version: 1.7.0`, `mode: SIMULATION`, `tradingEnabled: false`, `status: PAUSED`. Wait five minutes for `lastMarketCheck`.
 6. Recheck **Cloudflare Access / All traffic** and its authentication policy. Do not add live credentials or trading permissions.
 
 The Cloudflare browser editor alone is **not** a dependable route for deploying these Durable Object migrations and project-level bindings. The `wrangler.toml` file declares the required SQLite class migration and binding.
@@ -31,3 +31,6 @@ The Worker offers `/dashboard` as an HTML view of the existing read-only `/` sta
 
 ## v1.6
 After deployment, scheduled checks store at most 2016 historical points (approximately 7 days) for indexed chart display. History starts upon upgrade. Dashboard remains simulation-only.
+
+## v1.7 navigation
+The private dashboard now links to public Demo Garden and back. This Worker still hosts only the owner's single persistent garden. No new public authorization routes, no Kraken account permissions and no multi-user authentication have been added. Future friends' persistent gardens require verified identities with distinct Durable Objects and strict per-user authorization.
