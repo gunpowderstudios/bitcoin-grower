@@ -1,8 +1,8 @@
 import { DurableObject } from "cloudflare:workers";
-import { initialState } from "../../bot/engine.js";
+import { initialState, step, DEFAULT_RULES } from "../../bot/engine.js";
 
 // SIMULATION ONLY: no Kraken private API, no authentication credentials, no orders.
-const VERSION = "1.3.4";
+const VERSION = "1.4.0";
 const KRAKEN_TICKER = "https://api.kraken.com/0/public/Ticker?pair=XBTGBP";
 
 async function getPrice() {
@@ -50,11 +50,13 @@ export class BitcoinGrowerState extends DurableObject {
     if (!state) state = initialState(price);
 
 
-    // In this release simulation is hard-locked PAUSED until a reviewed control is added.
-    // Record price checks only; never run the trade engine automatically.
-    await this.ctx.storage.put("lastCheck", { checkedAt, price, reason: "Simulation paused" });
-    await this.ctx.storage.put("state", state);
-    return Response.json({ version: VERSION, mode: "SIMULATION", action: null, paused: true });
+    // Only a virtual ledger: the step() function cannot contact Kraken or place orders.
+    const result = step(state, price, checkedAt.slice(0, 10), DEFAULT_RULES);
+    await this.ctx.storage.put("state", result.state);
+    await this.ctx.storage.put("lastCheck", {
+      checkedAt, price, reason: result.reason, action: result.action?.side || null
+    });
+    return Response.json({ version: VERSION, mode: "SIMULATION", tradingEnabled: false, action: result.action, paused: false });
   }
 }
 
@@ -72,7 +74,16 @@ export default {
     return Response.json({
       app: "Bitcoin Grower", version: VERSION,
       mode: "SIMULATION", tradingEnabled: false,
-      status: "PAUSED", lastMarketCheck: info.lastCheck || null,
+      status: "SIMULATING", lastMarketCheck: info.lastCheck || null,
+      virtual: info.state ? {
+        initialGBP: 100,
+        cashGBP: info.state.cashGBP,
+        bitcoinBTC: info.state.btc,
+        estimatedTotalGBP: info.lastCheck ? info.state.cashGBP + info.state.btc * info.lastCheck.price : null,
+        trades: info.state.trades?.slice(-10) || [],
+        nextBuyGBP: info.state.lot ? null : info.state.buyReference * (1 - DEFAULT_RULES.dipPct / 100),
+        nextSellGBP: info.state.lot ? info.state.lot.price * (1 + DEFAULT_RULES.reboundPct / 100) : null
+      } : null,
       // No balances or transaction history returned publicly.
     }, { headers: { "Cache-Control": "no-store" } });
   },
