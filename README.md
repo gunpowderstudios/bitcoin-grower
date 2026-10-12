@@ -31,7 +31,7 @@ Never put API keys into a public GitHub repository, browser JavaScript, a screen
 ## Sharing with friends
 You can share the GitHub Pages link; each visitor runs an independent simulated garden in their own browser. No account registration or access to your Kraken account is involved.
 
-Version: **1.8.1** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
+Version: **1.8.3** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
 \n## Cloudflare simulation Worker\nThe prepared v1.8.1 Worker (requires deployment with Wrangler) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its virtual trading now runs automatically and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
 ## Owner-only simulation dashboard
 After deploying the new Worker, open `https://bitcoin-grower-bot.tim-c02.workers.dev/dashboard` to view persistent virtual balances, decisions and trades. Protect the Worker using Cloudflare Access (All traffic). Public GitHub Pages is a separate, browser-only demo for friends, not this owner dashboard. No live trading is supported.
@@ -52,3 +52,14 @@ Subtle SVG plant/coin animations, optional Web Audio synthesised chimes for harv
 
 ### v1.8.2 simple Time Machine
 Beginner-first flow: amount, historical start date, Play. Defaults to latest available historical end date; advanced strategy controls remain optional. Shows large profit/loss and percentage as journey proceeds, with plain-language replay buttons.
+
+### v1.8.3 Time Machine: a friendlier, livelier journey
+* **Three obvious steps** (amount, date, one big green button) with presets for 2017, 2020, 2022 and "5 years ago". The journey always ends at the newest available price. Strategy settings (spend per buy, buy/harvest percentages, fee, optional stop date) live in *Advanced settings*.
+* **Calculation fixes.** Buy-and-hold now pays the same one-off fee as the strategy (it previously ignored fees, flattering the comparison). After a harvest the reference price now resets to the harvest price, matching the paper engine in `bot/engine.js`. The buy size is now a % of the starting pot (default 10%, i.e. £10 on £100), so amounts other than £100 behave sensibly, and £1 or more can be planted. Bad rows in price files are skipped and counted, impossible dates are rejected and gaps of more than three days refuse the journey rather than guessing.
+* **Living plant.** One persistent SVG with seven stages (seed, shoot, seedling, growing plant, bush, small tree, golden Bitcoin tree). Growth follows the *value of the pot* (ratio to the amount planted, see `STAGE_RATIOS`), never the calendar: a losing pot stays small and its leaves droop; recovery perks it up. Harvests drop gold coins into a pile; sparkles, sway and unfurling leaves respect `prefers-reduced-motion`.
+* **Sound** (Web Audio, synthesised, off by default): coin clink for harvests, soft plop for buys, growth whoosh and rustle for new stages, and a completion tune. Effects are rate-limited and quieter at fast playback.
+* **Time travel.** Large year/date display, sky that moves from dusk to daylight, animated timeline, a chart that draws as time advances (green above the amount planted, red below), Slow/Normal/Fast, Skip 30 days, Show final results, Start again, toasts for buys and harvests, and an end-of-journey summary with the buy-and-hold comparison.
+* **Code layout.** `time-machine-engine.js` (pure logic, unit tested), `time-machine-plant.js`, `time-machine-sound.js`, `time-machine.js` (page controller), `time-machine.css`. Run `npm test` in the repository root.
+* **Data.** Prices are fetched live from the third-party `typedcypher/historical-bitcoin-prices` CSV (GPL-3.0, derived from Kaggle data and converted to GBP with daily exchange rates). If that fails the page tries `data/btc-gbp-daily.csv` (not shipped by default - add a `Date,BTC_GBP` file there if you want a saved fallback, mindful of the source's licence) and then offers a CSV import. Prices are never invented.
+* The Cloudflare Worker and My Garden dashboard were **not** changed or redeployed in this release (they still report their own v1.8.2 until next deployed).
+

@@ -1,12 +1,160 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bitcoin Grower — Time Machine</title><meta name="theme-color" content="#142a1c"><style>
-:root{font:16px system-ui,-apple-system,sans-serif;color:#e8f3e7;background:#0e2016;color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 45% 0,#2b5036,transparent 65%),#0e2016}main{max-width:1200px;margin:auto;padding:18px 18px 70px}header,.top,.controlrow{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}h1{font-size:30px;margin:4px 0}h2{font-size:20px;margin:0 0 14px}.sub,.hint{color:#b4cab7;font-size:13px;line-height:1.5}nav{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0}nav a{border:1px solid #54785b;padding:10px 14px;border-radius:10px;color:#cceac0;text-decoration:none;font-size:14px}nav a.active{background:#c4ee95;color:#142217;font-weight:700}.badge{border:1px solid #6a916e;padding:8px 12px;border-radius:22px;font-size:12px}.layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(315px,.75fr);gap:16px}.panel{background:#1b3424;border:1px solid #406247;border-radius:17px;padding:20px;margin-bottom:16px}.large{font-size:clamp(34px,5vw,53px);font-weight:800;color:#c6f19a}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:#26432d;border-radius:12px;padding:12px}.metric small{display:block;color:#b3c9b2;font-size:12px}.metric strong{font-size:20px}.tree{min-height:265px;display:grid;place-items:center;background:radial-gradient(ellipse,#2e5434,transparent 70%)}.tree svg{height:260px;max-width:100%;overflow:visible}.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{font-size:13px;color:#c6dac5;display:block;margin-bottom:5px}input,select{width:100%;background:#12271b;color:#fff;border:1px solid #69836d;border-radius:9px;padding:10px;min-height:43px}button{background:#c4ed97;color:#172516;border:0;padding:11px 15px;border-radius:9px;font-weight:750;cursor:pointer}button.alt{background:#35523b;color:#fff}button:disabled{opacity:.4;cursor:not-allowed}.buttons{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.status{color:#c9dfc9;font-size:13px;line-height:1.5}progress{width:100%;accent-color:#b8eb8e;height:12px}.chart{width:100%;height:230px;background:#12281a;border:1px solid #3e5c43;border-radius:12px}.legend{font-size:12px;color:#c0d3c0}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:9px 6px;border-bottom:1px solid #36543e;text-align:left}td:last-child,th:last-child{text-align:right}.scroll{max-height:340px;overflow:auto}.warn{padding:12px;background:#31442d;border-radius:10px;color:#dde9d5;font-size:13px;line-height:1.5}a{color:#c1ee93}@media(max-width:790px){.layout{grid-template-columns:1fr}.panel{padding:15px}main{padding:14px 12px 40px}.tree{min-height:220px}.tree svg{height:210px}} 
-.tree svg{transition:transform .35s ease}.tree svg.growing{animation:plant-breathe .7s ease}.tree svg .leaf{transform-box:fill-box;transform-origin:center;animation:leaf-grow .45s ease both}.tree svg .gold{animation:gold-pop .48s ease both;transform-box:fill-box;transform-origin:center}@keyframes leaf-grow{from{opacity:.4;scale:.5}to{opacity:1;scale:1}}@keyframes gold-pop{0%{opacity:0;scale:.25}65%{scale:1.2}100%{opacity:1;scale:1}}@keyframes plant-breathe{0%,100%{transform:scale(1)}45%{transform:scale(1.035)}}@media(prefers-reduced-motion:reduce){.tree svg,.tree svg .leaf,.tree svg .gold{animation:none!important;transition:none!important}}.hero-intro{font-size:16px;line-height:1.5;color:#cbe0c8;margin:0 0 18px}.simple-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}.simple-fields label{font-size:16px;font-weight:700}.simple-fields input{font-size:21px;font-weight:700;min-height:54px}.advanced{margin:14px 0;background:#12271b;border:1px solid #46694d;border-radius:13px;padding:12px}.advanced summary{font-weight:700;cursor:pointer;padding:7px}.profitHero{margin:12px 0;background:#11291a;border:1px solid #527356;border-radius:14px;padding:14px}.profitHero .amount{font-weight:850;font-size:clamp(28px,5vw,45px)}.profitHero .amount.negative{color:#ffaaa7}.profitHero .amount.positive{color:#b9ec90}.mainPlay{font-size:18px;padding:16px 18px;width:100%}.journey-note{font-size:14px;color:#cce3c7;margin:10px 0}@media(max-width:520px){.simple-fields{grid-template-columns:1fr}} </style></head><body><main><header><div><div class="sub">🌱 BITCOIN GROWER <b>v1.8.2</b></div><h1>Time Machine ⏳</h1><div class="sub">Plant some money in the past, then travel forward and discover how your Bitcoin Grower strategy might have performed.</div></div><span class="badge">HISTORICAL SIMULATION · NO REAL TRADES</span></header>
-<nav><a href="https://bitcoin-grower-bot.tim-c02.workers.dev/dashboard">🔒 My Garden</a><a href="./">🌱 Playground</a><a class="active" href="./time-machine.html">⏳ Time Machine</a></nav>
-<div class="layout"><div><section class="panel"><div class="top"><div><div class="sub">Your time-travelling pot · <span id="dateNow">—</span></div><div class="large" id="total">£100.00</div><div id="pnl" class="sub">Ready to plant</div></div><div class="sub" id="stage">Seedling</div></div>
-<div class="profitHero"><div class="sub">YOUR PROFIT OR LOSS</div><div id="profitBig" class="amount">£0.00</div><div id="profitPercent" class="sub">0.00% · journey not started</div><div id="journeyDate" class="journey-note">Choose a past date and press Play.</div></div><div class="tree"><svg id="tree" viewBox="0 0 320 265" role="img" aria-label="Illustrated Bitcoin plant"></svg></div><div class="metrics"><div class="metric"><small>Cash</small><strong id="cash">£100.00</strong></div><div class="metric"><small>Bitcoin held</small><strong id="btc">0 BTC</strong></div><div class="metric"><small>BTC historical price</small><strong id="price">—</strong></div><div class="metric"><small>Buy & hold comparison</small><strong id="hold">—</strong></div></div>
-<div class="buttons"><button id="sound" class="alt" aria-pressed="false">🔇 Sound off</button><button id="play" disabled>▶ Play Time Machine</button><button id="pause" class="alt" disabled>Pause</button><button id="reset" class="alt" disabled>↺ Start Again</button><button id="month" class="alt" disabled>⏩ Skip 30 Days</button><button id="finish" class="alt" disabled>🏁 Show Final Results</button></div><progress id="progress" value="0" max="100"></progress><p class="status" id="status">Loading historical prices…</p></section>
-<section class="panel"><h2>Historical performance</h2><svg id="chart" class="chart" viewBox="0 0 700 230" role="img" aria-label="Garden versus buy and hold"></svg><p class="legend">🟢 Grower value &nbsp; 🟡 Buy and hold · Both in GBP</p></section><section class="panel"><h2>Trade journal</h2><div class="scroll"><table><thead><tr><th>Date</th><th>Trade</th><th>BTC Price</th><th>GBP</th></tr></thead><tbody id="journal"><tr><td colspan="4">Run a simulation to see trades</td></tr></tbody></table></div></section></div>
-<div><section class="panel"><h2>Plant your money in the past</h2><p class="hero-intro">Three easy steps: choose an amount, choose a date in the past, and press Play to travel forward to the latest available Bitcoin price.</p><div class="simple-fields"><div><label for="starting">1. How much would you like to plant? (£)</label><input id="starting" type="number" min="20" max="1000000" step="10" value="100"></div><div><label for="start">2. Travel back to which date?</label><input id="start" type="date" value="2017-01-01" min="2010-01-01"></div></div><div class="journey-note">3. Press <b>Play Time Machine</b> to travel forward. Watch your plant and your profit change!</div><button id="startBig" class="mainPlay" disabled>▶ Plant my money & travel forward!</button><details class="advanced"><summary>⚙ Advanced settings · optional</summary><p class="hint">Leave these settings alone for your first journey. Your experiment uses the Grower buy-on-dips strategy, not a one-time purchase of Bitcoin.</p><div class="fields"><div><label for="buySize">Buy per dip (£)</label><input id="buySize" type="number" min="1" step="1" value="10"></div><div><label for="end">Stop at an earlier date (optional)</label><input id="end" type="date" value="2018-01-01"></div><div><label for="dip">Buy after fall (%)</label><input id="dip" type="number" value="5" min=".1" max="95" step=".5"></div><div><label for="rebound">Harvest after rise (%)</label><input id="rebound" type="number" value="10" min=".1" max="500" step=".5"></div><div><label for="harvest">Sell purchased portion (%)</label><input id="harvest" type="number" value="50" min="1" max="100" step="5"></div><div><label for="fee">Fee per trade (%)</label><input id="fee" type="number" value=".4" min="0" max="10" step=".05"></div><div><label for="speed">Playback speed</label><select id="speed"><option value="1">Day by day</option><option value="7">7 days / frame</option><option value="30" selected>Fast · 30 days / frame</option><option value="180">Very fast</option></select></div></div><p class="hint">Each historical daily close is one step. Buy after a fall from the last buy reference; harvest half of a purchased lot after a rebound. After harvesting, the retained half stays as BTC. No margin, borrowing or shorting.</p></details></section>
-<section class="panel"><h2>Historical data</h2><p class="hint" id="source">Loading daily BTC/GBP from a third-party public archive. Coverage and source will be displayed.</p><p class="hint">If it cannot load, import a CSV with columns <code>Date,BTC_GBP</code>. We will never substitute invented prices.</p><input type="file" id="csv" accept=".csv,text/csv" aria-label="Import BTC/GBP price CSV"><p id="coverage" class="status">—</p></section>
-<section class="panel"><h2>Result summary</h2><div class="metrics"><div class="metric"><small>Buys / sales</small><strong id="counts">0 / 0</strong></div><div class="metric"><small>Best value</small><strong id="best">—</strong></div><div class="metric"><small>Maximum drawdown</small><strong id="drawdown">—</strong></div><div class="metric"><small>vs buy and hold</small><strong id="difference">—</strong></div></div><p class="status" id="result">Set your dates and press Start.</p></section>
-<div class="warn">Historical results are not forecasts. Daily closing prices cannot prove intraday trade fills; liquidity, spreads, slippage, taxes and changing exchange minimums are excluded. Very early Bitcoin prices can be sparse or less reliable. Your real Kraken £100 is not accessed.</div></div></div></main><script type="module" src="./time-machine.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bitcoin Grower — Time Machine</title>
+<meta name="description" content="Plant an imaginary £100 in the past and watch it grow through real Bitcoin history. A friendly simulation — no real money, no real trades.">
+<meta name="theme-color" content="#0c1d14">
+<link rel="stylesheet" href="./time-machine.css?v=1.8.3">
+</head>
+<body>
+<a class="skip" href="#plant-heading">Skip to the plant</a>
+<main>
+<header>
+  <div>
+    <div class="sub">🌱 BITCOIN GROWER <span class="vtag" id="version">v1.8.3</span></div>
+    <h1>Time Machine ⏳</h1>
+    <div class="sub">Plant some pretend money in the past, then travel forward and watch it grow (or wilt!) through real Bitcoin history.</div>
+  </div>
+  <span class="badge">SIMULATION · NO REAL MONEY OR TRADES</span>
+</header>
+<nav aria-label="Bitcoin Grower sections">
+  <a href="https://bitcoin-grower-bot.tim-c02.workers.dev/dashboard">🔒 My Garden</a>
+  <a href="./">🌱 Playground</a>
+  <a class="active" href="./time-machine.html" aria-current="page">⏳ Time Machine</a>
+</nav>
+
+<!-- ============ SET UP: THREE STEPS ============ -->
+<section class="card" aria-labelledby="setup-heading" id="setup">
+  <h2 id="setup-heading">Plant your money in the past</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="num" aria-hidden="true">1</div>
+      <label for="amount">How much money would you like to plant?</label>
+      <div class="money"><span aria-hidden="true">£</span><input id="amount" type="number" inputmode="decimal" min="1" max="1000000" step="any" value="100" autocomplete="off"></div>
+      <p class="hint">£100 is a good start. It's pretend money, so you can't lose a penny.</p>
+    </div>
+    <div class="step">
+      <div class="num" aria-hidden="true">2</div>
+      <label for="from">When would you like to travel back to?</label>
+      <input id="from" type="date" value="2017-01-01">
+      <div class="chips" id="presets" role="group" aria-label="Quick date choices"></div>
+      <p class="hint" id="dateHint">You'll travel forward from that day to the newest price we have.</p>
+    </div>
+    <div class="step">
+      <div class="num" aria-hidden="true">3</div>
+      <button class="go" id="go" type="button" disabled>🌱 Plant my money &amp; travel forward!</button>
+      <p class="hint" id="goHint">Loading Bitcoin's history…</p>
+    </div>
+  </div>
+  <p class="err" id="error" role="alert" hidden></p>
+  <div class="explain">
+    <b>How it works:</b> your plant grows using the <b>Grower strategy</b> — it buys a small amount of Bitcoin after the price drops, then sells some after the price rises (that's a "harvest" 🪙). The big pot and profit numbers come from that strategy. <b>Buying Bitcoin outright and just waiting is a different thing</b> — we show it separately at the end so you can compare.
+  </div>
+  <details class="advanced" id="advanced">
+    <summary>⚙️ Advanced settings (optional — safe to ignore!)</summary>
+    <div class="fields">
+      <div><label for="buyPct">Spend per buy (% of your pot)</label><input id="buyPct" type="number" inputmode="decimal" value="10" min="1" max="100" step="any"><p class="hint">Each buy spends this share of what you planted.</p></div>
+      <div><label for="dipPct">Buy after the price falls (%)</label><input id="dipPct" type="number" inputmode="decimal" value="5" min="0.5" max="90" step="any"><p class="hint">Measured from the last price we bought or sold at.</p></div>
+      <div><label for="risePct">Harvest after the price rises (%)</label><input id="risePct" type="number" inputmode="decimal" value="10" min="0.5" max="500" step="any"><p class="hint">Measured from the price we bought at.</p></div>
+      <div><label for="sellPct">Harvest this much of the buy (%)</label><input id="sellPct" type="number" inputmode="decimal" value="50" min="1" max="100" step="any"><p class="hint">The rest is kept and keeps growing.</p></div>
+      <div><label for="feePct">Cost of each trade (%)</label><input id="feePct" type="number" inputmode="decimal" value="0.4" min="0" max="10" step="any"><p class="hint">Real exchanges charge a small fee.</p></div>
+      <div><label for="to">Stop travelling at (optional)</label><input id="to" type="date"><p class="hint">Leave empty to travel to the newest price.</p></div>
+    </div>
+    <button class="btn" id="defaults" type="button">Put the usual settings back</button>
+  </details>
+</section>
+
+<!-- ============ THE JOURNEY ============ -->
+<section aria-labelledby="plant-heading" id="journey">
+  <h2 id="plant-heading" class="sr">Your journey through time</h2>
+  <div class="scene" id="scene">
+    <div class="datebar">
+      <svg class="clock" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21"/><line class="hr" x1="24" y1="24" x2="24" y2="12"/><line class="min" x1="24" y1="24" x2="24" y2="7"/></svg>
+      <div class="when"><small id="whenLabel">Ready to travel</small><span class="year" id="year">—</span><span class="daymonth" id="daymonth"></span></div>
+    </div>
+    <svg class="plant" id="plant" aria-label="Your Bitcoin plant"></svg>
+    <div class="stagename" id="stage">Seed in the soil</div>
+    <div class="toasts" id="toasts" aria-hidden="true"></div>
+  </div>
+
+  <div class="figures" id="figures">
+    <div class="fig"><small>I started with</small><strong id="figStart">£100.00</strong></div>
+    <div class="fig"><small>My pot is now worth</small><strong id="figNow">£100.00</strong></div>
+    <div class="fig" id="figPnl"><small id="pnlLabel">So far I've made</small><strong id="pnl">£0.00</strong><span class="pct" id="pnlPct">Press the green button to begin</span></div>
+  </div>
+
+  <div class="card">
+    <div class="controls" role="group" aria-label="Journey controls">
+      <button class="btn primary" id="play" type="button" disabled>▶ Play</button>
+      <div class="seg" role="group" aria-label="Speed" id="speed">
+        <button type="button" data-speed="slow" aria-pressed="false">Slow</button>
+        <button type="button" data-speed="normal" aria-pressed="true">Normal</button>
+        <button type="button" data-speed="fast" aria-pressed="false">Fast</button>
+      </div>
+      <button class="btn" id="month" type="button" disabled>⏩ Skip 30 days</button>
+      <button class="btn" id="finish" type="button" disabled>🏁 Show final results</button>
+      <button class="btn" id="restart" type="button" disabled>↺ Start again</button>
+      <span class="spacer"></span>
+      <button class="btn" id="sound" type="button" aria-pressed="false">🔇 Sound off</button>
+    </div>
+    <div class="timeline" id="timeline" aria-hidden="true"><div class="rail"><div class="fill" id="tlFill"></div></div><div class="knob" id="tlKnob">⏳</div></div>
+    <div class="chartwrap">
+      <svg class="chart" id="chart" viewBox="0 0 700 250" role="img" aria-label="Chart of your pot's value over time"></svg>
+      <div class="legend">
+        <span><b style="color:#8cf06a">━</b> Your pot (Grower strategy)</span>
+        <span>▼ planted a little Bitcoin</span><span>● harvested 🪙</span>
+        <label><input type="checkbox" id="showHold"> Also show "just buy Bitcoin &amp; wait"</label>
+      </div>
+    </div>
+    <p class="status" id="status" aria-live="polite">Loading Bitcoin's history…</p>
+  </div>
+</section>
+
+<!-- ============ FINAL SUMMARY ============ -->
+<section class="card summary" id="summary" aria-labelledby="sum-heading" hidden>
+  <h2 id="sum-heading" tabindex="-1">🎉 Journey complete!</h2>
+  <p class="big" id="sumBig"></p>
+  <div class="sumgrid">
+    <div class="fig"><small>Starting money</small><strong id="sStart"></strong></div>
+    <div class="fig"><small>Final pot value</small><strong id="sEnd"></strong></div>
+    <div class="fig" id="sPnlBox"><small id="sPnlLabel">Total profit</small><strong id="sPnl"></strong><span class="pct" id="sPct"></span></div>
+    <div class="fig"><small>Virtual buys / harvests</small><strong id="sTrades"></strong></div>
+  </div>
+  <h3>Compared with buying Bitcoin and waiting</h3>
+  <div class="vs">
+    <div class="fig me"><small>🌱 Grower strategy</small><strong id="vsMe"></strong><span class="pct" id="vsMePct"></span></div>
+    <div class="fig"><small>📦 Just buying &amp; holding</small><strong id="vsHold"></strong><span class="pct" id="vsHoldPct"></span></div>
+  </div>
+  <p id="vsText"></p>
+  <p class="fine" id="sumFine"></p>
+  <p class="fine"><b>Remember:</b> this is a history lesson, not a promise. What happened in the past is no guide to what will happen next, and Bitcoin can lose a lot of its value.</p>
+  <div class="actions"><button class="btn primary" id="again" type="button">↑ Try another date</button><button class="btn" id="replay" type="button">↺ Watch it again</button></div>
+</section>
+
+<section class="card">
+  <details id="logbox">
+    <summary>📒 See every virtual buy and harvest</summary>
+    <div class="scroll"><table><thead><tr><th>Date</th><th>What happened</th><th>Bitcoin price</th><th>Amount</th></tr></thead><tbody id="journal"><tr><td colspan="4">Nothing yet — press play!</td></tr></tbody></table></div>
+  </details>
+</section>
+
+<section class="card">
+  <h2>About the prices</h2>
+  <p class="hint" id="source">Loading daily Bitcoin prices in pounds…</p>
+  <p class="hint" id="coverage"></p>
+  <details>
+    <summary>Use your own price file instead</summary>
+    <p class="hint">Choose a CSV with the columns <code>Date,BTC_GBP</code> (dates as YYYY-MM-DD, prices in pounds). We never make up prices — rows we can't read are skipped, and journeys with big holes in the data are refused.</p>
+    <input type="file" id="csv" accept=".csv,text/csv" aria-label="Choose a Date,BTC_GBP price file">
+  </details>
+</section>
+
+<div class="warn">
+  <b>Please read:</b> Time Machine is a simulation using past daily closing prices. It never touches real money, exchange accounts or API keys, and it cannot place real trades. Past results are not forecasts and nothing here is financial advice. Real life has costs this simulation leaves out — price differences between buying and selling, delays, minimum order sizes, and tax on any gains. Bitcoin prices from its earliest years are thin and less reliable. Bitcoin can lose most of its value.
+</div>
+</main>
+<script type="module" src="./time-machine.js?v=1.8.3"></script>
+</body>
+</html>
