@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#15271f"><meta name="description" content="Bitcoin Grower: a privacy-first, simulation-only BTC/GBP gardening experiment.">
+<title>Bitcoin Grower 🌱 — Paper Trading</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#eaf4e7;background:#0e1915;color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 70% 0,#294638 0%,#0e1915 56%);min-height:100vh}button,input{font:inherit}button{cursor:pointer}a{color:#b7ed99}.wrap{max-width:1130px;margin:auto;padding:23px 18px 60px}header{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;padding:15px 0 30px}.brand{display:flex;align-items:center;gap:13px}.logo{display:grid;place-items:center;font-size:35px;width:62px;height:62px;border-radius:18px;background:#2e4b34}h1{margin:0;font-size:clamp(24px,4vw,37px);letter-spacing:-1.1px}h2{font-size:19px;margin:0 0 15px}p{line-height:1.55}.sub,.muted{color:#a4b7a7}.sub{font-size:13px;margin:3px 0 0}.pill{border:1px solid #467055;border-radius:24px;padding:9px 12px;color:#d7f2cf;font-size:12px;white-space:nowrap}.notice{background:#27402e;border:1px solid #659573;border-radius:13px;padding:12px 16px;margin-bottom:20px;font-size:14px}.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.panel{background:#18271f;border:1px solid #35493a;border-radius:19px;padding:22px;box-shadow:0 16px 32px #0002}.panel+.panel{margin-top:18px}.hero{display:flex;align-items:center;gap:15px}.big{font-size:clamp(30px,4vw,44px);font-weight:750;letter-spacing:-1px}.plant{min-height:310px;display:grid;place-items:center;background:radial-gradient(circle at center,#375536 0%,transparent 70%);overflow:hidden}.plant svg{width:min(270px,95%);height:280px;filter:drop-shadow(0 12px 18px #0004)}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.stat{padding:15px;background:#24372b;border-radius:13px}.stat span{display:block;font-size:12px;color:#b5c7b5;margin-bottom:7px}.stat strong{font-size:clamp(18px,3vw,25px)}.accent{color:#b8ed8a}.negative{color:#ffab9b}.controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}label{display:block;font-size:13px;color:#b8cabc;margin-bottom:6px}input{width:100%;background:#0f1f17;border:1px solid #55705b;border-radius:10px;padding:11px;color:white}input:focus,button:focus-visible{outline:2px solid #b8ed8a;outline-offset:3px}.buttonRow{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}button{background:#b9ed8c;border:0;border-radius:11px;padding:11px 16px;color:#152317;font-weight:750}button.secondary{background:#314937;color:#f1f9ec;border:1px solid #4b6c50}button.danger{background:#59362f;color:#ffddd5}button:disabled{opacity:.45;cursor:not-allowed}.help{font-size:13px;color:#b3c7b4}table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;color:#9fbba6;font-weight:500}td,th{padding:9px 7px;border-bottom:1px solid #344838}td:last-child,th:last-child{text-align:right}.tableWrap{overflow:auto;max-height:360px}.section{margin-top:20px}.status{font-size:13px}.footer{padding-top:25px;color:#a7b5a8;font-size:13px}small{color:#a9bda9} .check{display:flex;gap:8px;align-items:center}.check input{width:auto}.targets{font-size:13px;display:grid;gap:6px;margin:14px 0;color:#bfd5bc}@media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:12px 12px 40px}.panel{padding:17px}.plant{min-height:255px}.plant svg{height:240px}.controls{gap:11px}.buttonRow button{flex:1}.stats{gap:8px}.stat{padding:12px}}
+</style></head>
+<body><main class="wrap">
+<header><div class="brand"><div class="logo" aria-hidden="true">🌱</div><div><h1>Bitcoin Grower</h1><div class="sub">Plant the dips. Harvest the rebounds. Learn as you grow.</div></div></div><span class="pill">🔒 SIMULATION ONLY · NO ACCOUNT ACCESS</span></header>
+<div class="notice"><strong>You're safe to experiment.</strong> This app never asks for a Kraken login, API key, password or wallet address. All simulated balances and trades stay in this browser. No real orders are placed.</div>
+<div class="grid">
+<div>
+<section class="panel"><div class="hero"><div><div class="muted">Your virtual garden</div><div class="big" id="value">£100.00</div><div id="performance" class="accent">£0.00 (0.00%)</div></div></div>
+<div class="plant" role="img" aria-label="An illustrated plant that grows with simulated bitcoin holdings">
+<svg viewBox="0 0 250 280"><ellipse cx="125" cy="258" rx="89" ry="11" fill="#09120d" opacity=".65"/>
+<path d="M72 204 L178 204 L163 255 Q125 274 87 255Z" fill="#b98357"/><path d="M72 204 L178 204 L171 217 L79 217Z" fill="#deaa78"/>
+<path id="stem" d="M125 203 Q126 148 125 95" fill="none" stroke="#8fc874" stroke-width="9" stroke-linecap="round"/>
+<g id="leaves"></g><g id="fruit"></g>
+<circle cx="125" cy="88" r="16" fill="#bce48e"/><path d="M125 87 Q88 54 119 42 Q150 44 125 87" fill="#76bd69"/></svg></div>
+<div class="stats"><div class="stat"><span>Virtual cash</span><strong id="cash">£100.00</strong></div><div class="stat"><span>Virtual Bitcoin</span><strong id="btc">0 BTC</strong></div><div class="stat"><span>Realised trade P/L</span><strong id="realised">£0.00</strong></div><div class="stat"><span>Buy & hold comparison</span><strong id="hold">£100.00</strong></div></div>
+<p class="help">Plant growth is decorative and reflects the amount of simulated Bitcoin held, not guaranteed returns.</p></section>
+<section class="panel section"><h2>📡 Price feed</h2><div class="big" id="price">Waiting for BTC/GBP…</div><p class="status" id="connection">Connecting to Kraken public market data…</p>
+<div class="targets"><div id="nextBuy">Next dip buy: waiting for reference price</div><div id="nextSell">Open harvest targets: none yet</div></div>
+<div class="buttonRow"><button id="reconnect" class="secondary">Reconnect feed</button><button id="sample" class="secondary">Try sample price movement</button></div>
+<p class="help">Prices come from Kraken's public WebSocket ticker. If it cannot connect, the simulation remains paused; sample movements are clearly marked and never treated as live prices.</p></section>
+</div>
+<div>
+<section class="panel"><h2>⚙️ Your growing rules</h2><div class="controls">
+<div><label for="seed">Starting pot (£)</label><input id="seed" type="number" min="20" step="10" value="100"></div>
+<div><label for="buySize">Buy per dip (£)</label><input id="buySize" type="number" min="1" step="1" value="10"></div>
+<div><label for="drop">Buy after a fall (%)</label><input id="drop" type="number" min="0.1" max="90" step="0.5" value="5"></div>
+<div><label for="rise">Harvest after rebound (%)</label><input id="rise" type="number" min="0.1" max="500" step="0.5" value="10"></div>
+<div><label for="sellFraction">Harvest of each purchase (%)</label><input id="sellFraction" type="number" min="1" max="100" step="5" value="50"></div>
+<div><label for="fee">Fee per trade (%)</label><input id="fee" type="number" min="0" max="10" step="0.05" value="0.4"></div>
+</div><p class="help">A dip is measured from the last buy reference price (initially the first observed price). Each purchased lot gets its own rebound target. Fee is an adjustable estimate, not a live Kraken fee quote.</p>
+<div class="buttonRow"><button id="toggle">▶ Start simulation</button><button id="reset" class="danger">Reset pot</button></div>
+<p id="mode" class="status">⏸ Paused — no simulated trading</p>
+</section>
+<section class="panel section"><h2>🧪 How it works</h2><p class="help">Example: BTC falls 5% → the grower buys £10 worth (minus fees). If that purchased portion later gains 10% from its buy price, it sells half and leaves half growing. New dips can create new lots. It won't borrow money or sell Bitcoin you never bought.</p><p class="help">At £10 order sizes, harvesting half may fall below Kraken's live minimum order. This is a learning prototype, not an executable strategy. It does not handle slippage, tax or exchange minimums.</p></section>
+<section class="panel section"><h2>📜 Virtual trade journal</h2><div class="tableWrap"><table><thead><tr><th>When</th><th>Action</th><th>Price</th><th>Value</th></tr></thead><tbody id="journal"><tr><td colspan="4">No trades yet</td></tr></tbody></table></div>
+<div class="buttonRow"><button class="secondary" id="export">Export CSV</button></div></section>
+</div></div>
+<footer class="footer">Bitcoin Grower v1.0 · An educational paper-trading experiment. Not financial advice. Cryptocurrency can lose substantial value. Each real sale may trigger UK capital gains tax. No analytics, cookies, accounts or secret credentials are used by this app. <a href="https://www.kraken.com" target="_blank" rel="noopener noreferrer">Kraken</a> is an independent trading platform; this app is not affiliated with it.</footer>
+</main><script>
+'use strict';
+const $=id=>document.getElementById(id);
+const formatGBP=n=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(n);
+const formatBTC=n=>Number(n).toFixed(8);
+const settings=()=>({seed:+$('seed').value,buySize:+$('buySize').value,drop:+$('drop').value,rise:+$('rise').value,sellFraction:+$('sellFraction').value,fee:+$('fee').value});
+const valid=s=>Object.entries(s).every(([k,v])=>Number.isFinite(v)&&v>=0)&&s.seed>=20&&s.buySize>=1&&s.drop>0&&s.drop<=90&&s.rise>0&&s.rise<=500&&s.sellFraction>0&&s.sellFraction<=100&&s.fee<=10;
+let state={cash:100,btc:0,lots:[],ref:null,first:null,last:null,realised:0,trades:[],active:false};
+let socket=null,live=false,feedPrice=null,manual=false,lastTick=0;
+function render(){
+const p=state.last;const total=state.cash+state.btc*(p||0);
+$('value').textContent=formatGBP(p?total:state.cash);
+const pl=p?total-settings().seed:0;
+$('performance').textContent=(pl>=0?'+':'')+formatGBP(pl)+' ('+(p?((pl/settings().seed)*100).toFixed(2):'0.00')+'%)';
+$('performance').className=pl<0?'negative':'accent';
+$('cash').textContent=formatGBP(state.cash);$('btc').textContent=formatBTC(state.btc)+' BTC';
+$('realised').textContent=formatGBP(state.realised);
+$('hold').textContent=state.first&&p?formatGBP(settings().seed*p/state.first):'—';
+$('price').textContent=p?formatGBP(p)+(manual?' (sample)':''):'Waiting for BTC/GBP…';
+$('nextBuy').textContent=state.ref&&p?'Next buy at '+formatGBP(state.ref*(1-settings().drop/100)):'Next dip buy: waiting for reference price';
+$('nextSell').textContent='Open harvest targets: '+(state.lots.filter(l=>!l.harvested).length?state.lots.filter(l=>!l.harvested).map(l=>formatGBP(l.price*(1+settings().rise/100))).join(' · '):'none yet');
+$('mode').textContent=state.active?'🟢 Simulation active (virtual orders only)':'⏸ Simulation paused';
+$('toggle').textContent=state.active?'⏸ Pause simulation':'▶ Start simulation';
+const leaves=$('leaves'),fruit=$('fruit');
+const n=Math.min(8,Math.ceil(state.btc*1200));leaves.innerHTML='';fruit.innerHTML='';
+for(let i=0;i<n;i++){const y=175-i*13;const side=i%2?1:-1;leaves.innerHTML+='<ellipse cx="'+(125+side*28)+'" cy="'+y+'" rx="30" ry="12" transform="rotate('+(side*30)+' '+(125+side*28)+' '+y+')" fill="'+(i%2?'#7eba6b':'#9ad580')+'"/>'}
+for(let i=0;i<Math.min(5,state.trades.filter(t=>t.side==='SELL').length);i++)fruit.innerHTML+='<circle cx="'+(i%2?156:91)+'" cy="'+(128+i*13)+'" r="7" fill="#edb94d"/>';
+$('journal').innerHTML=state.trades.length?state.trades.slice(-100).reverse().map(t=>'<tr><td>'+t.time+'</td><td>'+t.side+'</td><td>'+formatGBP(t.price)+'</td><td>'+formatGBP(t.value)+'</td></tr>').join(''):'<tr><td colspan="4">No trades yet</td></tr>';
+}
+function record(side,price,value){state.trades.push({time:new Date().toLocaleString('en-GB'),side,price,value});}
+function tick(price,isSample=false){
+if(!Number.isFinite(price)||price<=0)return;state.last=price;manual=isSample;if(state.first===null)state.first=price;if(state.ref===null)state.ref=price;
+if(state.active){
+const s=settings(),rate=s.fee/100;
+if(price<=state.ref*(1-s.drop/100)&&state.cash>=s.buySize){
+const amount=s.buySize*(1-rate)/price;state.cash-=s.buySize;state.btc+=amount;state.lots.push({price,amount,spent:s.buySize,harvested:false});state.ref=price;record('BUY',price,s.buySize);
+}
+for(const lot of state.lots){if(lot.harvested||price<lot.price*(1+s.rise/100))continue;
+const amount=lot.amount*s.sellFraction/100;const proceeds=amount*price*(1-rate);state.btc=Math.max(0,state.btc-amount);state.cash+=proceeds;state.realised+=proceeds-lot.spent*s.sellFraction/100;lot.harvested=true;record('SELL',price,proceeds);}
+}render();
+}
+function connect(){
+if(socket){socket.onclose=null;socket.close()}live=false;manual=false;$('connection').textContent='Connecting to Kraken BTC/GBP public ticker…';
+try{socket=new WebSocket('wss://ws.kraken.com/v2');
+socket.onopen=()=>socket.send(JSON.stringify({method:'subscribe',params:{channel:'ticker',symbol:['BTC/GBP']}}));
+socket.onmessage=e=>{let msg;try{msg=JSON.parse(e.data)}catch{return}if(msg.channel==='ticker'&&Array.isArray(msg.data)&&msg.data[0]){const p=Number(msg.data[0].last);if(p>0){live=true;feedPrice=p;lastTick=Date.now();$('connection').textContent='● Live market price from Kraken · '+new Date().toLocaleTimeString('en-GB');tick(p,false)}}else if(msg.success===false){$('connection').textContent='Kraken feed error: check connection or try again.'}};
+socket.onerror=()=>{$('connection').textContent='Price connection failed. Reconnect or use sample prices.'};
+socket.onclose=()=>{live=false;if(!manual)$('connection').textContent='Price feed disconnected; automatic simulation paused until reconnected.'};
+}catch(e){$('connection').textContent='Live feed unavailable in this browser.'}
+}
+function reset(){const s=settings();if(!valid(s)){alert('Please check your settings: the starting pot must be at least £20, and trade rules must be valid.');return}
+state={cash:s.seed,btc:0,lots:[],ref:feedPrice,first:feedPrice,last:feedPrice,realised:0,trades:[],active:false};manual=false;render();}
+$('toggle').onclick=()=>{if(!valid(settings())){alert('Please enter valid trading rules.');return}if(!state.active&&state.trades.length===0&&state.cash!==settings().seed){reset()}state.active=!state.active;render()};
+$('reset').onclick=()=>{if(confirm('Reset your entire virtual garden and trade journal?'))reset()};
+$('reconnect').onclick=connect;
+$('sample').onclick=()=>{if(live&&Date.now()-lastTick<60000){if(!confirm('Use sample movements instead of the live quote for a demonstration?'))return}if(socket){socket.onclose=null;socket.close();socket=null}live=false;const base=state.last||60000;const factor=state.trades.filter(t=>t.side==='BUY').length===state.trades.filter(t=>t.side==='SELL').length?.94:1.12;$('connection').textContent='🧪 Sample price movement — not a real quote';tick(base*factor,true)};
+$('export').onclick=()=>{const lines=['time,action,price_gbp,value_gbp',...state.trades.map(t=>[JSON.stringify(t.time),t.side,t.price.toFixed(2),t.value.toFixed(2)].join(','))];const url=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'}));const a=document.createElement('a');a.href=url;a.download='bitcoin-grower-simulated-trades.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+$('seed').addEventListener('change',()=>{if(!state.trades.length&&!state.active&&valid(settings()))reset()});
+setInterval(()=>{if(live&&Date.now()-lastTick>90000){live=false;$('connection').textContent='Feed stale — reconnect before running live-price simulation';if(state.active){state.active=false;render()}}},15000);
+render();connect();
+</script></body></html>
