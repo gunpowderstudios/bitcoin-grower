@@ -2,7 +2,7 @@ import { DurableObject } from "cloudflare:workers";
 import { initialState } from "../../bot/engine.js";
 
 // SIMULATION ONLY: no Kraken private API, no authentication credentials, no orders.
-const VERSION = "1.3.1";
+const VERSION = "1.3.2";
 const KRAKEN_TICKER = "https://api.kraken.com/0/public/Ticker?pair=XBTGBP";
 
 async function getPrice() {
