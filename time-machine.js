@@ -2,14 +2,13 @@
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.8.3';
-import { createPlant } from './time-machine-plant.js?v=1.8.3';
-import { createSound } from './time-machine-sound.js?v=1.8.3';
+} from './time-machine-engine.js?v=1.9.0';
+import { createPlant } from './time-machine-plant.js?v=1.9.0';
+import { createSound } from './time-machine-sound.js?v=1.9.0';
+import { loadHistory } from './price-data.js?v=1.9.0';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
-const LIVE_URL = 'https://raw.githubusercontent.com/typedcypher/historical-bitcoin-prices/main/data/daily_bitcoin_prices.csv';
-const LOCAL_URL = './data/btc-gbp-daily.csv'; // optional saved copy, used only if the live source is unreachable
 const DURATION = { slow: 70000, normal: 28000, fast: 10000 }; // how long a whole journey takes at each speed (ms)
 const MIN_FRAMES_PER_SEC = 4;
 const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -35,31 +34,15 @@ function showError(msg) { const e = $('error'); e.textContent = msg || ''; e.hid
 function setStatus(msg) { $('status').textContent = msg; }
 
 // ---------------------------------------------------------------- data loading
-async function fetchText(url, ms = 15000) {
-  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), ms);
-  try {
-    const r = await fetch(url, { cache: 'no-cache', signal: ctl.signal });
-    if (!r.ok) throw new Error('server answered ' + r.status);
-    return await r.text();
-  } finally { clearTimeout(timer); }
-}
-const SOURCE_TEXT = 'Daily Bitcoin prices in pounds (BTC/GBP) come from the open “historical-bitcoin-prices” dataset by typedcypher (GPL-3.0 licence), which is built from Kaggle Bitcoin price data and converted to pounds using daily exchange rates (the previous day’s rate is reused at weekends).';
 async function loadPrices() {
-  const tries = [
-    { url: LIVE_URL, note: SOURCE_TEXT + ' Loaded live from GitHub.' },
-    { url: LOCAL_URL, note: SOURCE_TEXT + ' The live source could not be reached, so a saved copy from this site is being used.' }
-  ];
-  const problems = [];
-  for (const t of tries) {
-    try {
-      const { points, rejected } = parseCSV(await fetchText(t.url));
-      acceptData(points, t.note + (rejected ? ' (' + rejected + ' unreadable rows were skipped.)' : ''));
-      return;
-    } catch (e) { problems.push(e.message || String(e)); }
+  try {
+    const { points, rejected, note } = await loadHistory();
+    acceptData(points, note + (rejected ? ' (' + rejected + ' unreadable rows were skipped.)' : ''));
+  } catch (e) {
+    $('source').textContent = 'We couldn’t load Bitcoin’s price history (' + e.message + '). Check your connection and reload, or choose your own Date,BTC_GBP file below. We will never make up prices.';
+    setStatus('Prices unavailable — see “About the prices” below.');
+    $('goHint').textContent = 'Waiting for Bitcoin’s history to load.';
   }
-  $('source').textContent = 'We couldn’t load Bitcoin’s price history (' + problems[0] + '). Check your connection and reload, or choose your own Date,BTC_GBP file below. We will never make up prices.';
-  setStatus('Prices unavailable — see “About the prices” below.');
-  $('goHint').textContent = 'Waiting for Bitcoin’s history to load.';
 }
 function acceptData(points, note) {
   const info = describeData(points);

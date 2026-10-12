@@ -1,0 +1,27 @@
+/* Bitcoin Grower Today's Garden v1.9.0 — builds on time-machine.css */
+.nowgrid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:center}
+.bigprice{font-size:clamp(40px,10vw,68px);font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.05}
+.chg{font-size:clamp(17px,4vw,22px);font-weight:750;margin:4px 0 6px}
+.chg.up{color:var(--gain)}.chg.down{color:var(--loss)}
+.liveline{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute);margin-bottom:14px}
+.dot{width:10px;height:10px;border-radius:50%;background:#7a8a7d;flex:none}
+.dot.live{background:#6bf06b;animation:pulse 2s ease-in-out infinite}
+.dot.stale{background:#f4c84a}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(107,240,107,.6)}50%{box-shadow:0 0 0 7px rgba(107,240,107,0)}}
+.figures3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.figures3 .fig{padding:10px 12px}.figures3 .fig strong{font-size:clamp(16px,3.6vw,21px)}
+.figures3 .fig.gain strong{color:var(--gain)}.figures3 .fig.loss strong{color:var(--loss)}
+.scene.day{--sky1:#3f86c4;--sky2:#f6d58a;min-height:0;margin:0}
+.scene.day .plant{padding-top:6px}
+.scene.day::before,.scene.day::after{display:none}
+.seedtext{font-size:clamp(17px,4vw,21px);font-weight:700;margin:16px 0 12px;line-height:1.4}
+.fcform{display:grid;grid-template-columns:auto 1fr;gap:16px 28px;align-items:end;margin:12px 0}
+.fcform label,.fcform .lbl{display:block;font-size:17px;font-weight:750;margin-bottom:6px}
+.resultbox{background:#13291c;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:12px 0}
+.resultbox p{margin:0 0 6px}
+.resultbox .big{font-size:clamp(19px,4.4vw,25px);margin:0 0 8px}
+.sw{display:inline-block;width:22px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.sw.wide{background:rgba(244,200,74,.25)}.sw.mid{background:rgba(244,200,74,.55)}
+.ctas .btn{display:inline-flex;align-items:center;text-decoration:none}
+@media(max-width:700px){.nowgrid{grid-template-columns:1fr}.fcform{grid-template-columns:1fr}}
+.caution{color:#ffe9a0}

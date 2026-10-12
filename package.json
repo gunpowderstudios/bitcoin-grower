@@ -1,11 +1,13 @@
 {
   "name": "bitcoin-grower",
-  "version": "1.8.3",
+  "version": "1.9.0",
   "private": true,
   "type": "module",
   "description": "Bitcoin Grower public simulator and Time Machine (simulation only).",
   "scripts": {
     "test": "node --test tests/*.test.js && (cd bot && npm test)"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

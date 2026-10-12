@@ -202,28 +202,33 @@ test('signed money and percentages use real plus/minus signs', () => {
 
 // ---------- project hygiene ----------
 const read = f => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
-test('version is 1.8.3 everywhere it should be', () => {
-  assert.equal(VERSION, '1.8.3');
-  assert.equal(JSON.parse(read('version.json')).version, '1.8.3');
-  assert.equal(JSON.parse(read('package.json')).version, '1.8.3');
-  assert.equal(JSON.parse(read('bot/package.json')).version, '1.8.3');
-  assert.match(read('time-machine.html'), /id="version">v1\.8\.3</);
-  assert.match(read('README.md'), /1\.8\.3/);
+test('version is 1.9.0 everywhere it should be', () => {
+  assert.equal(VERSION, '1.9.0');
+  assert.equal(JSON.parse(read('version.json')).version, '1.9.0');
+  assert.equal(JSON.parse(read('package.json')).version, '1.9.0');
+  assert.equal(JSON.parse(read('bot/package.json')).version, '1.9.0');
+  assert.match(read('time-machine.html'), /id="version">v1\.9\.0</);
+  assert.match(read('README.md'), /1\.9\.0/);
+  assert.match(read('index.html'), /id="version">v1\.9\.0</);
 });
 test('every element id the page script uses exists in the HTML', () => {
-  const html = read('time-machine.html'), js = read('time-machine.js');
-  const used = new Set([...js.matchAll(/\$\('([A-Za-z][\w-]*)'\)/g)].map(m => m[1]));
-  const have = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]));
-  const missing = [...used].filter(id => !have.has(id));
-  assert.deepEqual(missing, []);
+  for (const [page, script] of [['time-machine.html', 'time-machine.js'], ['index.html', 'garden.js']]) {
+    const html = read(page), js = read(script);
+    const used = new Set([...js.matchAll(/\$\('([A-Za-z][\w-]*)'\)/g)].map(m => m[1]));
+    const have = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]));
+    assert.deepEqual([...used].filter(id => !have.has(id)), [], page);
+  }
 });
 test('time machine code has no secrets, exchange APIs or order placement', () => {
-  for (const f of ['time-machine.js', 'time-machine-engine.js', 'time-machine-plant.js', 'time-machine-sound.js', 'time-machine.html']) {
+  for (const f of ['time-machine.js', 'time-machine-engine.js', 'time-machine-plant.js', 'time-machine-sound.js', 'time-machine.html', 'index.html', 'garden.js', 'forecast-engine.js', 'price-data.js']) {
     const text = read(f);
     assert.doesNotMatch(text, /api[_-]?key|api[_-]?secret|private[_-]?key|krakenapi|api\.kraken|AddOrder|Authorization|Bearer /i, f);
   }
   const urls = [...read('time-machine.js').matchAll(/https?:\/\/[^'"\s)]+/g)].map(m => m[0]);
   assert.ok(urls.every(u => /raw\.githubusercontent\.com\/typedcypher|bitcoin-grower-bot|github/.test(u) || u.includes('w3.org')), urls.join('\n'));
+  assert.doesNotMatch(read('live-price.js'), /api[_-]?key|api[_-]?secret|AddOrder|Authorization|\/private\/|Bearer /i);
+  const live = [...read('live-price.js').matchAll(/https:\/\/[^'"\s)]+/g)].map(m => m[0]);
+  assert.ok(live.every(u => /^https:\/\/api\.(kraken\.com\/0\/public\/|coingecko\.com\/api\/v3\/simple\/price)/.test(u)), live.join('\n')); // public read-only endpoints only
 });
 test('optional bundled price file, if present, is valid daily BTC/GBP', { skip: !fs.existsSync(new URL('../data/btc-gbp-daily.csv', import.meta.url)) }, () => {
   const { points } = parseCSV(read('data/btc-gbp-daily.csv'));

@@ -31,7 +31,7 @@ Never put API keys into a public GitHub repository, browser JavaScript, a screen
 ## Sharing with friends
 You can share the GitHub Pages link; each visitor runs an independent simulated garden in their own browser. No account registration or access to your Kraken account is involved.
 
-Version: **1.8.3** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
+Version: **1.9.0** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
 \n## Cloudflare simulation Worker\nThe prepared v1.8.1 Worker (requires deployment with Wrangler) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its virtual trading now runs automatically and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
 ## Owner-only simulation dashboard
 After deploying the new Worker, open `https://bitcoin-grower-bot.tim-c02.workers.dev/dashboard` to view persistent virtual balances, decisions and trades. Protect the Worker using Cloudflare Access (All traffic). Public GitHub Pages is a separate, browser-only demo for friends, not this owner dashboard. No live trading is supported.
@@ -62,4 +62,12 @@ Beginner-first flow: amount, historical start date, Play. Defaults to latest ava
 * **Code layout.** `time-machine-engine.js` (pure logic, unit tested), `time-machine-plant.js`, `time-machine-sound.js`, `time-machine.js` (page controller), `time-machine.css`. Run `npm test` in the repository root.
 * **Data.** Prices are fetched live from the third-party `typedcypher/historical-bitcoin-prices` CSV (GPL-3.0, derived from Kaggle data and converted to GBP with daily exchange rates). If that fails the page tries `data/btc-gbp-daily.csv` (not shipped by default - add a `Date,BTC_GBP` file there if you want a saved fallback, mindful of the source's licence) and then offers a CSV import. Prices are never invented.
 * The Cloudflare Worker and My Garden dashboard were **not** changed or redeployed in this release (they still report their own v1.8.2 until next deployed).
+
+## v1.9.0 Today's Garden (replaces the Playground)
+The site's front page (`index.html`) is now **Today's Garden**, a simple, simulation-only page for non-technical visitors:
+* **Live price.** Bitcoin in pounds from public, key-free, read-only tickers (Kraken, then CoinGecko), refreshed about every 30 seconds while the page is open and paused when the tab is hidden. If neither responds the newest daily close is shown and labelled as such. (Browser access to these tickers could not be tested from the build sandbox; the logic is unit-tested against sample responses.)
+* **The garden plant.** Shows what a £100 seed planted one year ago would be worth today, with the same pot-value-driven plant as the Time Machine, plus 1-week, 1-month and 1-year changes.
+* **The weather forecast.** Not a prediction: every past day since a chosen start year (2017 by default) is treated as a pretend planting day, and the page shows where 5 in 10 and 8 in 10 of the results landed after 1 month, 1 year or 5 years for any amount. Overlapping windows, ignored fees/tax and the early-years bias are stated on the page. See `forecast-engine.js`.
+* Shared loaders: `price-data.js` (history) and `live-price.js` (live price). The Time Machine now uses `price-data.js`. Navigation across pages: My Garden / Today's Garden / Time Machine.
+* The Cloudflare Worker and My Garden dashboard are unchanged (their navigation still says "Playground", which now points at Today's Garden).
 
