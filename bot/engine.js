@@ -30,7 +30,7 @@ export function step(previous, price, day, rules = DEFAULT_RULES) {
   const fee = rules.feePct / 100;
   // Exactly one purchased lot can be held by this engine.
   if (s.lot) {
-    if (price < s.lot.price * (1 + rules.reboundPct / 100))
+    if (price + 1e-8 < s.lot.price * (1 + rules.reboundPct / 100))
       return {state:s, action:null, reason:'Waiting for rebound'};
     const proceeds = s.lot.btc * price * (1-fee);
     if (s.lot.btc < rules.minimumOrderBTC)
