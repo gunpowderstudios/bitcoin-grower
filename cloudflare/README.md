@@ -1,4 +1,4 @@
-# Cloudflare Worker — Bitcoin Grower v1.4.0
+# Cloudflare Worker — Bitcoin Grower v1.5.0
 
 **Status:** Code prepared in GitHub. **Not deployed to Cloudflare yet.** SIMULATION ACTIVE; no private Kraken connections; no orders.
 
@@ -10,7 +10,7 @@ The source lives in `cloudflare/src/index.js` and uses the shared pure decision 
 2. Log in locally to Cloudflare with `npx wrangler login` — **do not send tokens or screenshots of secrets to anyone**.
 3. From the `cloudflare` directory run `npx wrangler deploy --config wrangler.toml` using the existing Worker name `bitcoin-grower-bot`.
 4. After deployment, confirm the Worker has a Durable Object binding named `GROWER_STATE` and a five-minute Cron Trigger.
-5. Visit the authenticated Worker URL. Its response should show `version: 1.4.0`, `mode: SIMULATION`, `tradingEnabled: false`, `status: PAUSED`. Wait five minutes for `lastMarketCheck`.
+5. Visit the authenticated Worker URL. Its response should show `version: 1.5.0`, `mode: SIMULATION`, `tradingEnabled: false`, `status: PAUSED`. Wait five minutes for `lastMarketCheck`.
 6. Recheck **Cloudflare Access / All traffic** and its authentication policy. Do not add live credentials or trading permissions.
 
 The Cloudflare browser editor alone is **not** a dependable route for deploying these Durable Object migrations and project-level bindings. The `wrangler.toml` file declares the required SQLite class migration and binding.
@@ -25,3 +25,6 @@ The Cloudflare browser editor alone is **not** a dependable route for deploying 
 - When eventually implemented, the live bot needs exchange reconciliation, minimum orders, partial fill handling, idempotency, durable budgets, remote halt and restricted credentials (no withdrawals).
 
 **Do not put Kraken API keys, secrets, passwords or cookies in this repository.**
+
+## v1.5 dashboard
+The Worker offers `/dashboard` as an HTML view of the existing read-only `/` status. Same-origin access avoids exposing tokens through GitHub Pages. Confirm Access really denies unauthenticated/incognito visitors before treating the status as private. Simulated data only, no credentials.
