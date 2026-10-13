@@ -31,7 +31,7 @@ Never put API keys into a public GitHub repository, browser JavaScript, a screen
 ## Sharing with friends
 You can share the GitHub Pages link; each visitor runs an independent simulated garden in their own browser. No account registration or access to your Kraken account is involved.
 
-Version: **1.11.0** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
+Version: **1.11.1** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
 \n## Cloudflare simulation Worker\nThe prepared v1.8.1 Worker (requires deployment with Wrangler) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its virtual trading now runs automatically and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
 ## Owner-only simulation dashboard
 After deploying the new Worker, open `https://bitcoin-grower-bot.tim-c02.workers.dev/dashboard` to view persistent virtual balances, decisions and trades. Protect the Worker using Cloudflare Access (All traffic). Public GitHub Pages is a separate, browser-only demo for friends, not this owner dashboard. No live trading is supported.
@@ -85,3 +85,7 @@ The Time Machine now offers three ready-made **pruning styles** (Light: sell a q
 * New files: `price-ranges.js` (range config and helpers). `live-price.js` gains `parseKrakenOHLC`, `parseCoinGeckoChart` and `fetchSeries` (public GETs only).
 * The Cloudflare Worker is untouched.
 * The **My Garden** link has been removed from the public pages' navigation for now. The Cloudflare Worker and its dashboard are untouched and still run.
+
+## v1.11.1
+* Chart axis can no longer dip below £0 (the All view showed "£-7,140").
+* The "£100 planted…" sentence now follows the selected tab (an hour ago … 2014). The plant itself stays on the one-year result.

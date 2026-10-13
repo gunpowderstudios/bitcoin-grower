@@ -1,10 +1,10 @@
-// Bitcoin Grower — Today's Prices page controller (v1.11.0). Simulation only; read-only public price data.
-import { VERSION, plantFor, formatGBP, signedPct, addDays, dayNumber, describeData } from './time-machine-engine.js?v=1.11.0';
-import { createPlant } from './time-machine-plant.js?v=1.11.0';
-import { loadHistory } from './price-data.js?v=1.11.0';
-import { fetchLive, fetchSeries } from './live-price.js?v=1.11.0';
-import { RANGES, RANGE_ORDER, historySeries, changeOver, trimToWindow, downsample, axisLabel, tooltipLabel } from './price-ranges.js?v=1.11.0';
-import { forecast, describe, changeSince, SINCE_CHOICES } from './forecast-engine.js?v=1.11.0';
+// Bitcoin Grower — Today's Prices page controller (v1.11.1). Simulation only; read-only public price data.
+import { VERSION, plantFor, formatGBP, signedPct, addDays, dayNumber, describeData } from './time-machine-engine.js?v=1.11.1';
+import { createPlant } from './time-machine-plant.js?v=1.11.1';
+import { loadHistory } from './price-data.js?v=1.11.1';
+import { fetchLive, fetchSeries } from './live-price.js?v=1.11.1';
+import { RANGES, RANGE_ORDER, historySeries, changeOver, trimToWindow, downsample, axisLabel, tooltipLabel } from './price-ranges.js?v=1.11.1';
+import { forecast, describe, changeSince, SINCE_CHOICES } from './forecast-engine.js?v=1.11.1';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -63,10 +63,17 @@ function renderSeed() {
   const worth = 100 * (1 + y.pct / 100), pl = plantFor(worth / 100, true);
   plant.setState(pl.stage, pl.droop);
   $('stage').textContent = pl.name + (pl.droop > 0.35 ? ' · drooping 😟' : '');
-  const diff = worth - 100;
-  $('seedText').textContent = 'A £100 seed planted a year ago (' + fmtDate(y.ref.date) + ') would be worth ' + formatGBP(worth) + ' today — ' + (diff >= 0 ? 'up ' : 'down ') + formatGBP(Math.abs(diff)) + ' (' + signedPct(y.pct) + ').';
+  S.yearSeed = { worth, pct: y.pct, date: y.ref.date }; renderSeedText();
 }
 
+const AGO = { '1h': 'an hour ago', '24h': '24 hours ago', '1w': 'a week ago', '1m': 'a month ago', '1y': 'a year ago', all: 'at the start of our history (2014)' };
+function renderSeedText() {
+  let pct = S.yearSeed?.pct, ref = S.yearSeed ? ' (' + fmtDate(S.yearSeed.date) + ')' : '';
+  if (S.range !== '1y') { const c = changeOver(S.series || []); if (!c) return; pct = c.pct; ref = ''; }
+  if (pct == null) return;
+  const worth = 100 * (1 + pct / 100), diff = worth - 100;
+  $('seedText').textContent = 'A £100 seed planted ' + AGO[S.range] + ref + ' would be worth ' + formatGBP(worth) + ' today — ' + (diff >= 0 ? 'up ' : 'down ') + formatGBP(Math.abs(diff)) + ' (' + signedPct(pct) + ').' + (S.range !== '1y' ? ' The plant above always shows the one-year result.' : '');
+}
 // ---------------------------------------------------------------- charts
 async function loadRange(key) {
   const r = RANGES[key];
@@ -102,6 +109,7 @@ function drawChart() {
     ch.className = 'rangechg'; ch.textContent = S.unavailable[S.range] ? 'This view needs the live price feed, which isn’t reachable right now. Try 1W, 1M, 1Y or All.' : 'Loading…';
     $('rangeLegend').textContent = 'Bitcoin’s price (£)'; return;
   }
+  renderSeedText();
   const series = S.series, chg = changeOver(series), up = chg.pct > 0.05, down = chg.pct < -0.05;
   ch.className = 'rangechg ' + (up ? 'up' : down ? 'down' : '');
   ch.textContent = (up ? '▲ ' : down ? '▼ ' : '■ ') + signedPct(chg.pct) + ' over ' + r.words;
@@ -109,7 +117,7 @@ function drawChart() {
   $('yearChart').setAttribute('aria-label', 'Bitcoin price over ' + r.words + ': ' + signedPct(chg.pct) + ', from ' + money0(chg.from) + ' to ' + money0(chg.to));
   const X0 = 74, X1 = 688, Y0 = 14, Y1 = 192, d0 = series[0].x, d1 = series.at(-1).x, span = d1 - d0;
   let lo = Infinity, hi = -Infinity; for (const s of series) { lo = Math.min(lo, s.v); hi = Math.max(hi, s.v); }
-  const pad = (hi - lo) * 0.08 || hi * 0.01; lo -= pad; hi += pad;
+  const pad = (hi - lo) * 0.08 || hi * 0.01; lo = Math.max(0, lo - pad); hi += pad;
   const X = x => X0 + (x - d0) / span * (X1 - X0), Y = v => Y1 - (v - lo) / (hi - lo) * (Y1 - Y0);
   for (const v of [hi, lo]) { svgEl('line', { x1: X0, x2: X1, y1: Y(v), y2: Y(v), stroke: '#2f5139' }, c); svgEl('text', { x: X0 - 6, y: Y(v) + 4, 'text-anchor': 'end' }, c).textContent = axis(v); }
   const line = series.map((s, i) => (i ? 'L' : 'M') + X(s.x).toFixed(1) + ' ' + Y(s.v).toFixed(1)).join(' ');
