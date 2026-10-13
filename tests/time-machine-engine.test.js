@@ -202,14 +202,14 @@ test('signed money and percentages use real plus/minus signs', () => {
 
 // ---------- project hygiene ----------
 const read = f => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
-test('version is 1.11.3 everywhere it should be', () => {
-  assert.equal(VERSION, '1.11.3');
-  assert.equal(JSON.parse(read('version.json')).version, '1.11.3');
-  assert.equal(JSON.parse(read('package.json')).version, '1.11.3');
-  assert.equal(JSON.parse(read('bot/package.json')).version, '1.11.3');
-  assert.match(read('time-machine.html'), /id="version">v1\.11\.3</);
+test('version is 1.11.4 everywhere it should be', () => {
+  assert.equal(VERSION, '1.11.4');
+  assert.equal(JSON.parse(read('version.json')).version, '1.11.4');
+  assert.equal(JSON.parse(read('package.json')).version, '1.11.4');
+  assert.equal(JSON.parse(read('bot/package.json')).version, '1.11.4');
+  assert.match(read('time-machine.html'), /id="version">v1\.11\.4</);
   assert.match(read('README.md'), /1\.10\.0/);
-  assert.match(read('index.html'), /id="version">v1\.11\.3</);
+  assert.match(read('index.html'), /id="version">v1\.11\.4</);
 });
 test('every element id the page script uses exists in the HTML', () => {
   for (const [page, script] of [['time-machine.html', 'time-machine.js'], ['index.html', 'garden.js']]) {
