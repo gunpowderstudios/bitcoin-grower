@@ -2,14 +2,13 @@
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.13.5';
-import { createPlant } from './time-machine-plant.js?v=1.13.5';
-import { createSound } from './time-machine-sound.js?v=1.13.5';
-import { loadHistory } from './price-data.js?v=1.13.5';
-import { createGardener } from './time-machine-gardener.js?v=1.13.5';
-import { createRace } from './time-machine-race.js?v=1.13.5';
-import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.5';
-import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.5';
+} from './time-machine-engine.js?v=1.13.6';
+import { createPlant } from './time-machine-plant.js?v=1.13.6';
+import { createSound } from './time-machine-sound.js?v=1.13.6';
+import { loadHistory } from './price-data.js?v=1.13.6';
+import { createRace } from './time-machine-race.js?v=1.13.6';
+import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.6';
+import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.6';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -18,7 +17,7 @@ const MIN_FRAMES_PER_SEC = 4;
 const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 const plant = createPlant($('plant'));
-const gardener = createGardener($('scene'));
+const gardener = { say() {}, clear() {}, text: '' }; // the little gardener and speech bubbles are switched off for now (code kept in time-machine-gardener.js)
 const fwRace = createRace($, { section: 'fwRace', beds: 'fwBeds', date: 'fwDate', scrub: 'fwScrub', play: 'fwPlay', restart: 'fwRestart', note: 'fwNote' }, {
   uid: 'fw', finishNote: beds => 'Over the chosen time, the typical run ended at ' + formatGBP(beds[1].sim.summary.end) + ', the rough patch at ' + formatGBP(beds[0].sim.summary.end) + ' and the good run at ' + formatGBP(beds[2].sim.summary.end) + '. The real future could land anywhere, even outside this range.'
 });

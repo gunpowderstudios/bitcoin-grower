@@ -1,6 +1,6 @@
 // The Bitcoin Garden — side-by-side gardens (used for the forward-in-time forecast).
-import { plantFor, formatGBP, signedPct } from './time-machine-engine.js?v=1.13.5';
-import { createPlant } from './time-machine-plant.js?v=1.13.5';
+import { plantFor, formatGBP, signedPct } from './time-machine-engine.js?v=1.13.6';
+import { createPlant } from './time-machine-plant.js?v=1.13.6';
 
 const NS = 'http://www.w3.org/2000/svg';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
