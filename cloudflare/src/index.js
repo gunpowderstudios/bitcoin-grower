@@ -86,7 +86,7 @@ export default {
     const response = await stub.fetch("https://internal/internal/status");
     const info = await response.json();
     return Response.json({
-      app: "Bitcoin Grower", version: VERSION,
+      app: "Bitcoin Garden", version: VERSION,
       mode: "SIMULATION", tradingEnabled: false,
       status: "SIMULATING", lastMarketCheck: info.lastCheck || null,
       history: (info.history || []).slice(-2016),
