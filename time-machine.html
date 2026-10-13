@@ -6,14 +6,14 @@
 <title>Bitcoin Grower — Time Machine</title>
 <meta name="description" content="Plant an imaginary £100 in the past and watch it grow through real Bitcoin history. A friendly simulation — no real money, no real trades.">
 <meta name="theme-color" content="#0c1d14">
-<link rel="stylesheet" href="./time-machine.css?v=1.11.7">
+<link rel="stylesheet" href="./time-machine.css?v=1.11.8">
 </head>
 <body>
 <a class="skip" href="#plant-heading">Skip to the plant</a>
 <main>
 <header>
   <div>
-    <div class="sub">🌱 BITCOIN GROWER <span class="vtag" id="version">v1.11.7</span></div>
+    <div class="sub">🌱 BITCOIN GROWER <span class="vtag" id="version">v1.11.8</span></div>
     <h1>Time Machine ⏳</h1>
     <div class="sub">Plant some pretend money in the past, then travel forward and watch it grow (or wilt!) through real Bitcoin history.</div>
   </div>
@@ -39,6 +39,7 @@
       <label for="from">When would you like to travel back to?</label>
       <input id="from" type="date" value="2017-01-01">
       <div class="chips" id="presets" role="group" aria-label="Quick date choices"></div>
+      <div class="explain" id="firstPrice" aria-live="polite">Loading the earliest available Bitcoin prices…</div>
       <p class="hint" id="dateHint">You'll travel forward from that day to the newest price we have.</p>
     </div>
     <div class="step">
@@ -142,6 +143,7 @@
   <h3 id="cmpHead">All three pruning styles, same dates</h3>
   <div class="scroll"><table class="cmp"><thead><tr><th>Style</th><th>Final pot</th><th>Gain</th><th>Buys / harvests</th><th>Biggest fall</th><th></th></tr></thead><tbody id="cmpBody"></tbody></table></div>
   <p class="fine" id="cmpText"></p>
+  <details class="advanced" id="purchaseMath"><summary>🧾 How was my final amount calculated?</summary><div class="explain" id="purchaseMathBody"></div></details>
   <p class="fine" id="sumFine"></p>
   <p class="fine"><b>Remember:</b> this is a history lesson, not a promise. What happened in the past is no guide to what will happen next, and Bitcoin can lose a lot of its value.</p>
   <div class="actions"><button class="btn primary" id="again" type="button">↑ Try another date</button><button class="btn" id="replay" type="button">↺ Watch it again</button></div>
@@ -156,6 +158,7 @@
 
 <section class="card">
   <h2>About the prices</h2>
+  <p class="hint">Bitcoin launched on 3 January 2009 without an established exchange price. Bitcoin trading markets began appearing in 2010, but this app currently starts at the <b>earliest dated BTC/GBP price in its verified loaded file</b>. We don't guess prices for earlier dates or claim that 2012 was Bitcoin's first trading day.</p>
   <p class="hint" id="source">Loading daily Bitcoin prices in pounds…</p>
   <p class="hint" id="coverage"></p>
   <details>
@@ -170,6 +173,6 @@
 </div>
 <footer class="sitefoot">Bitcoin Grower © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
 </main>
-<script type="module" src="./time-machine.js?v=1.11.7"></script>
+<script type="module" src="./time-machine.js?v=1.11.8"></script>
 </body>
 </html>
