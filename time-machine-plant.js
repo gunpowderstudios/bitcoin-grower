@@ -1,7 +1,7 @@
-// Bitcoin Garden Time Machine — the living plant (v1.13.13).
+// Bitcoin Garden Time Machine — the living plant (v1.14.0).
 // Three simple stages: a shoot, a small tree, then an oak. One persistent SVG; parts cross-fade and sway with CSS.
 // Milestone coins ripen on the leaves and drop to the ground like apples.
-import { coinsFor } from './time-machine-engine.js?v=1.13.13';
+import { coinsFor } from './time-machine-engine.js?v=1.14.0';
 const NS = 'http://www.w3.org/2000/svg';
 const LEAF = 'M0 0 C6 -7 20 -8 30 0 C20 8 6 7 0 0Z';
 const GROUND = 270; // y where fallen coins rest
@@ -91,8 +91,11 @@ export function createPlant(svg, uid = 'tm') {
   const pile = el('g', { class: 'tm-pile' }, svg);
   const pileLabel = el('text', { x: 180, y: 297, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, fill: '#ffe9a0', 'font-family': 'system-ui,sans-serif' }, svg);
 
-  function setFruit(ratio, animate = true) {
-    const n = coinsFor(ratio);
+  // Normally coins mark milestones (how many times what you planted the pot is worth). In cash-in mode the caller passes
+  // opts.count (apples really picked) and opts.label instead.
+  function setFruit(ratio, animate = true, opts = {}) {
+    const total = Number.isFinite(opts.count) ? Math.max(0, opts.count) : coinsFor(ratio);
+    const n = Math.min(total, SLOT_DX.length);
     while (fallen.length > n) fallen.pop().remove();
     const before = fallen.length;
     for (let i = before; i < n; i++) {
@@ -110,7 +113,7 @@ export function createPlant(svg, uid = 'tm') {
       fallen.push(g);
     }
     coins = n;
-    pileLabel.textContent = n && Number.isFinite(ratio) ? 'Worth ' + (ratio >= 10 ? Math.round(ratio) : ratio.toFixed(1)) + '× what you planted' : '';
+    pileLabel.textContent = typeof opts.label === 'string' ? opts.label : (n && Number.isFinite(ratio) ? 'Worth ' + (ratio >= 10 ? Math.round(ratio) : ratio.toFixed(1)) + '× what you planted' : '');
   }
 
   // ----- public controls -----

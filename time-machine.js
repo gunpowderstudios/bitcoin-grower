@@ -1,14 +1,14 @@
-// Bitcoin Garden Time Machine — page controller (v1.13.13). Simulation only: no accounts, keys or trading.
+// Bitcoin Garden Time Machine — page controller (v1.14.0). Simulation only: no accounts, keys or trading.
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.13.13';
-import { createPlant } from './time-machine-plant.js?v=1.13.13';
-import { createSound } from './time-machine-sound.js?v=1.13.13';
-import { loadHistory } from './price-data.js?v=1.13.13';
-import { createRace } from './time-machine-race.js?v=1.13.13';
-import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.13';
-import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.13';
+} from './time-machine-engine.js?v=1.14.0';
+import { createPlant } from './time-machine-plant.js?v=1.14.0';
+import { createSound } from './time-machine-sound.js?v=1.14.0';
+import { loadHistory } from './price-data.js?v=1.14.0';
+import { createRace } from './time-machine-race.js?v=1.14.0';
+import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.14.0';
+import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.14.0';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -26,8 +26,9 @@ sound.enableWhenAllowed(); // sound is on by default; it starts with the visitor
 const S = {
   data: null, sourceNote: '', steps: null, sim: null, cursor: 0, state: 'idle', speed: 'normal',
   raf: 0, last: 0, acc: 0, lastYear: '', lastStage: 0, droopMark: { t: 0, v: 0 }, lastPerk: 0, lastToast: 0,
-  shownLog: -1, chart: null, markers: 0, lastFast: false
+  shownLog: -1, chart: null, markers: 0, lastFast: false, mode: 'fwd', cashAt: 2
 };
+const isCash = () => S.mode === 'cash';
 $('version').textContent = 'v' + VERSION;
 
 // ---------------------------------------------------------------- helpers
@@ -112,12 +113,21 @@ function updateDateHint() {
 function readSettings() {
   return validateSettings({
     amount: $('amount').value === '' ? NaN : $('amount').value, buyPct: $('buyPct').value, dipPct: $('dipPct').value,
-    risePct: $('risePct').value, sellPct: $('sellPct').value, feePct: $('feePct').value, strategy: 'hold'
+    risePct: $('risePct').value, sellPct: $('sellPct').value, feePct: $('feePct').value, strategy: isCash() ? 'cashin' : 'hold', cashAt: S.cashAt
   });
 }
 $('from').addEventListener('input', () => { showError(''); syncPresets(); updateDateHint(); });
 $('to').addEventListener('input', () => { showError(''); updateDateHint(); });
 $('amount').addEventListener('input', () => { showError(''); if (S.state === 'idle') showIdleFigures(); });
+function updateCashHint() {
+  const a = Number($('amount').value), amt = Number.isFinite(a) && a > 0 ? a : DEFAULTS.amount, n = S.cashAt;
+  $('cashHint').textContent = 'Whenever your tree is worth ' + n + '× what you planted, we pick ' + formatGBP(amt).replace(/\.00$/, '') + ' of apples (sell ' + formatGBP(amt).replace(/\.00$/, '') + ' of Bitcoin) and put it in your pocket. The rest keeps growing.';
+}
+for (const b of $('cashChips').querySelectorAll('button')) b.onclick = () => {
+  S.cashAt = Number(b.dataset.at); updateCashHint(); updateModeText(); showError('');
+  $('cashChips').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+};
+$('amount').addEventListener('input', () => { updateCashHint(); updateModeText(); });
 $('defaults').onclick = () => { for (const k of ['buyPct', 'dipPct', 'risePct', 'sellPct', 'feePct']) $(k).value = DEFAULTS[k]; showError(''); };
 
 // ---------------------------------------------------------------- idle (nothing running yet)
@@ -134,7 +144,7 @@ function resetToIdle() {
   $('scene').style.setProperty('--sky1', '#1b1f4a'); $('scene').style.setProperty('--sky2', '#37306b');
   $('year').textContent = '⏳'; $('daymonth').textContent = 'Choose a date, then press the green button'; $('whenLabel').textContent = 'Ready to travel'; S.lastYear = '';
   $('tlFill').style.width = '0'; $('tlKnob').style.left = '0'; $('timeline').querySelectorAll('.tick').forEach(n => n.remove());
-  $('summary').hidden = true;
+  $('summary').hidden = true; $('cashLine').hidden = true;
   $('journal').innerHTML = '<tr><td colspan="4">Nothing yet — press play!</td></tr>';
   for (const id of ['play', 'month', 'finish', 'restart']) $(id).disabled = true;
   $('play').textContent = '▶ Play';
@@ -214,7 +224,7 @@ function loop(ts) {
 }
 function syncButtons() {
   $('play').textContent = S.state === 'playing' ? '⏸ Pause' : S.state === 'done' ? '↺ Play again' : S.state === 'paused' ? '▶ Resume' : '▶ Play';
-  $('go').textContent = S.state === 'idle' ? '🌱 Plant my money & travel forward!' : '🌱 Start a fresh journey with these choices';
+  $('go').textContent = S.state === 'idle' ? (isCash() ? '🍎 Plant my money & start picking!' : '🌱 Plant my money & travel forward!') : '🌱 Start a fresh journey with these choices';
 }
 $('play').onclick = () => (S.state === 'playing' ? pause() : play());
 $('restart').onclick = () => restart(false);
@@ -264,7 +274,12 @@ function render({ instant = false, fast = false, quiet = false, steps = 1 } = {}
   // plant
   const ratio = f.total / start, pl = plantFor(ratio, true);
   plant.setState(pl.stage, pl.droop);
-  plant.setFruit(ratio, !instant && !quiet && !reduceMotion());
+  if (isCash()) {
+    plant.setFruit(ratio, !instant && !quiet && !reduceMotion(), { count: f.sells, label: f.sells ? f.sells + (f.sells === 1 ? ' apple' : ' apples') + ' picked · ' + formatGBP(f.cash).replace(/\.\d\d$/, '') + ' in pocket' : '' });
+    const tree = f.btc * f.price;
+    $('cashLine').hidden = false;
+    $('cashLine').replaceChildren('🍎 In your pocket: ', Object.assign(document.createElement('b'), { textContent: formatGBP(f.cash) }), '  ·  🌳 Still growing: ', Object.assign(document.createElement('b'), { textContent: formatGBP(tree) }));
+  } else plant.setFruit(ratio, !instant && !quiet && !reduceMotion());
   $('stage').textContent = pl.name + (pl.droop > 0.35 ? ' · drooping 😟' : '');
   const now = performance.now();
   if (now - S.droopMark.t > 1500) { if (S.droopMark.v - pl.droop > 0.1 && now - S.lastPerk > 3000) { plant.perk(); S.lastPerk = now; } S.droopMark = { t: now, v: pl.droop }; }
@@ -301,10 +316,10 @@ function announceTrades(fresh, fast) {
   let text;
   if (fresh.length === 1) {
     const e = fresh[0];
-    text = e.side === 'SELL' ? '🪙 Harvest: sold some and banked ' + formatGBP(e.gbp) + ' · ' + fmtDate(e.date) : '🌱 Planted ' + formatGBP(e.gbp) + ' of Bitcoin · ' + fmtDate(e.date);
-  } else text = (buys.length ? '🌱 ' + buys.length + ' planted' : '') + (buys.length && sells.length ? ' · ' : '') + (sells.length ? '🪙 ' + sells.length + ' harvests (sold some)' : '');
+    text = e.side === 'SELL' ? (isCash() ? '🍎 Picked ' + formatGBP(e.gbp) + ' of apples into your pocket · ' + fmtDate(e.date) : '🪙 Harvest: sold some and banked ' + formatGBP(e.gbp) + ' · ' + fmtDate(e.date)) : '🌱 Planted ' + formatGBP(e.gbp) + ' of Bitcoin · ' + fmtDate(e.date);
+  } else text = (buys.length ? '🌱 ' + buys.length + ' planted' : '') + (buys.length && sells.length ? ' · ' : '') + (sells.length ? (isCash() ? '🍎 ' + sells.length + ' apple pickings' : '🪙 ' + sells.length + ' harvests (sold some)') : '');
   toast(text, sells.length ? 'sell' : 'buy');
-  setStatus(text.replace(/[🪙🌱]/gu, '').trim());
+  setStatus(text.replace(/[🪙🌱🍎]/gu, '').trim());
 }
 function toast(text, cls) {
   const box = $('toasts'), t = document.createElement('div');
@@ -314,10 +329,10 @@ function toast(text, cls) {
 }
 function renderLog(events, count) {
   const body = $('journal'); body.replaceChildren();
-  if (!count) { body.insertRow().insertCell().colSpan = 4; body.rows[0].cells[0].textContent = 'No buys or harvests yet.'; return; }
+  if (!count) { body.insertRow().insertCell().colSpan = 4; body.rows[0].cells[0].textContent = isCash() ? 'No apples picked yet.' : 'No buys or harvests yet.'; return; }
   for (let i = count - 1, shown = 0; i >= 0 && shown < 300; i--, shown++) {
     const e = events[i], row = body.insertRow();
-    for (const v of [fmtDate(e.date), e.side === 'BUY' ? '🌱 Planted Bitcoin' : '🪙 Harvested', formatGBP(e.price), formatGBP(e.gbp)]) row.insertCell().textContent = v;
+    for (const v of [fmtDate(e.date), e.side === 'BUY' ? '🌱 Planted Bitcoin' : isCash() ? '🍎 Picked apples' : '🪙 Harvested', formatGBP(e.price), formatGBP(e.gbp)]) row.insertCell().textContent = v;
   }
 }
 function mixHex(a, b, t) {
@@ -354,7 +369,7 @@ function buildTimelineTicks() {
 }
 const W = 700, X0 = 62, X1 = 688, Y0 = 16, Y1 = 214;
 function buildChart() {
-  const { frames, events, settings } = S.sim, N = frames.length, start = settings.amount, showHold = false;
+  const { frames, events, settings } = S.sim, N = frames.length, start = settings.amount, showHold = settings.strategy === 'cashin';
   const d0 = dayNumber(frames[0].date), d1 = dayNumber(frames.at(-1).date);
   let lo = start, hi = start;
   for (const f of frames) { lo = Math.min(lo, f.total); hi = Math.max(hi, f.total); if (showHold) { lo = Math.min(lo, f.hold); hi = Math.max(hi, f.hold); } }
@@ -427,10 +442,18 @@ function showPurchaseMath() {
   line('Starting price', formatGBP(first.price) + ' per BTC on ' + fmtLong(first.date));
   line('Ending price', formatGBP(last.price) + ' per BTC on ' + fmtLong(last.date));
   line('Original pot', formatGBP(s.start));
-  if (sim.settings.strategy === 'hold') {
+  if (sim.settings.strategy === 'hold' || sim.settings.strategy === 'cashin') {
     line('Original purchase', buys[0] ? fmtLong(buys[0].date) + ': ' + formatGBP(buys[0].gbp) + ' bought ' + buys[0].btc.toFixed(8) + ' BTC at ' + formatGBP(buys[0].price) + '/BTC' : '—');
-    line('Purchase fee', formatGBP(s.feesPaid));
-    line('Final Bitcoin value', s.btc.toFixed(8) + ' BTC × ' + formatGBP(last.price) + ' = ' + formatGBP(s.end));
+    if (sim.settings.strategy === 'cashin') {
+      line('Apples picked', s.sells + ' time' + (s.sells === 1 ? '' : 's') + ', each time selling ' + formatGBP(s.start) + ' of Bitcoin once the tree reached ×' + sim.settings.cashAt + ' what you planted');
+      line('Total fees', formatGBP(s.feesPaid));
+      line('In your pocket', formatGBP(s.cash));
+      line('Bitcoin still held', s.btc.toFixed(8) + ' BTC × ' + formatGBP(last.price) + ' = ' + formatGBP(s.btc * last.price));
+      line('Final total', formatGBP(s.cash) + ' + ' + formatGBP(s.btc * last.price) + ' = ' + formatGBP(s.end));
+    } else {
+      line('Purchase fee', formatGBP(s.feesPaid));
+      line('Final Bitcoin value', s.btc.toFixed(8) + ' BTC × ' + formatGBP(last.price) + ' = ' + formatGBP(s.end));
+    }
   } else {
     line('First purchase', buys[0] ? fmtLong(buys[0].date) + ': ' + formatGBP(buys[0].gbp) + ' at ' + formatGBP(buys[0].price) + '/BTC, buying ' + buys[0].btc.toFixed(8) + ' BTC after fees' : 'No dip triggered a purchase');
     line('Total virtual purchases and sales', s.buys + ' purchases / ' + s.sells + ' sales');
@@ -473,7 +496,7 @@ function showSummary() {
   $('sPnlLabel').textContent = up ? 'Total profit' : down ? 'Total loss' : 'Total profit or loss';
   $('sPnl').textContent = signedGBP(s.profit);
   $('sPct').textContent = (up ? '▲ ' : down ? '▼ ' : '■ ') + signedPct(s.pct);
-  $('sTrades').textContent = '1 purchase';
+  $('sTrades').textContent = isCash() ? s.sells + (s.sells === 1 ? ' time' : ' times') : '1 purchase'; $('sTradesLabel').textContent = isCash() ? 'Apples picked' : 'Bitcoin purchases';
   $('vsMe').textContent = formatGBP(s.end); $('vsMePct').textContent = signedPct(s.pct);
   $('vsHold').textContent = formatGBP(s.hold); $('vsHoldPct').textContent = signedPct(s.holdPct);
   const d = s.vsHold, close = Math.abs(d) < s.start * 0.005;
@@ -483,6 +506,24 @@ function showSummary() {
   $('sumFine').textContent = 'One-time purchase fee: ' + formatGBP(s.feesPaid) + ' · Biggest fall from a high point: ' + s.maxDrawdown.toFixed(1) + '%' +
     (s.skippedBuys ? ' · ' + s.skippedBuys + ' time' + (s.skippedBuys > 1 ? 's' : '') + ' the strategy wanted to buy but had no cash left' : '') +
     '. Buy-and-hold pays the same fee once. Both numbers are measured at the final day’s closing price.';
+  cashSummary(s);
+}
+// Cash in: say plainly what was picked, what is still growing, and how that compares with just holding.
+function cashSummary(s) {
+  const cash = isCash();
+  for (const id of ['vsHead', 'vsText']) $(id).hidden = !cash;
+  $('vsBox').hidden = true;
+  if (!cash) return;
+  const tree = s.btc * S.sim.frames.at(-1).price, g = x => formatGBP(x), d = s.vsHold, close = Math.abs(d) < s.start * 0.005;
+  $('sumBig').replaceChildren(Object.assign(document.createElement('span'), { textContent:
+    'You picked ' + s.sells + (s.sells === 1 ? ' apple' : ' apples') + ' worth ' + g(s.cash) + ' and still have a tree worth ' + g(tree) + ', ' + g(s.end) + ' in total from your ' + g(s.start) + ' planted on ' + fmtLong(s.from) + '.' }));
+  $('sEnd').textContent = g(s.end);
+  $('vsHead').textContent = 'Cashing in vs. just holding';
+  $('vsText').textContent = (close ? 'Cashing in finished level with simply holding.'
+    : d > 0 ? 'Cashing in finished ' + g(d) + ' ahead of simply holding all the way. Picking apples protected some gains when the price fell.'
+      : 'Simply holding would have finished ' + g(-d) + ' ahead of cashing in, because Bitcoin kept rising after the apples were picked.') +
+    ' The ' + g(s.cash) + ' in your pocket can’t fall, but the tree you left can. Neither is a promise for the future.';
+  $('sumFine').textContent = 'Cashing in sold ' + g(s.start) + ' of Bitcoin each time the tree hit ×' + S.sim.settings.cashAt + ' what you planted. Fees paid in total: ' + g(s.feesPaid) + ' · Biggest fall from a high point: ' + s.maxDrawdown.toFixed(1) + '%. Tax is not included.';
 }
 
 // ---------------------------------------------------------------- your own price file
@@ -502,13 +543,27 @@ window.addEventListener('resize', () => { if (window.innerWidth === lastW) retur
 // test hook (read-only view of state; used by automated tests)
 // ---------------------------------------------------------------- forward in time (a history-based forecast)
 const FW = { days: 365 };
-function setMode(mode) {
-  const fwd = mode === 'fwd';
-  $('backMode').hidden = fwd; $('fwdMode').hidden = !fwd;
-  $('modeBack').setAttribute('aria-pressed', String(!fwd)); $('modeFwd').setAttribute('aria-pressed', String(fwd));
-  if (fwd && S.state === 'playing') pause();
+function updateModeText() {
+  const cash = isCash(), a = Number($('amount').value), amt = formatGBP(Number.isFinite(a) && a > 0 ? a : DEFAULTS.amount).replace(/\.00$/, '');
+  $('cashStep').hidden = !cash; $('goNum').textContent = cash ? '4' : '3';
+  $('setup-heading').textContent = cash ? 'Plant your money, then pick apples as it grows' : 'Plant your money in the past';
+  $('modeExplain').replaceChildren(...(cash
+    ? [Object.assign(document.createElement('b'), { textContent: 'Plant once, pick apples as it grows: ' }), 'you buy Bitcoin on your chosen date. Whenever your tree is worth ×' + S.cashAt + ' what you planted, we pick ' + amt + ' of apples (sell ' + amt + ' of Bitcoin) and put it in your pocket. Apples drop to the ground as you go. At the end we compare with simply holding.']
+    : [Object.assign(document.createElement('b'), { textContent: 'Plant once, then watch: ' }), 'imagine buying Bitcoin on your chosen date and keeping it. Travel through real historical prices to see what it would be worth. No trading strategies, pruning or selling along the way.']));
+  $('lgBuy').hidden = cash; $('lgPick').hidden = !cash; $('lgHold').hidden = !cash;
+  $('logSummary').textContent = cash ? '📒 See every apple picked' : '📒 See your original Bitcoin purchase';
+  $('go').textContent = S.state === 'idle' ? (cash ? '🍎 Plant my money & start picking!' : '🌱 Plant my money & travel forward!') : '🌱 Start a fresh journey with these choices';
 }
-$('modeBack').onclick = () => setMode('back'); $('modeFwd').onclick = () => setMode('fwd');
+function setMode(mode) {
+  const fwd = mode === 'fwd', changed = mode !== S.mode;
+  S.mode = mode;
+  if (S.state === 'playing') pause(false);
+  $('backMode').hidden = fwd; $('fwdMode').hidden = !fwd;
+  $('modeBack').setAttribute('aria-pressed', String(mode === 'back')); $('modeFwd').setAttribute('aria-pressed', String(fwd)); $('modeCash').setAttribute('aria-pressed', String(mode === 'cash'));
+  if (changed && !fwd && S.data) resetToIdle(); // never mix one tab's journey with another's
+  updateCashHint(); updateModeText();
+}
+$('modeBack').onclick = () => setMode('back'); $('modeFwd').onclick = () => setMode('fwd'); $('modeCash').onclick = () => setMode('cash');
 setMode('fwd');
 for (const b of $('fwHorizons').querySelectorAll('button')) b.onclick = () => { FW.days = Number(b.dataset.days); $('fwHorizons').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); };
 $('fwGo').onclick = () => {

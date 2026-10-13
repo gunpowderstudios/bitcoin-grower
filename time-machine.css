@@ -204,7 +204,7 @@ code{background:#10261a;padding:1px 6px;border-radius:6px}
 @media(prefers-reduced-motion:reduce){.gardener .gsvg,.gardener.talking .garm{animation:none}}
 
 /* v1.13.2 — choosing a direction: back (🦖) or forward (🚀) */
-.modegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.modegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
 .mode{display:grid;gap:4px;justify-items:center;text-align:center;padding:16px 12px;border-radius:18px;border:2px solid #4f7b5a;background:#16301f;color:#e8f6e4;font:inherit;cursor:pointer;min-height:44px}
 .mode .big{font-size:46px;line-height:1}
 .mode b{font-size:18px}.mode small{color:var(--mute);font-size:13px;line-height:1.35}
@@ -212,4 +212,9 @@ code{background:#10261a;padding:1px 6px;border-radius:6px}
 .mode:hover{transform:translateY(-1px)}
 .beds.three{grid-template-columns:repeat(3,1fr)}
 #fwdMode[hidden],#backMode[hidden]{display:none}
-@media(max-width:700px){.modegrid{gap:8px}.mode .big{font-size:38px}.mode small{font-size:12px}.beds.three{grid-template-columns:1fr}}
+@media(max-width:700px){.modegrid{gap:6px}.mode{padding:12px 6px}.mode .big{font-size:34px}.mode b{font-size:15px}.mode small{font-size:11px}.beds.three{grid-template-columns:1fr}}
+
+/* v1.14.0 — Cash in: pick apples as the tree grows */
+.cashline{margin:10px 2px 0;padding:11px 14px;border-radius:14px;background:#2a3f2b;color:#ffe9a0;font-size:15px;line-height:1.5;text-align:center}
+.cashline b{color:#fff}
+.cashline[hidden],.step[hidden]{display:none}

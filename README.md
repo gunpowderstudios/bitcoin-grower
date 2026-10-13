@@ -31,7 +31,7 @@ Never put API keys into a public GitHub repository, browser JavaScript, a screen
 ## Sharing with friends
 You can share the GitHub Pages link; each visitor runs an independent simulated garden in their own browser. No account registration or access to your Kraken account is involved.
 
-Version: **1.13.13** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
+Version: **1.14.0** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
 \n## Cloudflare simulation Worker\nThe prepared v1.8.1 Worker (requires deployment with Wrangler) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its virtual trading now runs automatically and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
 ## Owner-only simulation dashboard
 After deploying the new Worker, open `https://bitcoin-grower-bot.tim-c02.workers.dev/dashboard` to view persistent virtual balances, decisions and trades. Protect the Worker using Cloudflare Access (All traffic). Public GitHub Pages is a separate, browser-only demo for friends, not this owner dashboard. No live trading is supported.
@@ -104,6 +104,12 @@ The Time Machine now offers three ready-made **pruning styles** (Light: sell a q
 
 ## v1.11.6
 * Time Machine gets a fourth choice, **Just hold**: everything in on day one, never sold. It plays through the same plant, chart and summary, and the results table compares it with the three pruning styles. Engine: `simulate(steps, {strategy:"hold"})`.
+
+## v1.14.0 · 🍎 Cash in (third Time Machine tab)
+- New tab next to Forward and Back: **Cash in**. You plant once on a past date, then choose one dial: pick apples whenever the tree is worth ×1.5, ×2, ×3 or ×5 what you planted.
+- Each pick sells what you planted (£X of Bitcoin, minus the fee) into your pocket; the rest keeps growing. Apples drop from the tree to the ground and the label counts them and the cash in your pocket.
+- The results say what is in your pocket, what is still growing and how that compares with simply holding (shown as a dashed line on the chart). Often holding wins in Bitcoin's history; the page says so plainly.
+- Engine: `strategy: 'cashin'` and `cashAt` (1.1–100). Same pretend-money simulation, no real trades.
 
 ## v1.13.13 · Trees grow sooner
 - Small tree now appears at 1.2× what you planted and the oak at 2× (was 1.5× and 3×), so typical forecasts visibly grow.
