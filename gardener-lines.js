@@ -1,4 +1,4 @@
-// The Bitcoin Garden — what the little gardener says (v1.13.1). Pure text helpers, no DOM, no network.
+// The Bitcoin Garden — what the little gardener says (v1.13.2). Pure text helpers, no DOM, no network.
 // Plain English only: it explains what the strategy is doing, never tells anyone what to buy or sell.
 import { formatGBP } from './time-machine-engine.js';
 

@@ -1,6 +1,6 @@
 // The Bitcoin Garden — side-by-side gardens (used for the forward-in-time forecast).
-import { plantFor, formatGBP, signedPct } from './time-machine-engine.js?v=1.13.1';
-import { createPlant } from './time-machine-plant.js?v=1.13.1';
+import { plantFor, formatGBP, signedPct } from './time-machine-engine.js?v=1.13.2';
+import { createPlant } from './time-machine-plant.js?v=1.13.2';
 
 const NS = 'http://www.w3.org/2000/svg';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -42,7 +42,6 @@ export function createRace($, ids = {}, opts = {}) {
       b.s.textContent = b.sub ? b.sub : f.sells + (f.sells === 1 ? ' sale' : ' sales') + (f.sells ? ' · ' + formatGBP(b.banked[idx]).replace(/\.00$/, '') + ' banked' : '');
       b.el.querySelector('.bn').title = pl.name;
     }
-    R.cursor = idx;
   }
 
   function finish() {
@@ -71,7 +70,7 @@ export function createRace($, ids = {}, opts = {}) {
     if (R.state === 'playing') pause();
     const i = Number(e.target.value);
     if (i < R.cursor) for (const b of R.beds) { b.plant.reset(); b.lastSells = 0; }
-    update(i, false); if (i >= R.N - 1) finish();
+    R.cursor = i; update(i, false); if (i >= R.N - 1) finish();
   };
   return {
     openBeds(list) {
