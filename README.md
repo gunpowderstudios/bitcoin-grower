@@ -1,4 +1,4 @@
-# 🌱 Bitcoin Grower
+# 🌱 Bitcoin Garden
 
 A friendly, mobile-ready BTC/GBP **paper trading** experiment. Plant on dips, harvest portions after a rebound, and compare your virtual portfolio against simply buying and holding Bitcoin.
 
@@ -31,7 +31,7 @@ Never put API keys into a public GitHub repository, browser JavaScript, a screen
 ## Sharing with friends
 You can share the GitHub Pages link; each visitor runs an independent simulated garden in their own browser. No account registration or access to your Kraken account is involved.
 
-Version: **1.11.8** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
+Version: **1.11.9** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
 \n## Cloudflare simulation Worker\nThe prepared v1.8.1 Worker (requires deployment with Wrangler) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its virtual trading now runs automatically and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
 ## Owner-only simulation dashboard
 After deploying the new Worker, open `https://bitcoin-grower-bot.tim-c02.workers.dev/dashboard` to view persistent virtual balances, decisions and trades. Protect the Worker using Cloudflare Access (All traffic). Public GitHub Pages is a separate, browser-only demo for friends, not this owner dashboard. No live trading is supported.
@@ -94,7 +94,7 @@ The Time Machine now offers three ready-made **pruning styles** (Light: sell a q
 * Removed the animated plant from Today's Prices (it duplicated the year-ago figures). The plant stays in the Time Machine. The "£100 seed" sentence remains, with a 🌱.
 
 ## v1.11.3
-* Footer on both pages: "Bitcoin Grower © Gunpowder Studios 2026", linking to gunpowderstudios.co.uk in a new tab (yellow).
+* Footer on both pages: "Bitcoin Garden © Gunpowder Studios 2026", linking to gunpowderstudios.co.uk in a new tab (yellow).
 
 ## v1.11.4
 * Time Machine step 3 explains pruning in plain English, with a "What's pruning?" worked example.
@@ -105,9 +105,12 @@ The Time Machine now offers three ready-made **pruning styles** (Light: sell a q
 ## v1.11.6
 * Time Machine gets a fourth choice, **Just hold**: everything in on day one, never sold. It plays through the same plant, chart and summary, and the results table compares it with the three pruning styles. Engine: `simulate(steps, {strategy:"hold"})`.
 
-## v1.11.8
+## v1.11.9
 * "When would you like to travel back to?" gets a **The very start (2012)** button for the earliest day we have prices, with a plain warning that pre-2014 prices are thin and results can look enormous.
 * The date hint now also says what one Bitcoin cost on the chosen start day (when we have a price for it).
 
-## v1.11.8 · Historical price transparency
+## v1.11.9 · Historical price transparency
 Time Machine now shows the earliest date and first BTC/GBP price in the actually loaded data, the chosen start day's price, and an expandable breakdown of purchase fees, BTC acquired, final valuation and profit/loss. It distinguishes Bitcoin's 2009 launch from the beginning of reliable price coverage. Earlier unsupported data are not invented. Extending back before 2012 requires a validated earlier BTC/GBP price series.
+
+## v1.11.9 · Bitcoin Garden branding
+Renamed app-facing branding from Bitcoin Grower to Bitcoin Garden. Existing repository and deployment URLs are intentionally unchanged until the GitHub repository is renamed and hosting paths are updated. Historical strategy descriptions and the persistent Cloudflare bot remain operationally unchanged.
