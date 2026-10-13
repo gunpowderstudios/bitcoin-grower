@@ -2,13 +2,13 @@
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.13.8';
-import { createPlant } from './time-machine-plant.js?v=1.13.8';
-import { createSound } from './time-machine-sound.js?v=1.13.8';
-import { loadHistory } from './price-data.js?v=1.13.8';
-import { createRace } from './time-machine-race.js?v=1.13.8';
-import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.8';
-import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.8';
+} from './time-machine-engine.js?v=1.13.9';
+import { createPlant } from './time-machine-plant.js?v=1.13.9';
+import { createSound } from './time-machine-sound.js?v=1.13.9';
+import { loadHistory } from './price-data.js?v=1.13.9';
+import { createRace } from './time-machine-race.js?v=1.13.9';
+import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.9';
+import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.9';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -509,6 +509,7 @@ function setMode(mode) {
   if (fwd && S.state === 'playing') pause();
 }
 $('modeBack').onclick = () => setMode('back'); $('modeFwd').onclick = () => setMode('fwd');
+setMode('fwd');
 for (const b of $('fwHorizons').querySelectorAll('button')) b.onclick = () => { FW.days = Number(b.dataset.days); $('fwHorizons').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); };
 $('fwGo').onclick = () => {
   $('fwError').hidden = true;
