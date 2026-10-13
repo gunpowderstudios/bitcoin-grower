@@ -31,7 +31,7 @@ Never put API keys into a public GitHub repository, browser JavaScript, a screen
 ## Sharing with friends
 You can share the GitHub Pages link; each visitor runs an independent simulated garden in their own browser. No account registration or access to your Kraken account is involved.
 
-Version: **1.13.7** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
+Version: **1.13.10** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
 \n## Cloudflare simulation Worker\nThe prepared v1.8.1 Worker (requires deployment with Wrangler) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its virtual trading now runs automatically and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
 ## Owner-only simulation dashboard
 After deploying the new Worker, open `https://bitcoin-grower-bot.tim-c02.workers.dev/dashboard` to view persistent virtual balances, decisions and trades. Protect the Worker using Cloudflare Access (All traffic). Public GitHub Pages is a separate, browser-only demo for friends, not this owner dashboard. No live trading is supported.
@@ -105,7 +105,7 @@ The Time Machine now offers three ready-made **pruning styles** (Light: sell a q
 ## v1.11.6
 * Time Machine gets a fourth choice, **Just hold**: everything in on day one, never sold. It plays through the same plant, chart and summary, and the results table compares it with the three pruning styles. Engine: `simulate(steps, {strategy:"hold"})`.
 
-## v1.13.7 · Forward label
+## v1.13.10 · Forward label
 - Time Machine forward box now reads “If you planted (or already own) this much today…”, so people can enter what they already hold.
 
 ## v1.13.6 · Simpler scene
@@ -152,8 +152,11 @@ Renamed app-facing branding from Bitcoin Grower to Bitcoin Garden. Existing repo
 ## v1.13.3 · Simple historical Bitcoin calculator
 Historical Time Machine now makes a single Bitcoin purchase on the selected start date and holds it through historical daily prices. No dip-buying, pruning or selling. Clearer descriptions and one-purchase summary; future projections stay separate and hypothetical. Cloudflare background bot is unchanged.
 
-## v1.13.9 · Simpler forward scenarios and bull/bear education
+## v1.13.10 · Simpler forward scenarios and bull/bear education
 Renamed forward scenarios to Tough Times (bear), Middle Ground, Boom Times (bull), each with plain-English descriptions. Added expandable explanation of bull and bear markets and the historical ~4-year cycle, explicitly warning that it is not a prediction or reliable schedule. No changes to underlying percentile forecast calculations or Cloudflare bot.
 
-## v1.13.9 · Forward-first navigation
+## v1.13.10 · Forward-first navigation
 Time Machine now opens with Forward in Time selected and shown first, while retaining Back in Time as the second option. Forecast and historical calculations unchanged.
+
+## v1.13.10 · Forecast garden coin sounds and version display
+Forward-in-time three-garden playback now triggers a rate-limited, gentle synthesised coin clink when new milestone coins fall. Respects existing sound enable control and reduced-motion preference; scrubbing does not trigger audio. Synchronised Time Machine HTML version badge, JS engine version, imports and cache query strings to prevent stale version display. No forecast maths or Cloudflare bot changes.
