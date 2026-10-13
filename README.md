@@ -151,3 +151,6 @@ Renamed app-facing branding from Bitcoin Grower to Bitcoin Garden. Existing repo
 
 ## v1.13.3 · Simple historical Bitcoin calculator
 Historical Time Machine now makes a single Bitcoin purchase on the selected start date and holds it through historical daily prices. No dip-buying, pruning or selling. Clearer descriptions and one-purchase summary; future projections stay separate and hypothetical. Cloudflare background bot is unchanged.
+
+## v1.13.8 · Simpler forward scenarios and bull/bear education
+Renamed forward scenarios to Tough Times (bear), Middle Ground, Boom Times (bull), each with plain-English descriptions. Added expandable explanation of bull and bear markets and the historical ~4-year cycle, explicitly warning that it is not a prediction or reliable schedule. No changes to underlying percentile forecast calculations or Cloudflare bot.
