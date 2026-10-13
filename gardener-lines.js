@@ -6,7 +6,7 @@ const pct = n => Math.max(1, Math.round(Math.abs(n))) + '%';
 const share = p => p >= 100 ? 'all of it' : p === 50 ? 'half of it' : p === 25 ? 'a quarter of it' : Math.round(p) + '% of it';
 
 export function startLine({ amount, fromLabel }) {
-  return 'Hello! I’m planting ' + formatGBP(amount).replace(/\.00$/, '') + ' on ' + fromLabel + '. I’ll plant a little more when the price drops, and sell some when it rises.';
+  return 'Hello! I’m planting ' + formatGBP(amount).replace(/\.00$/, '') + ' on ' + fromLabel + '. I’ll leave it to grow and we’ll watch what happens. Coins will drop from the tree as it passes milestones.';
 }
 export function buyLine({ price, prevPrice, amount }) {
   const drop = prevPrice > 0 ? 100 * (1 - price / prevPrice) : NaN;

@@ -1,6 +1,6 @@
 // The Bitcoin Garden — side-by-side gardens (used for the forward-in-time forecast).
-import { plantFor, formatGBP, signedPct } from './time-machine-engine.js?v=1.13.2';
-import { createPlant } from './time-machine-plant.js?v=1.13.2';
+import { plantFor, formatGBP, signedPct } from './time-machine-engine.js?v=1.13.4';
+import { createPlant } from './time-machine-plant.js?v=1.13.4';
 
 const NS = 'http://www.w3.org/2000/svg';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -34,7 +34,7 @@ export function createRace($, ids = {}, opts = {}) {
     for (const b of R.beds) {
       const f = b.sim.frames[idx], start = b.sim.settings.amount, ratio = f.total / start, pl = plantFor(ratio, true);
       b.plant.setState(pl.stage, pl.droop);
-      if (f.sells !== b.lastSells) { b.plant.setCoins(f.sells, animate && f.sells > b.lastSells && !reduceMotion(), b.banked[idx]); b.lastSells = f.sells; }
+      b.plant.setFruit(ratio, animate && !reduceMotion());
       b.v.textContent = formatGBP(f.total);
       const pnl = f.total - start, up = pnl > 0.004, down = pnl < -0.004;
       b.g.className = 'bg ' + (up ? 'gain' : down ? 'loss' : '');

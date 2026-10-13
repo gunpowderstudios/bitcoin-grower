@@ -1,7 +1,7 @@
 // Bitcoin Garden Time Machine — pure simulation logic (v1.13.3).
 // No DOM, no network, no credentials, no exchange access: this module only does
 // arithmetic on historical prices so it can be tested in Node and reused by the page.
-export const VERSION = '1.13.3';
+export const VERSION = '1.13.4';
 
 export const DEFAULTS = Object.freeze({
   amount: 100,   // £ planted at the start
@@ -166,15 +166,20 @@ export function simulate(steps, rawSettings) {
 }
 
 // ---------- plant growth ----------
-export const STAGES = Object.freeze([
-  'Seed in the soil', 'Tiny green shoot', 'Seedling', 'Growing plant', 'Bush', 'Small tree', 'Golden Bitcoin tree'
-]);
-/** Lowest pot ratio (value / starting pot) for stages 1-6. Below the first the plant is a dormant seed again. */
-export const STAGE_RATIOS = Object.freeze([0.6, 0.9, 1.05, 1.25, 2, 5]);
+export const STAGES = Object.freeze(['Shoot', 'Small tree', 'Oak']);
+/** Lowest pot ratio (value / starting pot) for stages 1-2. Below the first it is still a little shoot. */
+export const STAGE_RATIOS = Object.freeze([1.5, 3]);
+/** Milestones (x what you planted). Each one, once passed, ripens a coin that drops from the leaves to the ground. */
+export const MILESTONES = Object.freeze([1.5, 2, 3, 5, 10, 25]);
+/** How many milestone coins are on the ground for a pot worth `ratio` times what was planted. */
+export function coinsFor(ratio) {
+  if (!Number.isFinite(ratio)) return 0;
+  return MILESTONES.filter(m => ratio >= m).length;
+}
 
 /**
- * Map the pot's value to a plant. The plant follows the money, never the calendar:
- * a pot that has lost value stays a small, drooping plant and a pot that has grown 5x is a golden tree.
+ * Map the pot's value to a plant: a shoot, a small tree, then an oak. The plant follows the money, never the calendar:
+ * a pot that has lost value stays a drooping shoot and a pot worth 3x what was planted is an oak.
  * `droop` (0-1) rises as the pot falls below what was planted.
  */
 export function plantFor(ratio, started = true) {

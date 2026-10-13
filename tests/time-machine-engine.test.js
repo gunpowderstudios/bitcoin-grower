@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {
-  VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor,
+  VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES, MILESTONES, coinsFor,
   addDays, addYears, isRealDate, signedGBP, signedPct, formatGBP
 } from '../time-machine-engine.js';
 
@@ -69,7 +69,7 @@ test('selectRange tolerates a weekend-sized hole at the start but not a big one'
 
 // ---------- settings ----------
 test('validateSettings applies defaults and rejects nonsense', () => {
-  assert.deepEqual(validateSettings({}), DEFAULTS);
+  assert.deepEqual(validateSettings({}), { ...DEFAULTS, strategy: 'grow' });
   for (const bad of [{ amount: 0 }, { amount: -5 }, { amount: NaN }, { amount: 2e6 }, { buyPct: 0 }, { buyPct: 101 }, { dipPct: 0 }, { dipPct: 95 },
     { risePct: 0 }, { sellPct: 0 }, { sellPct: 101 }, { feePct: -1 }, { feePct: 11 }, { amount: 'abc' }])
     assert.throws(() => validateSettings(bad), /Please|must be/, JSON.stringify(bad));
@@ -139,7 +139,7 @@ test('rising market: nothing to buy, pot stays at the amount planted while buy-a
 test('falling market: pot loses less than buy-and-hold, plant must not look rich', () => {
   const r = simulate(series(Array.from({ length: 60 }, (_, i) => 100 - i)), DEFAULTS);
   assert.ok(r.summary.end < 100 && r.summary.end > r.summary.hold);
-  assert.ok(plantFor(r.summary.end / 100).stage <= 2);
+  assert.ok(plantFor(r.summary.end / 100).stage <= 1);
 });
 test('sideways market inside the buy band: no trades, no change', () => {
   const r = simulate(series(Array.from({ length: 60 }, (_, i) => 100 + (i % 2 ? 2 : -2))), DEFAULTS);
@@ -182,16 +182,24 @@ test('small starting amounts work (£1)', () => {
 });
 
 // ---------- plant follows the money ----------
-test('plantFor maps value to stage monotonically and droops only below the amount planted', () => {
+test('plantFor gives a shoot, a small tree, then an oak, and droops only below the amount planted', () => {
+  assert.deepEqual(STAGES, ['Shoot', 'Small tree', 'Oak']);
   assert.equal(plantFor(1, false).stage, 0);
-  let prev = -1;
-  for (const r of [0.2, 0.59, 0.6, 0.89, 0.9, 1, 1.04, 1.05, 1.24, 1.25, 1.99, 2, 4.99, 5, 50]) { const s = plantFor(r).stage; assert.ok(s >= prev, 'monotonic at ' + r); prev = s; }
-  assert.equal(plantFor(1).stage, 2); assert.equal(plantFor(1).droop, 0);
-  assert.equal(plantFor(5).stage, 6); assert.equal(plantFor(0.5).stage, 0);
+  let prev = 0;
+  for (const r of [0.2, 0.9, 1, 1.49, 1.5, 2.99, 3, 50]) { const s = plantFor(r).stage; assert.ok(s >= prev, 'monotonic at ' + r); prev = s; }
+  assert.equal(plantFor(1.49).stage, 0); assert.equal(plantFor(1.5).stage, 1);
+  assert.equal(plantFor(2.99).stage, 1); assert.equal(plantFor(3).stage, 2);
+  assert.equal(plantFor(1).droop, 0);
   assert.ok(plantFor(0.9).droop > 0 && plantFor(0.7).droop > plantFor(0.9).droop && plantFor(0.1).droop === 1);
   assert.equal(plantFor(1.3).droop, 0);
-  assert.ok(plantFor(0.99).stage <= 2, 'a losing pot is never a big tree');
+  assert.equal(plantFor(0.99).stage, 0, 'a losing pot is never a tree');
 });
+test('coinsFor counts milestones passed (1.5x, 2x, 3x, 5x, 10x, 25x)', () => {
+  assert.equal(coinsFor(0.5), 0); assert.equal(coinsFor(1.49), 0); assert.equal(coinsFor(1.5), 1);
+  assert.equal(coinsFor(2.5), 2); assert.equal(coinsFor(3), 3); assert.equal(coinsFor(9.99), 4);
+  assert.equal(coinsFor(10), 5); assert.equal(coinsFor(1000), MILESTONES.length); assert.equal(coinsFor(NaN), 0);
+});
+
 
 // ---------- formatting ----------
 test('signed money and percentages use real plus/minus signs', () => {
@@ -202,14 +210,14 @@ test('signed money and percentages use real plus/minus signs', () => {
 
 // ---------- project hygiene ----------
 const read = f => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
-test('version is 1.13.2 everywhere it should be', () => {
-  assert.equal(VERSION, '1.13.2');
-  assert.equal(JSON.parse(read('version.json')).version, '1.13.2');
-  assert.equal(JSON.parse(read('package.json')).version, '1.13.2');
-  assert.equal(JSON.parse(read('bot/package.json')).version, '1.13.2');
-  assert.match(read('time-machine.html'), /id="version">v1\.13\.2</);
+test('version is 1.13.4 everywhere it should be', () => {
+  assert.equal(VERSION, '1.13.4');
+  assert.equal(JSON.parse(read('version.json')).version, '1.13.4');
+  assert.equal(JSON.parse(read('package.json')).version, '1.13.4');
+  assert.equal(JSON.parse(read('bot/package.json')).version, '1.13.4');
+  assert.match(read('time-machine.html'), /id="version">v1\.13\.4</);
   assert.match(read('README.md'), /1\.10\.0/);
-  assert.match(read('index.html'), /id="version">v1\.13\.2</);
+  assert.match(read('index.html'), /id="version">v1\.13\.4</);
 });
 test('every element id the page script uses exists in the HTML', () => {
   for (const [page, script] of [['time-machine.html', 'time-machine.js'], ['time-machine.html', 'time-machine-race.js'], ['index.html', 'garden.js']]) {

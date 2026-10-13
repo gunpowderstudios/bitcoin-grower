@@ -147,16 +147,17 @@ code{background:#10261a;padding:1px 6px;border-radius:6px}
 @keyframes unfurl{from{scale:.1;opacity:.2}to{scale:1;opacity:1}}
 .grew .tm-part.on,.perk .tm-part.on{animation:swell .9s ease}
 @keyframes swell{0%{transform:scale(1)}40%{transform:scale(1.06,1.09)}100%{transform:scale(1)}}
-.tm-aura{animation:breathe 4s ease-in-out infinite alternate;transform-origin:180px 100px}
-@keyframes breathe{from{opacity:.55;scale:.94}to{opacity:1;scale:1.04}}
-.tm-hang{animation:bob 3.2s ease-in-out infinite alternate}
-@keyframes bob{from{transform:translateY(-2px)}to{transform:translateY(3px)}}
-.tm-spark{transform-box:fill-box;transform-origin:center;opacity:0;animation:twinkle 2.8s ease-in-out infinite}
-@keyframes twinkle{0%,100%{opacity:0;scale:.2}45%{opacity:.95;scale:1}}
-.tm-spark.once{animation:twinkle1 1.3s ease-out .55s both}
-@keyframes twinkle1{0%{opacity:0;scale:.2}40%{opacity:1;scale:1.1}100%{opacity:0;scale:.5}}
-.tm-coin.drop{animation:coindrop 1.15s cubic-bezier(.45,0,.55,1) both}
-@keyframes coindrop{0%{transform:translateY(-200px);opacity:0}12%{opacity:1}52%{transform:translateY(0)}68%{transform:translateY(-15px)}84%{transform:translateY(0)}92%{transform:translateY(-4px)}100%{transform:translateY(0)}}
+/* apples: a coin ripens on a leaf, hangs a moment, then drops and bounces on the ground */
+.tm-coin.apple{animation:appledrop 2.4s both}
+@keyframes appledrop{
+  0%{transform:translate(var(--dx),var(--dy)) scale(.1);opacity:0;animation-timing-function:ease-out}
+  22%{transform:translate(var(--dx),var(--dy)) scale(1);opacity:1}
+  34%{transform:translate(var(--dx),var(--dy)) scale(1.18) rotate(8deg)}
+  46%{transform:translate(var(--dx),var(--dy)) scale(1) rotate(-6deg);animation-timing-function:cubic-bezier(.5,0,.9,.6)}
+  78%{transform:translate(0,0) scale(1);animation-timing-function:ease-out}
+  88%{transform:translate(0,-12px)}
+  100%{transform:translate(0,0)}
+}
 .tm-glow{opacity:.35}
 
 @media(max-width:640px){
@@ -171,7 +172,6 @@ code{background:#10261a;padding:1px 6px;border-radius:6px}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition-duration:.01s!important;scroll-behavior:auto!important}
-  .tm-spark{opacity:.8;scale:.7}.tm-spark.once{display:none}
 }
 
 .lbl{font-size:19px;font-weight:750;line-height:1.3}

@@ -1,17 +1,19 @@
-// Bitcoin Garden Time Machine — the living plant (v1.13.2).
-// One persistent SVG: parts grow, fade and sway with CSS transitions instead of being redrawn.
-// The picture is driven only by stage (0-6) and droop (0-1), both derived from the pot's real value.
+// Bitcoin Garden Time Machine — the living plant (v1.13.4).
+// Three simple stages: a shoot, a small tree, then an oak. One persistent SVG; parts cross-fade and sway with CSS.
+// Milestone coins ripen on the leaves and drop to the ground like apples.
+import { coinsFor } from './time-machine-engine.js?v=1.13.4';
 const NS = 'http://www.w3.org/2000/svg';
 const LEAF = 'M0 0 C6 -7 20 -8 30 0 C20 8 6 7 0 0Z';
-const SPARK = 'M0 -11 L1.8 -1.8 L11 0 L1.8 1.8 L0 11 L-1.8 1.8 L-11 0 L-1.8 -1.8Z';
-const COIN_SLOTS = (() => { // harvest coins stack up in a little pyramid beside the plant
-  const out = []; const rows = [5, 4, 3, 2, 1];
-  rows.forEach((n, r) => { for (let i = 0; i < n; i++) out.push({ x: 262 + (i - (n - 1) / 2) * 17 + 8, y: 276 - r * 13 }); });
-  return out;
-})();
-
-function rng(seed) { return () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const GROUND = 279; // y where fallen coins rest
+const SLOT_DX = [-62, 58, -34, 36, -88, 84]; // where fallen coins land, either side of the trunk
+// Where coins can ripen, per stage (leaf tips on the crown). The shoot is too young for fruit.
+const SPOTS = [
+  [],
+  [[126, 170], [236, 170], [150, 150], [210, 148], [180, 122]],
+  [[92, 134], [268, 134], [122, 158], [238, 158], [146, 98], [214, 98], [180, 68], [100, 108], [260, 108]]
+];
 const lerp = (a, b, t) => a + (b - a) * t;
+function rng(seed) { return () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const hex = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
 const mix = (a, b, t) => '#' + hex(a).map((v, i) => Math.round(lerp(v, hex(b)[i], t)).toString(16).padStart(2, '0')).join('');
 
@@ -28,6 +30,7 @@ export function createPlant(svg, uid = 'tm') {
   svg.setAttribute('role', 'img');
   svg.replaceChildren();
   let stage = 0, coins = 0;
+  const fallen = [];
 
   // ----- gradients (their colours are updated as the plant wilts or perks up) -----
   const defs = el('defs', {}, svg);
@@ -81,45 +84,24 @@ export function createPlant(svg, uid = 'tm') {
     }
   };
 
-  // 0 — seed in the soil
+  // 0 — a shoot
   const p0 = part(0);
-  el('ellipse', { cx: 180, cy: 262, rx: 13, ry: 9, fill: '#6b4a2b', transform: 'rotate(-18 180 260)' }, p0);
-  el('ellipse', { cx: 175, cy: 256, rx: 5, ry: 2.4, fill: '#a77b4b', transform: 'rotate(-18 177 259.5)' }, p0);
-  el('path', { d: 'M174 264 q6 3 13 -1', stroke: '#4a321d', 'stroke-width': 1.2, fill: 'none', 'stroke-linecap': 'round' }, p0);
-  // 1 — tiny shoot
+  stem(p0, 'M180 264 C180 250 182 238 182 224', 5);
+  leaf(p0, 181, 242, -28, 0.8, 1); leaf(p0, 181, 242, -152, 0.8, -1, 'B');
+  leaf(p0, 182, 224, -52, 1.0, 1); leaf(p0, 182, 224, -128, 1.0, -1, 'B');
+  leaf(p0, 182, 222, -90, 0.7, 1);
+  // 1 — a small tree
   const p1 = part(1);
-  stem(p1, 'M180 264 C180 254 181 247 182 240', 4);
-  leaf(p1, 182, 240, -35, 0.55, 1); leaf(p1, 182, 240, -145, 0.55, -1, 'B');
-  // 2 — seedling with two leaves
+  el('path', { d: 'M170 266 C174 240 176 210 178 176 L186 176 C188 210 190 240 194 266Z', fill: 'url(#tmTrunk)' }, p1);
+  stem(p1, 'M179 200 C168 190 158 184 148 174', 5, '#7e5333'); stem(p1, 'M185 194 C196 184 206 178 216 170', 5, '#7e5333');
+  [[180, 138, 56, 42], [146, 160, 34, 26], [216, 158, 34, 26]].forEach(a => blob(p1, ...a));
+  ring(p1, 180, 142, 66, 46, 20, 1.15);
+  // 2 — an oak
   const p2 = part(2);
-  stem(p2, 'M180 264 C179 247 181 232 181 218', 5);
-  leaf(p2, 181, 228, -22, 0.95, 1); leaf(p2, 181, 228, -158, 0.95, -1, 'B');
-  leaf(p2, 181, 218, -78, 0.6, 1); leaf(p2, 181, 218, -102, 0.6, -1, 'B');
-  // 3 — growing plant
-  const p3 = part(3);
-  stem(p3, 'M180 264 C176 236 184 208 181 168', 7);
-  pair(p3, 179, 244, 22, 1.0); pair(p3, 181, 220, 28, 1.15, 'B'); pair(p3, 182, 196, 30, 1.1); pair(p3, 181, 174, 40, 0.9, 'B');
-  leaf(p3, 181, 168, -90, 0.8, 1);
-  // 4 — bush
-  const p4 = part(4);
-  blob(p4, 180, 218, 74, 44); blob(p4, 140, 232, 44, 28); blob(p4, 224, 230, 46, 30);
-  stem(p4, 'M180 264 C178 240 182 206 180 160', 8); stem(p4, 'M178 262 C160 238 146 214 128 196', 6); stem(p4, 'M182 262 C202 238 216 214 234 196', 6);
-  ring(p4, 180, 214, 78, 44, 26, 1.1);
-  pair(p4, 180, 188, 35, 1.2); pair(p4, 181, 168, 45, 1.0, 'B'); leaf(p4, 180, 160, -90, 0.9, 1);
-  // 5 — small tree
-  const p5 = part(5);
-  el('path', { d: 'M168 266 C173 238 175 208 177 168 L187 168 C189 208 190 238 196 266Z', fill: 'url(#tmTrunk)' }, p5);
-  stem(p5, 'M178 206 C166 196 154 188 142 178', 6, '#7e5333'); stem(p5, 'M186 196 C200 186 212 178 224 166', 6, '#7e5333');
-  [[180, 128, 66, 48], [132, 146, 40, 32], [228, 146, 42, 34], [180, 92, 44, 32]].forEach(a => blob(p5, ...a));
-  ring(p5, 180, 124, 80, 56, 30, 1.2);
-  // 6 — large golden tree
-  const p6 = part(6);
-  const aura = el('circle', { class: 'tm-aura', cx: 180, cy: 100, r: 120, fill: 'url(#tmGlow)' }, p6);
-  aura.setAttribute('opacity', 0.9);
-  el('path', { d: 'M156 268 C168 244 171 214 173 150 L189 150 C191 214 194 244 208 268 C196 262 164 262 156 268Z', fill: 'url(#tmTrunk)' }, p6);
-  [['M176 214 C158 202 142 190 124 172', 8], ['M186 196 C206 182 224 170 244 150', 8], ['M180 160 C168 140 158 124 146 106', 6], ['M184 150 C196 130 206 114 220 96', 6]].forEach(([d, w]) => stem(p6, d, w, '#774d2f'));
-  [[180, 96, 88, 62], [118, 120, 52, 40], [244, 118, 54, 42], [150, 58, 52, 36], [214, 56, 52, 38], [180, 146, 56, 28]].forEach(a => blob(p6, ...a));
-  ring(p6, 180, 92, 104, 70, 46, 1.35);
+  el('path', { d: 'M150 268 C164 246 168 210 170 150 L192 150 C194 210 198 246 212 268 C196 262 166 262 150 268Z', fill: 'url(#tmTrunk)' }, p2);
+  [['M172 210 C154 198 138 186 122 168', 9], ['M190 196 C210 182 228 170 246 152', 9], ['M178 160 C166 140 156 124 144 106', 6], ['M186 150 C198 130 208 114 222 96', 6]].forEach(([d, w]) => stem(p2, d, w, '#774d2f'));
+  [[180, 100, 92, 62], [108, 128, 54, 42], [252, 128, 56, 44], [146, 62, 52, 38], [214, 62, 52, 38], [180, 150, 62, 28]].forEach(a => blob(p2, ...a));
+  ring(p2, 180, 98, 108, 70, 44, 1.35);
   function coinShape(parent, r) {
     el('circle', { r, fill: 'url(#tmCoin)', stroke: '#b4801a', 'stroke-width': 1.2 }, parent);
     el('circle', { r: r * 0.72, fill: 'none', stroke: '#fbe89a', 'stroke-width': 0.8 }, parent);
@@ -127,23 +109,30 @@ export function createPlant(svg, uid = 'tm') {
     t.textContent = '₿';
   }
 
-  // ----- harvested coins pile (in front, drawn last) -----
+  // ----- apples: coins ripen on a leaf, then drop to the ground -----
   const pile = el('g', { class: 'tm-pile' }, svg);
-  const pileLabel = el('text', { x: 270, y: 296, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, fill: '#ffe9a0', 'font-family': 'system-ui,sans-serif' }, svg);
+  const pileLabel = el('text', { x: 180, y: 296, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, fill: '#ffe9a0', 'font-family': 'system-ui,sans-serif' }, svg);
 
-  function setCoins(n, animate = true, banked = null) {
-    n = Math.max(0, n);
-    const shown = Math.min(n, COIN_SLOTS.length), had = Math.min(coins, COIN_SLOTS.length);
-    if (n < coins) pile.replaceChildren();
-    const start = n < coins ? 0 : had;
-    for (let i = start; i < shown; i++) {
-      const s = COIN_SLOTS[i];
-      const g = el('g', { transform: `translate(${s.x} ${s.y})` }, pile);
-      const bounce = el('g', { class: 'tm-coin' + (animate ? ' drop' : '') }, g); coinShape(bounce, 8.5);
-      if (animate) el('path', { class: 'tm-spark once', d: SPARK, fill: '#fff6c0' }, g);
+  function setFruit(ratio, animate = true) {
+    const n = coinsFor(ratio);
+    while (fallen.length > n) fallen.pop().remove();
+    const before = fallen.length;
+    for (let i = before; i < n; i++) {
+      const slotX = 180 + SLOT_DX[i % SLOT_DX.length], slotY = GROUND + ((i * 5) % 7) - 3;
+      const g = el('g', { transform: `translate(${slotX} ${slotY})` }, pile);
+      const inner = el('g', { class: 'tm-coin' }, g);
+      coinShape(inner, 10.5);
+      if (animate) {
+        const spots = SPOTS[stage] && SPOTS[stage].length ? SPOTS[stage] : SPOTS[1];
+        const spot = spots.reduce((a, b) => Math.abs(b[0] - slotX) < Math.abs(a[0] - slotX) ? b : a);
+        inner.style.setProperty('--dx', (spot[0] - slotX) + 'px'); inner.style.setProperty('--dy', (spot[1] - slotY) + 'px');
+        inner.style.animationDelay = ((i - before) * 0.9) + 's';
+        inner.classList.add('apple');
+      }
+      fallen.push(g);
     }
     coins = n;
-    pileLabel.textContent = n ? (n === 1 ? '1 sale' : n + ' sales') + (Number.isFinite(banked) ? ' · £' + Math.round(banked).toLocaleString('en-GB') + ' banked' : ' banked') : '';
+    pileLabel.textContent = n && Number.isFinite(ratio) ? 'Worth ' + (ratio >= 10 ? Math.round(ratio) : ratio.toFixed(1)) + '× what you planted' : '';
   }
 
   // ----- public controls -----
@@ -165,7 +154,7 @@ export function createPlant(svg, uid = 'tm') {
     svg.classList.toggle('droopy', droop > 0.05);
   }
   function perk() { svg.classList.remove('perk'); void svg.getBoundingClientRect(); svg.classList.add('perk'); }
-  function reset() { setCoins(0, false); stage = -1; delete svg.dataset.ready; setState(0, 0); }
+  function reset() { setFruit(0, false); stage = -1; delete svg.dataset.ready; setState(0, 0); }
 
   setState(0, 0);
   if (uid !== 'tm') { // several plants on one page: give the colour gradients that change (leaves, crown) their own ids
@@ -175,5 +164,5 @@ export function createPlant(svg, uid = 'tm') {
       for (const a of ['fill', 'stroke']) { const v = n.getAttribute(a); if (v && v.includes('#tm')) n.setAttribute(a, swap(v)); }
     });
   }
-  return { setState, setCoins, perk, reset, get stage() { return stage; }, get coins() { return coins; } };
+  return { setState, setFruit, perk, reset, get stage() { return stage; }, get coins() { return coins; } };
 }

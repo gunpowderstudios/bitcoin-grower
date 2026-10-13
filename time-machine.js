@@ -2,14 +2,14 @@
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.13.3';
-import { createPlant } from './time-machine-plant.js?v=1.13.3';
-import { createSound } from './time-machine-sound.js?v=1.13.3';
-import { loadHistory } from './price-data.js?v=1.13.3';
-import { createGardener } from './time-machine-gardener.js?v=1.13.3';
-import { createRace } from './time-machine-race.js?v=1.13.3';
-import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.3';
-import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.3';
+} from './time-machine-engine.js?v=1.13.4';
+import { createPlant } from './time-machine-plant.js?v=1.13.4';
+import { createSound } from './time-machine-sound.js?v=1.13.4';
+import { loadHistory } from './price-data.js?v=1.13.4';
+import { createGardener } from './time-machine-gardener.js?v=1.13.4';
+import { createRace } from './time-machine-race.js?v=1.13.4';
+import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.4';
+import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.4';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -265,6 +265,7 @@ function render({ instant = false, fast = false, quiet = false, steps = 1 } = {}
   // plant
   const ratio = f.total / start, pl = plantFor(ratio, true);
   plant.setState(pl.stage, pl.droop);
+  plant.setFruit(ratio, !instant && !quiet && !reduceMotion());
   $('stage').textContent = pl.name + (pl.droop > 0.35 ? ' · drooping 😟' : '');
   const now = performance.now();
   if (now - S.droopMark.t > 1500) { if (S.droopMark.v - pl.droop > 0.1 && now - S.lastPerk > 3000) { plant.perk(); S.lastPerk = now; } S.droopMark = { t: now, v: pl.droop }; }
@@ -281,7 +282,6 @@ function render({ instant = false, fast = false, quiet = false, steps = 1 } = {}
   if (f.events !== seen || S.shownLog < 0) {
     const fresh = events.slice(Math.min(seen, f.events), f.events);
     const sells = fresh.filter(e => e.side === 'SELL'), buys = fresh.filter(e => e.side === 'BUY');
-    plant.setCoins(0, false, 0);
     if (!instant && !quiet && fresh.length) {
       const e = fresh.at(-1), at = events.indexOf(e), prev = events[at - 1];
       if (e.side === 'BUY') gardener.say(buyLine({ price: e.price, prevPrice: prev ? prev.price : frames[0].price, amount: e.gbp }), { priority: 2 });
