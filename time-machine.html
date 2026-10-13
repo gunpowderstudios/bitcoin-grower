@@ -6,14 +6,14 @@
 <title>The Bitcoin Garden — Time Machine</title>
 <meta name="description" content="Plant an imaginary £100 in the past and watch it grow through real Bitcoin history. A friendly simulation — no real money, no real trades.">
 <meta name="theme-color" content="#0c1d14">
-<link rel="stylesheet" href="./time-machine.css?v=1.13.8">
+<link rel="stylesheet" href="./time-machine.css?v=1.13.9">
 </head>
 <body>
 <a class="skip" href="#plant-heading">Skip to the plant</a>
 <main>
 <header>
   <div>
-    <div class="sub">🌱 THE BITCOIN GARDEN <span class="vtag" id="version">v1.13.8</span></div>
+    <div class="sub">🌱 THE BITCOIN GARDEN <span class="vtag" id="version">v1.13.9</span></div>
     <h1>Time Machine ⏳</h1>
     <div class="sub">Travel back in time to see what really happened to pretend money, or forward to see the range of futures the past suggests.</div>
   </div>
@@ -28,12 +28,12 @@
 <section class="card modes" aria-labelledby="mode-heading">
   <h2 id="mode-heading">Which way do you want to travel?</h2>
   <div class="modegrid" role="group" aria-labelledby="mode-heading">
-    <button type="button" class="mode" id="modeBack" aria-pressed="true"><span class="big" aria-hidden="true">🦖</span><b>Back in time</b><small>Plant money in the past and watch what really happened.</small></button>
-    <button type="button" class="mode" id="modeFwd" aria-pressed="false"><span class="big" aria-hidden="true">🚀</span><b>Forward in time</b><small>See the range of futures the past suggests. A forecast, not a promise.</small></button>
+    <button type="button" class="mode" id="modeFwd" aria-pressed="true"><span class="big" aria-hidden="true">🚀</span><b>Forward in time</b><small>See the range of futures the past suggests. A forecast, not a promise.</small></button>
+    <button type="button" class="mode" id="modeBack" aria-pressed="false"><span class="big" aria-hidden="true">🦖</span><b>Back in time</b><small>Plant money in the past and watch what really happened.</small></button>
   </div>
 </section>
 
-<div id="backMode">
+<div id="backMode" hidden>
 <!-- ============ SET UP: THREE STEPS ============ -->
 <section class="card" aria-labelledby="setup-heading" id="setup">
   <h2 id="setup-heading">Plant your money in the past</h2>
@@ -145,7 +145,7 @@
 </div>
 
 <!-- ============ FORWARD IN TIME ============ -->
-<div id="fwdMode" hidden>
+<div id="fwdMode">
 <section class="card" aria-labelledby="fw-heading" id="fwSetup">
   <h2 id="fw-heading">🚀 Launch into the future</h2>
   <details class="advanced"><summary>🐂 Bull markets, 🐻 bear markets &amp; Bitcoin's four-year cycle</summary>
@@ -218,6 +218,6 @@
 </div>
 <footer class="sitefoot">The Bitcoin Garden © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
 </main>
-<script type="module" src="./time-machine.js?v=1.13.8"></script>
+<script type="module" src="./time-machine.js?v=1.13.9"></script>
 </body>
 </html>
