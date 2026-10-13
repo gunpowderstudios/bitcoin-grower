@@ -2,14 +2,14 @@
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.13.2';
-import { createPlant } from './time-machine-plant.js?v=1.13.2';
-import { createSound } from './time-machine-sound.js?v=1.13.2';
-import { loadHistory } from './price-data.js?v=1.13.2';
-import { createGardener } from './time-machine-gardener.js?v=1.13.2';
-import { createRace } from './time-machine-race.js?v=1.13.2';
-import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.2';
-import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.2';
+} from './time-machine-engine.js?v=1.13.3';
+import { createPlant } from './time-machine-plant.js?v=1.13.3';
+import { createSound } from './time-machine-sound.js?v=1.13.3';
+import { loadHistory } from './price-data.js?v=1.13.3';
+import { createGardener } from './time-machine-gardener.js?v=1.13.3';
+import { createRace } from './time-machine-race.js?v=1.13.3';
+import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.3';
+import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.3';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -113,7 +113,7 @@ function updateDateHint() {
 function readSettings() {
   return validateSettings({
     amount: $('amount').value === '' ? NaN : $('amount').value, buyPct: $('buyPct').value, dipPct: $('dipPct').value,
-    risePct: $('risePct').value, sellPct: $('sellPct').value, feePct: $('feePct').value
+    risePct: $('risePct').value, sellPct: $('sellPct').value, feePct: $('feePct').value, strategy: 'hold'
   });
 }
 $('from').addEventListener('input', () => { showError(''); syncPresets(); updateDateHint(); });
@@ -281,7 +281,7 @@ function render({ instant = false, fast = false, quiet = false, steps = 1 } = {}
   if (f.events !== seen || S.shownLog < 0) {
     const fresh = events.slice(Math.min(seen, f.events), f.events);
     const sells = fresh.filter(e => e.side === 'SELL'), buys = fresh.filter(e => e.side === 'BUY');
-    plant.setCoins(f.sells, !instant && !quiet && fresh.length > 0 && !reduceMotion(), events.slice(0, f.events).reduce((a, e) => a + (e.side === 'SELL' ? e.gbp : 0), 0));
+    plant.setCoins(0, false, 0);
     if (!instant && !quiet && fresh.length) {
       const e = fresh.at(-1), at = events.indexOf(e), prev = events[at - 1];
       if (e.side === 'BUY') gardener.say(buyLine({ price: e.price, prevPrice: prev ? prev.price : frames[0].price, amount: e.gbp }), { priority: 2 });
@@ -355,7 +355,7 @@ function buildTimelineTicks() {
 }
 const W = 700, X0 = 62, X1 = 688, Y0 = 16, Y1 = 214;
 function buildChart() {
-  const { frames, events, settings } = S.sim, N = frames.length, start = settings.amount, showHold = $('showHold').checked;
+  const { frames, events, settings } = S.sim, N = frames.length, start = settings.amount, showHold = false;
   const d0 = dayNumber(frames[0].date), d1 = dayNumber(frames.at(-1).date);
   let lo = start, hi = start;
   for (const f of frames) { lo = Math.min(lo, f.total); hi = Math.max(hi, f.total); if (showHold) { lo = Math.min(lo, f.hold); hi = Math.max(hi, f.hold); } }
@@ -428,7 +428,11 @@ function showPurchaseMath() {
   line('Starting price', formatGBP(first.price) + ' per BTC on ' + fmtLong(first.date));
   line('Ending price', formatGBP(last.price) + ' per BTC on ' + fmtLong(last.date));
   line('Original pot', formatGBP(s.start));
-  {
+  if (sim.settings.strategy === 'hold') {
+    line('Original purchase', buys[0] ? fmtLong(buys[0].date) + ': ' + formatGBP(buys[0].gbp) + ' bought ' + buys[0].btc.toFixed(8) + ' BTC at ' + formatGBP(buys[0].price) + '/BTC' : '—');
+    line('Purchase fee', formatGBP(s.feesPaid));
+    line('Final Bitcoin value', s.btc.toFixed(8) + ' BTC × ' + formatGBP(last.price) + ' = ' + formatGBP(s.end));
+  } else {
     line('First purchase', buys[0] ? fmtLong(buys[0].date) + ': ' + formatGBP(buys[0].gbp) + ' at ' + formatGBP(buys[0].price) + '/BTC, buying ' + buys[0].btc.toFixed(8) + ' BTC after fees' : 'No dip triggered a purchase');
     line('Total virtual purchases and sales', s.buys + ' purchases / ' + s.sells + ' sales');
     line('Total estimated trading fees', formatGBP(s.feesPaid));
@@ -456,7 +460,7 @@ function complete(instant = false) {
   $('sum-heading').focus({ preventScroll: true });
 }
 function showSummary() {
-  gardener.say(endLine(S.sim.summary), { priority: 3, ms: 7000 });
+  gardener.say('Your historical Bitcoin journey is complete!', { priority: 3, ms: 7000 });
   showPurchaseMath();
   const s = S.sim.summary, up = s.profit > 0.004, down = s.profit < -0.004;
   const years = s.days / 365.25, span = years >= 1.5 ? years.toFixed(1) + ' years' : Math.round(s.days / 30.44) + ' months';
@@ -470,14 +474,14 @@ function showSummary() {
   $('sPnlLabel').textContent = up ? 'Total profit' : down ? 'Total loss' : 'Total profit or loss';
   $('sPnl').textContent = signedGBP(s.profit);
   $('sPct').textContent = (up ? '▲ ' : down ? '▼ ' : '■ ') + signedPct(s.pct);
-  $('sTrades').textContent = s.buys + ' / ' + s.sells;
+  $('sTrades').textContent = '1 purchase';
   $('vsMe').textContent = formatGBP(s.end); $('vsMePct').textContent = signedPct(s.pct);
   $('vsHold').textContent = formatGBP(s.hold); $('vsHoldPct').textContent = signedPct(s.holdPct);
   const d = s.vsHold, close = Math.abs(d) < s.start * 0.005;
   $('vsText').textContent = close ? 'The two ended up almost exactly the same.'
     : d > 0 ? 'In this period the Grower strategy finished ' + formatGBP(d) + ' ahead of simply buying Bitcoin on day one and waiting.'
       : 'In this period, simply buying Bitcoin on day one and waiting would have finished ' + formatGBP(-d) + ' ahead of the Grower strategy. Buy-and-hold puts everything into Bitcoin straight away, so it gains more when Bitcoin climbs — and falls further when it drops.';
-  $('sumFine').textContent = 'Trading fees paid: ' + formatGBP(s.feesPaid) + ' · Biggest fall from a high point: ' + s.maxDrawdown.toFixed(1) + '%' +
+  $('sumFine').textContent = 'One-time purchase fee: ' + formatGBP(s.feesPaid) + ' · Biggest fall from a high point: ' + s.maxDrawdown.toFixed(1) + '%' +
     (s.skippedBuys ? ' · ' + s.skippedBuys + ' time' + (s.skippedBuys > 1 ? 's' : '') + ' the strategy wanted to buy but had no cash left' : '') +
     '. Buy-and-hold pays the same fee once. Both numbers are measured at the final day’s closing price.';
 }
