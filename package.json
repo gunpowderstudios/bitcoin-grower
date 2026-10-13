@@ -1,9 +1,9 @@
 {
   "name": "bitcoin-grower",
-  "version": "1.11.8",
+  "version": "1.11.9",
   "private": true,
   "type": "module",
-  "description": "Bitcoin Grower public simulator and Time Machine (simulation only).",
+  "description": "Bitcoin Garden public simulator and Time Machine (simulation only).",
   "scripts": {
     "test": "node --test tests/*.test.js && (cd bot && npm test)"
   },
