@@ -160,3 +160,6 @@ Time Machine now opens with Forward in Time selected and shown first, while reta
 
 ## v1.13.10 · Forecast garden coin sounds and version display
 Forward-in-time three-garden playback now triggers a rate-limited, gentle synthesised coin clink when new milestone coins fall. Respects existing sound enable control and reduced-motion preference; scrubbing does not trigger audio. Synchronised Time Machine HTML version badge, JS engine version, imports and cache query strings to prevent stale version display. No forecast maths or Cloudflare bot changes.
+
+## v1.13.11 · Plain-English forecast chart legend
+On Today's Prices, renamed wide area to Possible Ups & Downs, middle area to More Typical Outcomes, and centre line to Middle Ground. Added a small disclosure explaining middle 80%, middle 50%, and historical median. Forecast calculations unchanged.
