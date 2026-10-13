@@ -2,14 +2,14 @@
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.13.4';
-import { createPlant } from './time-machine-plant.js?v=1.13.4';
-import { createSound } from './time-machine-sound.js?v=1.13.4';
-import { loadHistory } from './price-data.js?v=1.13.4';
-import { createGardener } from './time-machine-gardener.js?v=1.13.4';
-import { createRace } from './time-machine-race.js?v=1.13.4';
-import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.4';
-import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.4';
+} from './time-machine-engine.js?v=1.13.5';
+import { createPlant } from './time-machine-plant.js?v=1.13.5';
+import { createSound } from './time-machine-sound.js?v=1.13.5';
+import { loadHistory } from './price-data.js?v=1.13.5';
+import { createGardener } from './time-machine-gardener.js?v=1.13.5';
+import { createRace } from './time-machine-race.js?v=1.13.5';
+import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.5';
+import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.5';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';

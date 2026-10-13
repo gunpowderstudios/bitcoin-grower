@@ -1,9 +1,9 @@
 // Bitcoin Grower — Today's Prices page controller (v1.11.7). Simulation only; read-only public price data.
-import { VERSION, formatGBP, signedPct, addDays, dayNumber, describeData } from './time-machine-engine.js?v=1.13.4';
-import { loadHistory } from './price-data.js?v=1.13.4';
-import { fetchLive, fetchSeries } from './live-price.js?v=1.13.4';
-import { RANGES, RANGE_ORDER, historySeries, changeOver, trimToWindow, downsample, axisLabel, tooltipLabel } from './price-ranges.js?v=1.13.4';
-import { forecast, describe, changeSince, SINCE_CHOICES } from './forecast-engine.js?v=1.13.4';
+import { VERSION, formatGBP, signedPct, addDays, dayNumber, describeData } from './time-machine-engine.js?v=1.13.5';
+import { loadHistory } from './price-data.js?v=1.13.5';
+import { fetchLive, fetchSeries } from './live-price.js?v=1.13.5';
+import { RANGES, RANGE_ORDER, historySeries, changeOver, trimToWindow, downsample, axisLabel, tooltipLabel } from './price-ranges.js?v=1.13.5';
+import { forecast, describe, changeSince, SINCE_CHOICES } from './forecast-engine.js?v=1.13.5';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
