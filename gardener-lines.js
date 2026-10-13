@@ -1,14 +1,12 @@
-// The Bitcoin Garden — what the little gardener says (v1.13.0). Pure text helpers, no DOM, no network.
+// The Bitcoin Garden — what the little gardener says (v1.13.1). Pure text helpers, no DOM, no network.
 // Plain English only: it explains what the strategy is doing, never tells anyone what to buy or sell.
 import { formatGBP } from './time-machine-engine.js';
 
 const pct = n => Math.max(1, Math.round(Math.abs(n))) + '%';
 const share = p => p >= 100 ? 'all of it' : p === 50 ? 'half of it' : p === 25 ? 'a quarter of it' : Math.round(p) + '% of it';
 
-export function startLine({ amount, hold, fromLabel }) {
-  return hold
-    ? 'Hello! I’m putting all ' + formatGBP(amount).replace(/\.00$/, '') + ' in on ' + fromLabel + ' and then I won’t touch it. Let’s see what happens.'
-    : 'Hello! I’m planting ' + formatGBP(amount).replace(/\.00$/, '') + ' on ' + fromLabel + '. I’ll plant a little more when the price drops, and pick some when it rises.';
+export function startLine({ amount, fromLabel }) {
+  return 'Hello! I’m planting ' + formatGBP(amount).replace(/\.00$/, '') + ' on ' + fromLabel + '. I’ll plant a little more when the price drops, and sell some when it rises.';
 }
 export function buyLine({ price, prevPrice, amount }) {
   const drop = prevPrice > 0 ? 100 * (1 - price / prevPrice) : NaN;
@@ -16,7 +14,7 @@ export function buyLine({ price, prevPrice, amount }) {
 }
 export function sellLine({ price, buyPrice, sellPct, gbp }) {
   const rise = buyPrice > 0 ? 100 * (price / buyPrice - 1) : NaN;
-  return 'It’s up about ' + (Number.isFinite(rise) && rise > 0 ? pct(rise) : '10%') + ' on what I planted: pruning time! I’m selling ' + share(sellPct) + ' and banking ' + formatGBP(gbp) + '.' + (sellPct >= 100 ? '' : ' The rest keeps growing.');
+  return 'It’s up about ' + (Number.isFinite(rise) && rise > 0 ? pct(rise) : '10%') + ' on what I planted, so I’m selling ' + share(sellPct) + ' and banking ' + formatGBP(gbp) + '.' + (sellPct >= 100 ? '' : ' The rest keeps growing.');
 }
 /** Milestones for the whole pot. `seen` is a Set of keys already said this journey. Returns text or null. */
 export function moodLine({ ratio, prevRatio, seen }) {
@@ -29,9 +27,9 @@ export function moodLine({ ratio, prevRatio, seen }) {
   if (ratio >= 1 && seen.has('drop') && prevRatio < 1) { const t = once('recover', 'The sun’s back out. The pot has climbed back to where it started.'); if (t) return t; }
   return null;
 }
-export function endLine(summary, hold) {
+export function endLine(summary) {
   const up = summary.profit > 0.004, down = summary.profit < -0.004;
   const end = formatGBP(summary.end);
-  return up ? 'We made it to today! The pot ended at ' + end + (hold ? '. Remember it fell as far as ' + Math.round(summary.maxDrawdown) + '% along the way.' : '. Have a look at how holding and the other styles compare.')
+  return up ? 'We made it to today! The pot ended at ' + end + '. Scroll down to see how that compares with simply buying and holding.'
     : down ? 'We made it to today, but the pot ended at ' + end + ', below what we planted. That can happen with Bitcoin.' : 'We made it to today and ended almost exactly where we started.';
 }

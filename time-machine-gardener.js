@@ -1,4 +1,4 @@
-// The Bitcoin Garden — the little gardener who explains what is happening (v1.13.0). Decoration + speech bubble.
+// The Bitcoin Garden — the little gardener who explains what is happening (v1.13.1). Decoration + speech bubble.
 const NS = 'http://www.w3.org/2000/svg';
 export function createGardener(host) {
   const wrap = document.createElement('div');

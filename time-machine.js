@@ -1,15 +1,15 @@
 // Bitcoin Garden Time Machine — page controller (v1.8.3). Simulation only: no accounts, keys or trading.
 import {
-  VERSION, DEFAULTS, PRESETS, HOLD, compareAll, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
+  VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.13.0';
-import { createPlant } from './time-machine-plant.js?v=1.13.0';
-import { createSound } from './time-machine-sound.js?v=1.13.0';
-import { loadHistory } from './price-data.js?v=1.13.0';
-import { createGardener } from './time-machine-gardener.js?v=1.13.0';
-import { createRace } from './time-machine-race.js?v=1.13.0';
-import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.0';
-import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.0';
+} from './time-machine-engine.js?v=1.13.1';
+import { createPlant } from './time-machine-plant.js?v=1.13.1';
+import { createSound } from './time-machine-sound.js?v=1.13.1';
+import { loadHistory } from './price-data.js?v=1.13.1';
+import { createGardener } from './time-machine-gardener.js?v=1.13.1';
+import { createRace } from './time-machine-race.js?v=1.13.1';
+import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.1';
+import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.1';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -19,14 +19,13 @@ const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)
 
 const plant = createPlant($('plant'));
 const gardener = createGardener($('scene'));
-const race = createRace($);
 const fwRace = createRace($, { section: 'fwRace', beds: 'fwBeds', date: 'fwDate', scrub: 'fwScrub', play: 'fwPlay', restart: 'fwRestart', note: 'fwNote' }, {
   uid: 'fw', finishNote: beds => 'Over the chosen time, the typical run ended at ' + formatGBP(beds[1].sim.summary.end) + ', the rough patch at ' + formatGBP(beds[0].sim.summary.end) + ' and the good run at ' + formatGBP(beds[2].sim.summary.end) + '. The real future could land anywhere, even outside this range.'
 });
 const sound = createSound();
 sound.enableWhenAllowed(); // sound is on by default; it starts with the visitor's first click or tap
 const S = {
-  preset: 'medium', data: null, sourceNote: '', steps: null, sim: null, cursor: 0, state: 'idle', speed: 'normal',
+  data: null, sourceNote: '', steps: null, sim: null, cursor: 0, state: 'idle', speed: 'normal',
   raf: 0, last: 0, acc: 0, lastYear: '', lastStage: 0, droopMark: { t: 0, v: 0 }, lastPerk: 0, lastToast: 0,
   shownLog: -1, chart: null, markers: 0, lastFast: false
 };
@@ -114,36 +113,13 @@ function updateDateHint() {
 function readSettings() {
   return validateSettings({
     amount: $('amount').value === '' ? NaN : $('amount').value, buyPct: $('buyPct').value, dipPct: $('dipPct').value,
-    risePct: $('risePct').value, sellPct: $('sellPct').value, feePct: $('feePct').value,
-    strategy: S.preset === 'hold' ? 'hold' : 'grow'
+    risePct: $('risePct').value, sellPct: $('sellPct').value, feePct: $('feePct').value
   });
 }
 $('from').addEventListener('input', () => { showError(''); syncPresets(); updateDateHint(); });
 $('to').addEventListener('input', () => { showError(''); updateDateHint(); });
 $('amount').addEventListener('input', () => { showError(''); if (S.state === 'idle') showIdleFigures(); });
-$('defaults').onclick = () => { for (const k of ['buyPct', 'dipPct', 'risePct', 'sellPct', 'feePct']) $(k).value = DEFAULTS[k]; showError(''); choosePreset('medium'); };
-
-// ---------------------------------------------------------------- pruning styles
-function choosePreset(key) {
-  S.preset = key;
-  const p = PRESETS[key];
-  if (p) { $('dipPct').value = p.dipPct; $('risePct').value = p.risePct; $('sellPct').value = p.sellPct; }
-  for (const b of $('styles').children) b.setAttribute('aria-pressed', String(b.dataset.preset === key));
-  $('customNote').hidden = key !== 'custom';
-}
-(function buildStyles() {
-  const box = $('styles');
-  for (const p of [...Object.values(PRESETS), HOLD]) {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'style' + (p.hold ? ' hold' : ''); b.dataset.preset = p.key; b.setAttribute('aria-pressed', 'false');
-    b.innerHTML = '<span class="em" aria-hidden="true">' + p.emoji + '</span><span class="tx"><b></b><small></small></span>';
-    b.querySelector('b').textContent = p.name; b.querySelector('small').textContent = p.blurb;
-    b.onclick = () => { choosePreset(p.key); showError(''); };
-    box.appendChild(b);
-  }
-  for (const id of ['dipPct', 'risePct', 'sellPct']) $(id).addEventListener('input', () => choosePreset('custom'));
-  choosePreset('medium');
-})();
+$('defaults').onclick = () => { for (const k of ['buyPct', 'dipPct', 'risePct', 'sellPct', 'feePct']) $(k).value = DEFAULTS[k]; showError(''); };
 
 // ---------------------------------------------------------------- idle (nothing running yet)
 function showIdleFigures() {
@@ -182,7 +158,6 @@ function begin(autoplay) {
     S.sim = simulate(steps, settings); S.steps = steps;
   } catch (e) { showError(e.message); $('error').scrollIntoView({ block: 'nearest' }); return false; }
   if (sound.enabled) sound.unlock();
-  { const holding = S.sim.settings.strategy === 'hold', cb = $('showHold'); if (holding) cb.checked = false; cb.closest('label').hidden = holding; }
   $('figStart').textContent = formatGBP(S.sim.settings.amount);
   buildTimelineTicks(); buildChart();
   restart(autoplay);
@@ -192,11 +167,11 @@ function begin(autoplay) {
 function restart(autoplay) {
   stopLoop(); S.cursor = 0; S.state = 'ready'; S.lastStage = 0; S.shownLog = -1; S.markers = 0; S.acc = 0;
   plant.reset(); S.droopMark = { t: performance.now(), v: 0 };
-  $('summary').hidden = true; race.close(); gardener.clear(); S.mood = new Set(); S.prevRatio = 1;
+  $('summary').hidden = true; gardener.clear(); S.mood = new Set(); S.prevRatio = 1;
   for (const id of ['play', 'month', 'finish', 'restart']) $(id).disabled = false;
   $('chart').querySelectorAll('.mk').forEach(n => n.remove());
   render({ instant: true });
-  { const st = S.sim.settings; gardener.say(startLine({ amount: st.amount, hold: st.strategy === 'hold', fromLabel: fmtLong(S.sim.frames[0].date) }), { priority: 2, ms: 6500 }); }
+  { const st = S.sim.settings; gardener.say(startLine({ amount: st.amount, fromLabel: fmtLong(S.sim.frames[0].date) }), { priority: 2, ms: 6500 }); }
   setStatus('Ready! Press play to start travelling forward.');
   syncButtons();
   if (autoplay) play();
@@ -257,7 +232,6 @@ $('finish').onclick = () => {
   render({ instant: true }); complete(true);
 };
 $('go').onclick = () => begin(true);
-$('raceBtn').onclick = () => { const s = S.sim.settings; race.open(S.steps, { amount: s.amount, buyPct: s.buyPct, feePct: s.feePct }); $('race').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' }); $('race-heading').focus({ preventScroll: true }); };
 $('again').onclick = () => { $('setup').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' }); $('from').focus({ preventScroll: true }); };
 $('replay').onclick = () => { restart(true); $('journey').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' }); };
 for (const b of $('speed').querySelectorAll('button')) b.onclick = () => {
@@ -443,7 +417,6 @@ function showPurchaseMath() {
   if (!sim?.frames?.length) return;
   const frames = sim.frames, s = sim.summary, first = frames[0], last = frames.at(-1);
   const fee = sim.settings.feePct / 100;
-  const isHold = sim.settings.strategy === 'hold';
   const buys = sim.events.filter(e => e.side === 'BUY');
   const box = $('purchaseMathBody');
   box.replaceChildren();
@@ -455,13 +428,7 @@ function showPurchaseMath() {
   line('Starting price', formatGBP(first.price) + ' per BTC on ' + fmtLong(first.date));
   line('Ending price', formatGBP(last.price) + ' per BTC on ' + fmtLong(last.date));
   line('Original pot', formatGBP(s.start));
-  if (isHold) {
-    const e = buys[0];
-    line('First and only purchase', e ? formatGBP(e.gbp) + ' invested on ' + fmtLong(e.date) : 'No purchase recorded');
-    line('Purchase fee (' + sim.settings.feePct + '%)', formatGBP(s.feesPaid));
-    line('Bitcoin bought', e ? e.btc.toFixed(8) + ' BTC' : '—');
-    line('Final Bitcoin value', (e ? e.btc.toFixed(8) + ' BTC × ' + formatGBP(last.price) : '—') + ' = ' + formatGBP(s.end));
-  } else {
+  {
     line('First purchase', buys[0] ? fmtLong(buys[0].date) + ': ' + formatGBP(buys[0].gbp) + ' at ' + formatGBP(buys[0].price) + '/BTC, buying ' + buys[0].btc.toFixed(8) + ' BTC after fees' : 'No dip triggered a purchase');
     line('Total virtual purchases and sales', s.buys + ' purchases / ' + s.sells + ' sales');
     line('Total estimated trading fees', formatGBP(s.feesPaid));
@@ -488,32 +455,9 @@ function complete(instant = false) {
   sm.scrollIntoView({ behavior: reduceMotion() || instant ? 'auto' : 'smooth', block: 'start' });
   $('sum-heading').focus({ preventScroll: true });
 }
-function renderCompare() {
-  const body = $('cmpBody'); body.replaceChildren();
-  const s = S.sim.settings, base = { amount: s.amount, buyPct: s.buyPct, feePct: s.feePct };
-  const all = compareAll(S.steps, base), mine = S.sim.summary;
-  const rows = Object.values(PRESETS).map(p => ({ key: p.key, label: p.emoji + ' ' + p.name, r: all[p.key] }));
-  if (S.preset === 'custom') rows.push({ key: 'custom', label: '⚙️ Your custom settings', r: mine });
-  rows.push({ key: 'hold', label: HOLD.emoji + ' ' + HOLD.name, hold: true, r: mine });
-  for (const row of rows) {
-    const tr = body.insertRow(); if (row.key === S.preset) tr.className = 'played';
-    const end = row.hold ? mine.hold : row.r.end, pct = row.hold ? mine.holdPct : row.r.pct;
-    const cells = [row.label + (row.key === S.preset ? ' (you watched this)' : ''), formatGBP(end), signedPct(pct), row.hold ? '1 / 0' : row.r.buys + ' / ' + row.r.sells, row.hold ? (S.preset === 'hold' ? mine.maxDrawdown.toFixed(0) + '%' : '—') : row.r.maxDrawdown.toFixed(0) + '%'];
-    for (const v of cells) tr.insertCell().textContent = v;
-    const last = tr.insertCell();
-    if ((PRESETS[row.key] || row.key === 'hold') && row.key !== S.preset) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = '▶ Watch'; b.onclick = () => { choosePreset(row.key); begin(true); }; last.appendChild(b); }
-  }
-  const L = all.light, M = all.medium, H = all.heavy;
-  const best = Object.values(PRESETS).reduce((a, p) => (all[p.key].end > all[a.key].end ? p : a), PRESETS.light);
-  $('cmpText').textContent = 'Over this journey ' + best.name.toLowerCase() + ' finished top of the three. The trade-off to notice: the lighter the pruning, the more of your plant is left in Bitcoin, so the bigger the dips on the way (biggest fall: light ' + L.maxDrawdown.toFixed(0) + '%, medium ' + M.maxDrawdown.toFixed(0) + '%, heavy ' + H.maxDrawdown.toFixed(0) + '%). A different period could rank them differently.';
-  const holding = S.preset === 'hold';
-  $('cmpHead').textContent = holding ? 'Just holding, compared with the pruning styles' : 'All three pruning styles, same dates';
-  if (holding) $('cmpText').textContent = 'You watched Just hold, which finished on ' + formatGBP(mine.end) + '. The best pruning style, ' + best.name.toLowerCase() + ', finished on ' + formatGBP(all[best.key].end) + '. Pruning sells some Bitcoin along the way, so it usually rides out the falls better but gives up some of the gains. Try watching one to see the difference.';
-}
 function showSummary() {
-  gardener.say(endLine(S.sim.summary, S.sim.settings.strategy === 'hold'), { priority: 3, ms: 7000 });
+  gardener.say(endLine(S.sim.summary), { priority: 3, ms: 7000 });
   showPurchaseMath();
-  renderCompare();
   const s = S.sim.summary, up = s.profit > 0.004, down = s.profit < -0.004;
   const years = s.days / 365.25, span = years >= 1.5 ? years.toFixed(1) + ' years' : Math.round(s.days / 30.44) + ' months';
   const big = $('sumBig');
@@ -529,13 +473,6 @@ function showSummary() {
   $('sTrades').textContent = s.buys + ' / ' + s.sells;
   $('vsMe').textContent = formatGBP(s.end); $('vsMePct').textContent = signedPct(s.pct);
   $('vsHold').textContent = formatGBP(s.hold); $('vsHoldPct').textContent = signedPct(s.holdPct);
-  const holdingRun = S.preset === 'hold';
-  $('vsHead').hidden = $('vsBox').hidden = holdingRun;
-  if (holdingRun) {
-    $('vsText').textContent = 'This is the whole story of just holding: everything went in on day one and was never touched. The pruning styles below show what selling some along the way would have done.';
-    $('sumFine').textContent = 'Fee paid: ' + formatGBP(s.feesPaid) + ' (once, on day one) · Biggest fall from a high point: ' + s.maxDrawdown.toFixed(1) + '%. Measured at the final day’s closing price.';
-    return;
-  }
   const d = s.vsHold, close = Math.abs(d) < s.start * 0.005;
   $('vsText').textContent = close ? 'The two ended up almost exactly the same.'
     : d > 0 ? 'In this period the Grower strategy finished ' + formatGBP(d) + ' ahead of simply buying Bitcoin on day one and waiting.'
@@ -584,7 +521,7 @@ $('fwGo').onclick = () => {
     $('fwRace').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' }); $('fwrace-heading').focus({ preventScroll: true });
   } catch (e) { $('fwError').textContent = e.message; $('fwError').hidden = false; }
 };
-window.__race = race; window.__fwRace = fwRace; window.__setMode = setMode;
+window.__fwRace = fwRace; window.__setMode = setMode;
 window.__tm = { gardener, get state() { return S.state; }, get cursor() { return S.cursor; }, get sim() { return S.sim; }, plant };
 
 showIdleFigures(); drawEmptyChart(); syncButtons();

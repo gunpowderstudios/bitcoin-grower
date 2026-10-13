@@ -1,6 +1,6 @@
-// The Bitcoin Garden — four gardens growing side by side (v1.13.0). Same money, same dates; only the pruning differs.
-import { simulate, plantFor, formatGBP, signedGBP, signedPct, PRESETS, HOLD } from './time-machine-engine.js?v=1.13.0';
-import { createPlant } from './time-machine-plant.js?v=1.13.0';
+// The Bitcoin Garden — side-by-side gardens (used for the forward-in-time forecast).
+import { plantFor, formatGBP, signedPct } from './time-machine-engine.js?v=1.13.1';
+import { createPlant } from './time-machine-plant.js?v=1.13.1';
 
 const NS = 'http://www.w3.org/2000/svg';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -27,17 +27,6 @@ export function createRace($, ids = {}, opts = {}) {
     R.N = R.beds[0].sim.frames.length;
     const sc = $(I.scrub); sc.min = 0; sc.max = R.N - 1; sc.value = 0;
   }
-  function build(steps, base) {
-    const defs = [...Object.values(PRESETS).map(p => ({ key: p.key, emoji: p.emoji, name: p.name, set: { dipPct: p.dipPct, risePct: p.risePct, sellPct: p.sellPct } })),
-      { key: 'hold', emoji: HOLD.emoji, name: HOLD.name, set: { strategy: 'hold' }, hold: true }];
-    mount(defs.map(d => {
-      const sim = simulate(steps, { ...base, ...d.set });
-      const banked = []; let sum = 0, k = 0;
-      for (const f of sim.frames) { while (k < f.events) { if (sim.events[k].side === 'SELL') sum += sim.events[k].gbp; k++; } banked.push(sum); }
-      return { key: d.key, emoji: d.emoji, name: d.name, hold: d.hold, sim, banked };
-    }));
-  }
-
   function update(idx, animate) {
     idx = Math.max(0, Math.min(R.N - 1, Math.round(idx)));
     $(I.date).textContent = fmtDate(R.beds[0].sim.frames[idx].date);
@@ -50,7 +39,7 @@ export function createRace($, ids = {}, opts = {}) {
       const pnl = f.total - start, up = pnl > 0.004, down = pnl < -0.004;
       b.g.className = 'bg ' + (up ? 'gain' : down ? 'loss' : '');
       b.g.textContent = (up ? '▲ ' : down ? '▼ ' : '■ ') + signedPct(100 * (f.total / start - 1));
-      b.s.textContent = b.sub ? b.sub : b.hold ? 'No selling, ever' : f.sells + (f.sells === 1 ? ' sale' : ' sales') + (f.sells ? ' · ' + formatGBP(b.banked[idx]).replace(/\.00$/, '') + ' banked' : '');
+      b.s.textContent = b.sub ? b.sub : f.sells + (f.sells === 1 ? ' sale' : ' sales') + (f.sells ? ' · ' + formatGBP(b.banked[idx]).replace(/\.00$/, '') + ' banked' : '');
       b.el.querySelector('.bn').title = pl.name;
     }
     R.cursor = idx;
@@ -58,16 +47,7 @@ export function createRace($, ids = {}, opts = {}) {
 
   function finish() {
     stop(); R.state = 'done'; $(I.play).textContent = '▶ Play again';
-    if (opts.finishNote) { $(I.note).textContent = opts.finishNote(R.beds); return; }
-    const last = R.beds.map(b => ({ b, end: b.sim.summary.end, fall: b.sim.summary.maxDrawdown }));
-    const top = last.reduce((a, c) => (c.end > a.end ? c : a)), smooth = last.reduce((a, c) => (c.fall < a.fall ? c : a));
-    for (const b of R.beds) b.badges.replaceChildren();
-    const badge = (b, t) => { const s = document.createElement('span'); s.className = 'badge2'; s.textContent = t; b.badges.appendChild(s); };
-    badge(top.b, '🏆 Biggest pot');
-    badge(smooth.b, top.b === smooth.b ? '🛡️ Smoothest too' : '🛡️ Smoothest ride');
-    $(I.note).textContent = top.b === smooth.b
-      ? top.b.name + ' finished with the biggest pot (' + formatGBP(top.end) + ') and the smallest fall along the way (' + Math.round(top.fall) + '%) over this period.'
-      : top.b.name + ' finished with the biggest pot (' + formatGBP(top.end) + ') but fell as far as ' + Math.round(top.fall) + '% along the way. ' + smooth.b.name + ' had the smoothest ride (biggest fall ' + Math.round(smooth.fall) + '%) but finished with ' + formatGBP(smooth.end) + '. Over a different period the order could be completely different.';
+    $(I.note).textContent = opts.finishNote ? opts.finishNote(R.beds) : '';
   }
   function frame(t) {
     const dt = Math.min(100, t - R.last); R.last = t;
@@ -96,11 +76,6 @@ export function createRace($, ids = {}, opts = {}) {
   return {
     openBeds(list) {
       stop(); mount(list); $(I.section).hidden = false; R.state = 'ready'; R.cursor = 0; update(0, false); $(I.note).textContent = '';
-      if (reduceMotion()) { update(R.N - 1, false); finish(); } else play();
-    },
-    open(steps, base) {
-      stop(); build(steps, base); $(I.section).hidden = false; R.state = 'ready'; R.cursor = 0; update(0, false);
-      $(I.note).textContent = '';
       if (reduceMotion()) { update(R.N - 1, false); finish(); } else play();
     },
     close() { stop(); R.state = 'idle'; $(I.section).hidden = true; },

@@ -1,7 +1,7 @@
-// Bitcoin Garden Time Machine — pure simulation logic (v1.13.0).
+// Bitcoin Garden Time Machine — pure simulation logic (v1.13.1).
 // No DOM, no network, no credentials, no exchange access: this module only does
 // arithmetic on historical prices so it can be tested in Node and reused by the page.
-export const VERSION = '1.13.0';
+export const VERSION = '1.13.1';
 
 export const DEFAULTS = Object.freeze({
   amount: 100,   // £ planted at the start
@@ -73,8 +73,7 @@ export function validateSettings(input = {}) {
   const s = {
     amount: Number(input.amount ?? DEFAULTS.amount), buyPct: Number(input.buyPct ?? DEFAULTS.buyPct),
     dipPct: Number(input.dipPct ?? DEFAULTS.dipPct), risePct: Number(input.risePct ?? DEFAULTS.risePct),
-    sellPct: Number(input.sellPct ?? DEFAULTS.sellPct), feePct: Number(input.feePct ?? DEFAULTS.feePct),
-    strategy: input.strategy === 'hold' ? 'hold' : 'grow'
+    sellPct: Number(input.sellPct ?? DEFAULTS.sellPct), feePct: Number(input.feePct ?? DEFAULTS.feePct)
   };
   const bad = (k, lo, hi) => !Number.isFinite(s[k]) || s[k] < lo || s[k] > hi;
   if (bad('amount', 1, 1e6)) throw new Error('Please plant between £1 and £1,000,000.');
@@ -84,34 +83,6 @@ export function validateSettings(input = {}) {
   if (bad('sellPct', 1, 100)) throw new Error('"Harvest this much" must be between 1% and 100%.');
   if (bad('feePct', 0, 10)) throw new Error('The fee must be between 0% and 10%.');
   return s;
-}
-
-// ---------- the fourth choice: no pruning at all ----------
-/** "Just hold": everything goes into Bitcoin on day one and is never touched. Not a pruning style, so it is kept apart from PRESETS. */
-export const HOLD = Object.freeze({ key: 'hold', emoji: '📦', name: 'Just hold', hold: true,
-  blurb: 'No buying or selling along the way. Everything goes in on day one and stays there. The simplest way to see how Bitcoin itself did.' });
-
-// ---------- pruning styles ----------
-/**
- * Three ready-made styles. Only the share sold at each harvest changes ("how hard to prune"); the buy/harvest
- * steps stay at 5% down / 10% up so there is always something to watch. Medium equals DEFAULTS.
- */
-export const PRESETS = Object.freeze({
-  light: Object.freeze({ key: 'light', emoji: '🌿', name: 'Light pruning', dipPct: 5, risePct: 10, sellPct: 25,
-    blurb: 'Sells a quarter of each purchase and keeps most of it growing. Bigger gains in good times, bigger dips in bad.' }),
-  medium: Object.freeze({ key: 'medium', emoji: '✂️', name: 'Medium pruning', dipPct: 5, risePct: 10, sellPct: 50,
-    blurb: 'Sells half of each purchase and keeps half growing. A balanced middle path.' }),
-  heavy: Object.freeze({ key: 'heavy', emoji: '🪓', name: 'Heavy pruning', dipPct: 5, risePct: 10, sellPct: 100,
-    blurb: 'Sells all of each purchase after it rises. Steadiest ride, but smaller gains.' })
-});
-
-/** Run every pruning style over the same journey, using the visitor's amount, buy size and fee. */
-export function compareAll(steps, base = {}) {
-  const out = {};
-  for (const [k, p] of Object.entries(PRESETS)) {
-    out[k] = simulate(steps, { ...base, dipPct: p.dipPct, risePct: p.risePct, sellPct: p.sellPct }).summary;
-  }
-  return out;
 }
 
 // ---------- choosing the journey ----------
@@ -157,13 +128,7 @@ export function simulate(steps, rawSettings) {
   const events = [], frames = [];
   for (let i = 0; i < steps.length; i++) {
     const { date, price } = steps[i];
-    if (s.strategy === 'hold') {
-      if (i === 0) { // everything in on day one, one fee, never touched again
-        const qty = s.amount * (1 - fee) / price;
-        cash = 0; btc = qty; buys = 1; feesPaid += s.amount * fee;
-        events.push({ i, date, side: 'BUY', price, gbp: s.amount, btc: qty });
-      }
-    } else if (lot && price >= lot.price * (1 + s.risePct / 100) - 1e-9) {
+    if (lot && price >= lot.price * (1 + s.risePct / 100) - 1e-9) {
       const qty = Math.min(btc, lot.btc * sellFrac), gross = qty * price, net = gross * (1 - fee);
       btc = Math.max(0, btc - qty); cash += net; feesPaid += gross - net; sells++;
       events.push({ i, date, side: 'SELL', price, gbp: net, btc: qty });

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor,
-  addDays, addYears, isRealDate, signedGBP, signedPct, formatGBP, PRESETS, compareAll
+  addDays, addYears, isRealDate, signedGBP, signedPct, formatGBP
 } from '../time-machine-engine.js';
 
 const near = (a, b, eps = 1e-9) => assert.ok(Math.abs(a - b) <= eps, `${a} is not within ${eps} of ${b}`);
@@ -69,7 +69,7 @@ test('selectRange tolerates a weekend-sized hole at the start but not a big one'
 
 // ---------- settings ----------
 test('validateSettings applies defaults and rejects nonsense', () => {
-  assert.deepEqual(validateSettings({}), { ...DEFAULTS, strategy: 'grow' });
+  assert.deepEqual(validateSettings({}), DEFAULTS);
   for (const bad of [{ amount: 0 }, { amount: -5 }, { amount: NaN }, { amount: 2e6 }, { buyPct: 0 }, { buyPct: 101 }, { dipPct: 0 }, { dipPct: 95 },
     { risePct: 0 }, { sellPct: 0 }, { sellPct: 101 }, { feePct: -1 }, { feePct: 11 }, { amount: 'abc' }])
     assert.throws(() => validateSettings(bad), /Please|must be/, JSON.stringify(bad));
@@ -202,14 +202,14 @@ test('signed money and percentages use real plus/minus signs', () => {
 
 // ---------- project hygiene ----------
 const read = f => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
-test('version is 1.13.0 everywhere it should be', () => {
-  assert.equal(VERSION, '1.13.0');
-  assert.equal(JSON.parse(read('version.json')).version, '1.13.0');
-  assert.equal(JSON.parse(read('package.json')).version, '1.13.0');
-  assert.equal(JSON.parse(read('bot/package.json')).version, '1.13.0');
-  assert.match(read('time-machine.html'), /id="version">v1\.13\.0</);
+test('version is 1.13.1 everywhere it should be', () => {
+  assert.equal(VERSION, '1.13.1');
+  assert.equal(JSON.parse(read('version.json')).version, '1.13.1');
+  assert.equal(JSON.parse(read('package.json')).version, '1.13.1');
+  assert.equal(JSON.parse(read('bot/package.json')).version, '1.13.1');
+  assert.match(read('time-machine.html'), /id="version">v1\.13\.1</);
   assert.match(read('README.md'), /1\.10\.0/);
-  assert.match(read('index.html'), /id="version">v1\.13\.0</);
+  assert.match(read('index.html'), /id="version">v1\.13\.1</);
 });
 test('every element id the page script uses exists in the HTML', () => {
   for (const [page, script] of [['time-machine.html', 'time-machine.js'], ['time-machine.html', 'time-machine-race.js'], ['index.html', 'garden.js']]) {
@@ -235,56 +235,15 @@ test('optional bundled price file, if present, is valid daily BTC/GBP', { skip: 
   assert.ok(describeData(points).maxGap <= 3);
 });
 
-// ---------- pruning styles ----------
-test('pruning styles: medium equals the default strategy, only the share sold differs, all valid', () => {
-  assert.deepEqual(['light', 'medium', 'heavy'], Object.keys(PRESETS));
-  assert.equal(PRESETS.medium.dipPct, DEFAULTS.dipPct); assert.equal(PRESETS.medium.risePct, DEFAULTS.risePct); assert.equal(PRESETS.medium.sellPct, DEFAULTS.sellPct);
-  assert.deepEqual([25, 50, 100], Object.values(PRESETS).map(p => p.sellPct));
-  assert.ok(Object.values(PRESETS).every(p => p.dipPct === 5 && p.risePct === 10 && p.name && p.blurb));
-  for (const p of Object.values(PRESETS)) validateSettings({ dipPct: p.dipPct, risePct: p.risePct, sellPct: p.sellPct });
-});
-test('compareAll matches individual simulations, keeps the visitor\'s amount and fee, and orders sensibly', () => {
-  const steps = series(Array.from({ length: 300 }, (_, i) => 100 + 30 * Math.sin(i / 5) + i * 0.2));
-  const base = { amount: 250, buyPct: 20, feePct: 0.8 };
-  const all = compareAll(steps, base);
-  for (const k of ['light', 'medium', 'heavy']) {
-    const one = simulate(steps, { ...base, dipPct: 5, risePct: 10, sellPct: PRESETS[k].sellPct }).summary;
-    assert.deepEqual(all[k], one); assert.equal(all[k].start, 250);
-  }
-  assert.deepEqual(all.medium, simulate(steps, base).summary);
-});
-test('heavy pruning sells everything it harvests; light keeps most of it', () => {
-  const steps = series([100, 100, 94, 94, 103.4, 103.4]);
-  const all = compareAll(steps, {});
-  near(all.heavy.btc, 0, 1e-12);
-  assert.ok(all.light.btc > all.medium.btc && all.medium.btc > all.heavy.btc);
-});
-
-// ---------- just hold ----------
-import { HOLD } from '../time-machine-engine.js';
-test('just hold: all in on day one, never sells, equals buy-and-hold', () => {
-  const steps = [100, 90, 120, 80, 150, 140, 160, 130, 170].map((price, i) => ({ date: addDays('2020-01-01', i), price }));
-  const r = simulate(steps, { amount: 1000, feePct: 0.4, strategy: 'hold' });
-  assert.equal(r.events.length, 1); assert.equal(r.events[0].side, 'BUY'); assert.equal(r.events[0].i, 0);
-  assert.equal(r.summary.buys, 1); assert.equal(r.summary.sells, 0);
-  assert.ok(Math.abs(r.summary.end - r.summary.hold) < 1e-9);
-  assert.ok(Math.abs(r.summary.end - 1000 * 0.996 * 170 / 100) < 1e-9);
-  assert.ok(Math.abs(r.summary.feesPaid - 4) < 1e-9);
-  for (const f of r.frames) assert.ok(Math.abs(f.total - f.hold) < 1e-9);
-  assert.equal(HOLD.key, 'hold'); assert.ok(!('hold' in PRESETS));
-  assert.equal(simulate(steps, { strategy: 'bogus' }).settings.strategy, 'grow');
-});
-
 // ---------- the gardener's lines ----------
 import { startLine, buyLine, sellLine, moodLine, endLine } from '../gardener-lines.js';
 test('gardener lines: plain English, correct numbers, no advice', () => {
-  assert.match(startLine({ amount: 1000, hold: false, fromLabel: '1 January 2017' }), /planting £1,000 on 1 January 2017/);
-  assert.match(startLine({ amount: 1000, hold: true, fromLabel: '1 January 2017' }), /won’t touch it/);
+  assert.match(startLine({ amount: 1000, fromLabel: '1 January 2017' }), /planting £1,000 on 1 January 2017/);
   assert.match(buyLine({ price: 90, prevPrice: 100, amount: 10 }), /dropped about 10%.*£10 of Bitcoin/);
-  assert.match(sellLine({ price: 110, buyPrice: 100, sellPct: 50, gbp: 5.5 }), /up about 10%.*half of it.*£5\.50.*rest keeps growing/);
+  assert.match(sellLine({ price: 110, buyPrice: 100, sellPct: 50, gbp: 5.5 }), /up about 10%.*selling half of it.*£5\.50.*rest keeps growing/);
   assert.match(sellLine({ price: 110, buyPrice: 100, sellPct: 100, gbp: 11 }), /all of it/);
   assert.doesNotMatch(sellLine({ price: 110, buyPrice: 100, sellPct: 100, gbp: 11 }), /rest keeps growing/);
-  const all = [startLine({ amount: 1, fromLabel: 'x' }), buyLine({ price: 1, prevPrice: 2, amount: 1 }), sellLine({ price: 2, buyPrice: 1, sellPct: 25, gbp: 1 }), endLine({ profit: 5, end: 105, maxDrawdown: 40 }, true)].join(' ');
+  const all = [startLine({ amount: 1, fromLabel: 'x' }), buyLine({ price: 1, prevPrice: 2, amount: 1 }), sellLine({ price: 2, buyPrice: 1, sellPct: 25, gbp: 1 }), endLine({ profit: 5, end: 105, maxDrawdown: 40 })].join(' ');
   assert.doesNotMatch(all, /you should|guarantee|will rise|get rich/i);
 });
 test('gardener mood lines fire once each and mention storms honestly', () => {
@@ -295,5 +254,5 @@ test('gardener mood lines fire once each and mention storms honestly', () => {
   assert.match(moodLine({ ratio: 0.49, prevRatio: 0.6, seen }), /half its value.*might not come back/);
   assert.match(moodLine({ ratio: 1.02, prevRatio: 0.9, seen }), /sun’s back out/);
   assert.match(moodLine({ ratio: 2.1, prevRatio: 1.9, seen }), /doubled/);
-  assert.match(endLine({ profit: -5, end: 95, maxDrawdown: 30 }, false), /below what we planted/);
+  assert.match(endLine({ profit: -5, end: 95, maxDrawdown: 30 }), /below what we planted/);
 });
