@@ -2,10 +2,10 @@
 import {
   VERSION, DEFAULTS, PRESETS, HOLD, compareAll, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.11.7';
-import { createPlant } from './time-machine-plant.js?v=1.11.7';
-import { createSound } from './time-machine-sound.js?v=1.11.7';
-import { loadHistory } from './price-data.js?v=1.11.7';
+} from './time-machine-engine.js?v=1.11.8';
+import { createPlant } from './time-machine-plant.js?v=1.11.8';
+import { createSound } from './time-machine-sound.js?v=1.11.8';
+import { loadHistory } from './price-data.js?v=1.11.8';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -80,7 +80,17 @@ function buildPresets() {
   }
 }
 function syncPresets() { for (const b of $('presets').children) b.setAttribute('aria-pressed', String(b.dataset.date === $('from').value)); }
+function updateFirstPrice() {
+  if (!S.data?.points?.length) return;
+  const first = S.data.points[0];
+  const picked = S.data.points.find(p => p.date >= $('from').value);
+  const text = 'Earliest price in this data: ' + formatGBP(first.price) + ' per BTC on ' + fmtLong(first.date) + '. ';
+  $('firstPrice').textContent = text + (picked
+    ? 'On your chosen date, one BTC cost ' + formatGBP(picked.price) + ' (' + fmtLong(picked.date) + ').'
+    : 'Choose a supported start date to see its price.');
+}
 function updateDateHint() {
+  updateFirstPrice();
   const from = $('from').value;
   if (!from || !S.data) return;
   const end = $('to').value || S.data.last;
@@ -413,6 +423,43 @@ function updateChart() {
   }
 }
 
+function showPurchaseMath() {
+  const sim = S.sim;
+  if (!sim?.frames?.length) return;
+  const frames = sim.frames, s = sim.summary, first = frames[0], last = frames.at(-1);
+  const fee = sim.settings.feePct / 100;
+  const isHold = sim.settings.strategy === 'hold';
+  const buys = sim.events.filter(e => e.side === 'BUY');
+  const box = $('purchaseMathBody');
+  box.replaceChildren();
+  const line = (label, value) => {
+    const p = document.createElement('p');
+    const b = document.createElement('b'); b.textContent = label + ': ';
+    p.append(b, document.createTextNode(value)); box.appendChild(p);
+  };
+  line('Starting price', formatGBP(first.price) + ' per BTC on ' + fmtLong(first.date));
+  line('Ending price', formatGBP(last.price) + ' per BTC on ' + fmtLong(last.date));
+  line('Original pot', formatGBP(s.start));
+  if (isHold) {
+    const e = buys[0];
+    line('First and only purchase', e ? formatGBP(e.gbp) + ' invested on ' + fmtLong(e.date) : 'No purchase recorded');
+    line('Purchase fee (' + sim.settings.feePct + '%)', formatGBP(s.feesPaid));
+    line('Bitcoin bought', e ? e.btc.toFixed(8) + ' BTC' : '—');
+    line('Final Bitcoin value', (e ? e.btc.toFixed(8) + ' BTC × ' + formatGBP(last.price) : '—') + ' = ' + formatGBP(s.end));
+  } else {
+    line('First purchase', buys[0] ? fmtLong(buys[0].date) + ': ' + formatGBP(buys[0].gbp) + ' at ' + formatGBP(buys[0].price) + '/BTC, buying ' + buys[0].btc.toFixed(8) + ' BTC after fees' : 'No dip triggered a purchase');
+    line('Total virtual purchases and sales', s.buys + ' purchases / ' + s.sells + ' sales');
+    line('Total estimated trading fees', formatGBP(s.feesPaid));
+    line('Final cash', formatGBP(s.cash));
+    line('Bitcoin still held', s.btc.toFixed(8) + ' BTC × ' + formatGBP(last.price) + ' = ' + formatGBP(s.btc * last.price));
+    line('Final pot value', formatGBP(s.cash) + ' cash + ' + formatGBP(s.btc * last.price) + ' Bitcoin = ' + formatGBP(s.end));
+  }
+  line('Profit or loss', formatGBP(s.end) + ' − ' + formatGBP(s.start) + ' = ' + signedGBP(s.profit) + ' (' + signedPct(s.pct) + ')');
+  const note = document.createElement('p');note.className='hint';
+  note.textContent='Calculations use historical daily prices provided by the selected dataset, with estimated fees. They are not proof these trades could have been executed. Especially early Bitcoin prices may be sparse.';
+  box.appendChild(note);
+}
+
 // ---------------------------------------------------------------- finishing
 function complete(instant = false) {
   stopLoop(); S.state = 'done'; $('scene').classList.remove('playing');
@@ -449,6 +496,7 @@ function renderCompare() {
   if (holding) $('cmpText').textContent = 'You watched Just hold, which finished on ' + formatGBP(mine.end) + '. The best pruning style, ' + best.name.toLowerCase() + ', finished on ' + formatGBP(all[best.key].end) + '. Pruning sells some Bitcoin along the way, so it usually rides out the falls better but gives up some of the gains. Try watching one to see the difference.';
 }
 function showSummary() {
+  showPurchaseMath();
   renderCompare();
   const s = S.sim.summary, up = s.profit > 0.004, down = s.profit < -0.004;
   const years = s.days / 365.25, span = years >= 1.5 ? years.toFixed(1) + ' years' : Math.round(s.days / 30.44) + ' months';
