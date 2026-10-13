@@ -2,10 +2,13 @@
 import {
   VERSION, DEFAULTS, PRESETS, HOLD, compareAll, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.11.11';
-import { createPlant } from './time-machine-plant.js?v=1.11.11';
-import { createSound } from './time-machine-sound.js?v=1.11.11';
-import { loadHistory } from './price-data.js?v=1.11.11';
+} from './time-machine-engine.js?v=1.12.0';
+import { createPlant } from './time-machine-plant.js?v=1.12.0';
+import { createSound } from './time-machine-sound.js?v=1.12.0';
+import { loadHistory } from './price-data.js?v=1.12.0';
+import { createGardener } from './time-machine-gardener.js?v=1.12.0';
+import { createRace } from './time-machine-race.js?v=1.12.0';
+import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.12.0';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -14,6 +17,8 @@ const MIN_FRAMES_PER_SEC = 4;
 const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 const plant = createPlant($('plant'));
+const gardener = createGardener($('scene'));
+const race = createRace($);
 const sound = createSound();
 sound.enableWhenAllowed(); // sound is on by default; it starts with the visitor's first click or tap
 const S = {
@@ -183,10 +188,11 @@ function begin(autoplay) {
 function restart(autoplay) {
   stopLoop(); S.cursor = 0; S.state = 'ready'; S.lastStage = 0; S.shownLog = -1; S.markers = 0; S.acc = 0;
   plant.reset(); S.droopMark = { t: performance.now(), v: 0 };
-  $('summary').hidden = true;
+  $('summary').hidden = true; race.close(); gardener.clear(); S.mood = new Set(); S.prevRatio = 1;
   for (const id of ['play', 'month', 'finish', 'restart']) $(id).disabled = false;
   $('chart').querySelectorAll('.mk').forEach(n => n.remove());
   render({ instant: true });
+  { const st = S.sim.settings; gardener.say(startLine({ amount: st.amount, hold: st.strategy === 'hold', fromLabel: fmtLong(S.sim.frames[0].date) }), { priority: 2, ms: 6500 }); }
   setStatus('Ready! Press play to start travelling forward.');
   syncButtons();
   if (autoplay) play();
@@ -247,6 +253,7 @@ $('finish').onclick = () => {
   render({ instant: true }); complete(true);
 };
 $('go').onclick = () => begin(true);
+$('raceBtn').onclick = () => { const s = S.sim.settings; race.open(S.steps, { amount: s.amount, buyPct: s.buyPct, feePct: s.feePct }); $('race').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' }); $('race-heading').focus({ preventScroll: true }); };
 $('again').onclick = () => { $('setup').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' }); $('from').focus({ preventScroll: true }); };
 $('replay').onclick = () => { restart(true); $('journey').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' }); };
 for (const b of $('speed').querySelectorAll('button')) b.onclick = () => {
@@ -290,6 +297,7 @@ function render({ instant = false, fast = false, quiet = false, steps = 1 } = {}
   $('scene').style.setProperty('--sky1', mixHex('#1b1f4a', '#3f86c4', prog)); $('scene').style.setProperty('--sky2', mixHex('#37306b', '#f6d58a', prog));
   // timeline
   $('tlFill').style.width = (prog * 100).toFixed(2) + '%'; $('tlKnob').style.left = (prog * 100).toFixed(2) + '%';
+  { const line = moodLine({ ratio, prevRatio: S.prevRatio ?? 1, seen: S.mood || (S.mood = new Set()) }); S.prevRatio = ratio; if (line && !instant && !quiet) gardener.say(line, { priority: 1 }); }
   // trades since last render
   const seen = S.shownLog < 0 ? 0 : S.shownLog;
   if (f.events !== seen || S.shownLog < 0) {
@@ -297,6 +305,9 @@ function render({ instant = false, fast = false, quiet = false, steps = 1 } = {}
     const sells = fresh.filter(e => e.side === 'SELL'), buys = fresh.filter(e => e.side === 'BUY');
     plant.setCoins(f.sells, !instant && !quiet && fresh.length > 0 && !reduceMotion(), events.slice(0, f.events).reduce((a, e) => a + (e.side === 'SELL' ? e.gbp : 0), 0));
     if (!instant && !quiet && fresh.length) {
+      const e = fresh.at(-1), at = events.indexOf(e), prev = events[at - 1];
+      if (e.side === 'BUY') gardener.say(buyLine({ price: e.price, prevPrice: prev ? prev.price : frames[0].price, amount: e.gbp }), { priority: 2 });
+      else { let b = null; for (let k = at - 1; k >= 0; k--) if (events[k].side === 'BUY') { b = events[k]; break; } gardener.say(sellLine({ price: e.price, buyPrice: b?.price, sellPct: settings.sellPct, gbp: e.gbp }), { priority: 2 }); }
       if (sells.length) sound.play('clink', { fast }); else if (buys.length) sound.play('plant', { fast });
       announceTrades(fresh, fast);
     }
@@ -496,6 +507,7 @@ function renderCompare() {
   if (holding) $('cmpText').textContent = 'You watched Just hold, which finished on ' + formatGBP(mine.end) + '. The best pruning style, ' + best.name.toLowerCase() + ', finished on ' + formatGBP(all[best.key].end) + '. Pruning sells some Bitcoin along the way, so it usually rides out the falls better but gives up some of the gains. Try watching one to see the difference.';
 }
 function showSummary() {
+  gardener.say(endLine(S.sim.summary, S.sim.settings.strategy === 'hold'), { priority: 3, ms: 7000 });
   showPurchaseMath();
   renderCompare();
   const s = S.sim.summary, up = s.profit > 0.004, down = s.profit < -0.004;
@@ -544,7 +556,8 @@ let lastW = window.innerWidth;
 window.addEventListener('resize', () => { if (window.innerWidth === lastW) return; lastW = window.innerWidth; if (S.sim) { buildTimelineTicks(); buildChart(); render({ instant: true, quiet: true }); } });
 
 // test hook (read-only view of state; used by automated tests)
-window.__tm = { get state() { return S.state; }, get cursor() { return S.cursor; }, get sim() { return S.sim; }, plant };
+window.__race = race;
+window.__tm = { gardener, get state() { return S.state; }, get cursor() { return S.cursor; }, get sim() { return S.sim; }, plant };
 
 showIdleFigures(); drawEmptyChart(); syncButtons();
 loadPrices();

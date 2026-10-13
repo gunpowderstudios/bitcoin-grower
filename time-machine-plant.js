@@ -1,4 +1,4 @@
-// Bitcoin Garden Time Machine — the living plant (v1.11.11).
+// Bitcoin Garden Time Machine — the living plant (v1.12.0).
 // One persistent SVG: parts grow, fade and sway with CSS transitions instead of being redrawn.
 // The picture is driven only by stage (0-6) and droop (0-1), both derived from the pot's real value.
 const NS = 'http://www.w3.org/2000/svg';
@@ -22,7 +22,7 @@ function el(tag, attrs = {}, parent) {
   return e;
 }
 
-export function createPlant(svg) {
+export function createPlant(svg, uid = 'tm') {
   const rand = rng(1830);
   svg.setAttribute('viewBox', '0 -50 360 350');
   svg.setAttribute('role', 'img');
@@ -168,5 +168,12 @@ export function createPlant(svg) {
   function reset() { setCoins(0, false); stage = -1; delete svg.dataset.ready; setState(0, 0); }
 
   setState(0, 0);
+  if (uid !== 'tm') { // several plants on one page: give the colour gradients that change (leaves, crown) their own ids
+    const swap = v => v && v.replace(/#tm(LeafA|LeafB|Crown)\)/g, '#' + uid + '$1)');
+    svg.querySelectorAll('*').forEach(n => {
+      const id = n.getAttribute('id'); if (id === 'tmLeafA' || id === 'tmLeafB' || id === 'tmCrown') n.setAttribute('id', uid + id.slice(2));
+      for (const a of ['fill', 'stroke']) { const v = n.getAttribute(a); if (v && v.includes('#tm')) n.setAttribute(a, swap(v)); }
+    });
+  }
   return { setState, setCoins, perk, reset, get stage() { return stage; }, get coins() { return coins; } };
 }

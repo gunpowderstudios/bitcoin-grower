@@ -6,14 +6,14 @@
 <title>The Bitcoin Garden — Time Machine</title>
 <meta name="description" content="Plant an imaginary £100 in the past and watch it grow through real Bitcoin history. A friendly simulation — no real money, no real trades.">
 <meta name="theme-color" content="#0c1d14">
-<link rel="stylesheet" href="./time-machine.css?v=1.11.11">
+<link rel="stylesheet" href="./time-machine.css?v=1.12.0">
 </head>
 <body>
 <a class="skip" href="#plant-heading">Skip to the plant</a>
 <main>
 <header>
   <div>
-    <div class="sub">🌱 THE BITCOIN GARDEN <span class="vtag" id="version">v1.11.11</span></div>
+    <div class="sub">🌱 THE BITCOIN GARDEN <span class="vtag" id="version">v1.12.0</span></div>
     <h1>Time Machine ⏳</h1>
     <div class="sub">Plant some pretend money in the past, then travel forward and watch it grow (or wilt!) through real Bitcoin history.</div>
   </div>
@@ -147,6 +147,21 @@
   <p class="fine" id="sumFine"></p>
   <p class="fine"><b>Remember:</b> this is a history lesson, not a promise. What happened in the past is no guide to what will happen next, and Bitcoin can lose a lot of its value.</p>
   <div class="actions"><button class="btn primary" id="again" type="button">↑ Try another date</button><button class="btn" id="replay" type="button">↺ Watch it again</button></div>
+  <div class="actions"><button class="btn primary" id="raceBtn" type="button">🌻 Watch all four grow side by side</button></div>
+</section>
+
+<!-- ============ FOUR GARDENS SIDE BY SIDE ============ -->
+<section class="card race" id="race" aria-labelledby="race-heading" hidden>
+  <h2 id="race-heading" tabindex="-1">🌻 Four gardens, side by side</h2>
+  <p class="hint">Same money, same dates. The only difference is how much each gardener prunes (sells) along the way.</p>
+  <div class="racebar">
+    <div class="racedate" id="raceDate" aria-hidden="true">—</div>
+    <button class="btn primary" id="racePlay" type="button">⏸ Pause</button>
+    <button class="btn" id="raceRestart" type="button">↺ Again</button>
+    <input type="range" id="raceScrub" min="0" max="0" value="0" aria-label="Move through time">
+  </div>
+  <div class="beds" id="beds"></div>
+  <p class="racenote" id="raceNote" aria-live="polite"></p>
 </section>
 
 <section class="card">
@@ -173,6 +188,6 @@
 </div>
 <footer class="sitefoot">The Bitcoin Garden © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
 </main>
-<script type="module" src="./time-machine.js?v=1.11.11"></script>
+<script type="module" src="./time-machine.js?v=1.12.0"></script>
 </body>
 </html>

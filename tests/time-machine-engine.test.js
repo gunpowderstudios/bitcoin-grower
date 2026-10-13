@@ -202,17 +202,17 @@ test('signed money and percentages use real plus/minus signs', () => {
 
 // ---------- project hygiene ----------
 const read = f => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
-test('version is 1.11.11 everywhere it should be', () => {
-  assert.equal(VERSION, '1.11.11');
-  assert.equal(JSON.parse(read('version.json')).version, '1.11.11');
-  assert.equal(JSON.parse(read('package.json')).version, '1.11.11');
-  assert.equal(JSON.parse(read('bot/package.json')).version, '1.11.11');
-  assert.match(read('time-machine.html'), /id="version">v1\.11\.11</);
+test('version is 1.12.0 everywhere it should be', () => {
+  assert.equal(VERSION, '1.12.0');
+  assert.equal(JSON.parse(read('version.json')).version, '1.12.0');
+  assert.equal(JSON.parse(read('package.json')).version, '1.12.0');
+  assert.equal(JSON.parse(read('bot/package.json')).version, '1.12.0');
+  assert.match(read('time-machine.html'), /id="version">v1\.12\.0</);
   assert.match(read('README.md'), /1\.10\.0/);
-  assert.match(read('index.html'), /id="version">v1\.11\.11</);
+  assert.match(read('index.html'), /id="version">v1\.12\.0</);
 });
 test('every element id the page script uses exists in the HTML', () => {
-  for (const [page, script] of [['time-machine.html', 'time-machine.js'], ['index.html', 'garden.js']]) {
+  for (const [page, script] of [['time-machine.html', 'time-machine.js'], ['time-machine.html', 'time-machine-race.js'], ['index.html', 'garden.js']]) {
     const html = read(page), js = read(script);
     const used = new Set([...js.matchAll(/\$\('([A-Za-z][\w-]*)'\)/g)].map(m => m[1]));
     const have = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]));
@@ -273,4 +273,27 @@ test('just hold: all in on day one, never sells, equals buy-and-hold', () => {
   for (const f of r.frames) assert.ok(Math.abs(f.total - f.hold) < 1e-9);
   assert.equal(HOLD.key, 'hold'); assert.ok(!('hold' in PRESETS));
   assert.equal(simulate(steps, { strategy: 'bogus' }).settings.strategy, 'grow');
+});
+
+// ---------- the gardener's lines ----------
+import { startLine, buyLine, sellLine, moodLine, endLine } from '../gardener-lines.js';
+test('gardener lines: plain English, correct numbers, no advice', () => {
+  assert.match(startLine({ amount: 1000, hold: false, fromLabel: '1 January 2017' }), /planting £1,000 on 1 January 2017/);
+  assert.match(startLine({ amount: 1000, hold: true, fromLabel: '1 January 2017' }), /won’t touch it/);
+  assert.match(buyLine({ price: 90, prevPrice: 100, amount: 10 }), /dropped about 10%.*£10 of Bitcoin/);
+  assert.match(sellLine({ price: 110, buyPrice: 100, sellPct: 50, gbp: 5.5 }), /up about 10%.*half of it.*£5\.50.*rest keeps growing/);
+  assert.match(sellLine({ price: 110, buyPrice: 100, sellPct: 100, gbp: 11 }), /all of it/);
+  assert.doesNotMatch(sellLine({ price: 110, buyPrice: 100, sellPct: 100, gbp: 11 }), /rest keeps growing/);
+  const all = [startLine({ amount: 1, fromLabel: 'x' }), buyLine({ price: 1, prevPrice: 2, amount: 1 }), sellLine({ price: 2, buyPrice: 1, sellPct: 25, gbp: 1 }), endLine({ profit: 5, end: 105, maxDrawdown: 40 }, true)].join(' ');
+  assert.doesNotMatch(all, /you should|guarantee|will rise|get rich/i);
+});
+test('gardener mood lines fire once each and mention storms honestly', () => {
+  const seen = new Set();
+  assert.equal(moodLine({ ratio: 1.1, prevRatio: 1, seen }), null);
+  assert.match(moodLine({ ratio: 0.79, prevRatio: 0.9, seen }), /Storm clouds.*down about 21%/);
+  assert.equal(moodLine({ ratio: 0.78, prevRatio: 0.79, seen }), null);
+  assert.match(moodLine({ ratio: 0.49, prevRatio: 0.6, seen }), /half its value.*might not come back/);
+  assert.match(moodLine({ ratio: 1.02, prevRatio: 0.9, seen }), /sun’s back out/);
+  assert.match(moodLine({ ratio: 2.1, prevRatio: 1.9, seen }), /doubled/);
+  assert.match(endLine({ profit: -5, end: 95, maxDrawdown: 30 }, false), /below what we planted/);
 });
