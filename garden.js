@@ -1,10 +1,9 @@
-// Bitcoin Grower — Today's Prices page controller (v1.11.1). Simulation only; read-only public price data.
-import { VERSION, plantFor, formatGBP, signedPct, addDays, dayNumber, describeData } from './time-machine-engine.js?v=1.11.1';
-import { createPlant } from './time-machine-plant.js?v=1.11.1';
-import { loadHistory } from './price-data.js?v=1.11.1';
-import { fetchLive, fetchSeries } from './live-price.js?v=1.11.1';
-import { RANGES, RANGE_ORDER, historySeries, changeOver, trimToWindow, downsample, axisLabel, tooltipLabel } from './price-ranges.js?v=1.11.1';
-import { forecast, describe, changeSince, SINCE_CHOICES } from './forecast-engine.js?v=1.11.1';
+// Bitcoin Grower — Today's Prices page controller (v1.11.2). Simulation only; read-only public price data.
+import { VERSION, formatGBP, signedPct, addDays, dayNumber, describeData } from './time-machine-engine.js?v=1.11.2';
+import { loadHistory } from './price-data.js?v=1.11.2';
+import { fetchLive, fetchSeries } from './live-price.js?v=1.11.2';
+import { RANGES, RANGE_ORDER, historySeries, changeOver, trimToWindow, downsample, axisLabel, tooltipLabel } from './price-ranges.js?v=1.11.2';
+import { forecast, describe, changeSince, SINCE_CHOICES } from './forecast-engine.js?v=1.11.2';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -15,7 +14,6 @@ const money0 = n => formatGBP(n).replace(/\.00$/, '');
 const axis = n => '£' + Math.round(n).toLocaleString('en-GB');
 
 $('version').textContent = 'v' + VERSION;
-const plant = createPlant($('plant'));
 const S = { points: null, live: null, price: null, horizon: 365, timer: 0, tick: 0, range: '1y', series: null, source: '', unavailable: {} };
 const shortCache = {};
 
@@ -60,9 +58,7 @@ function renderSeed() {
   for (const [id, d] of [['c7', 7], ['c30', 30], ['c365', 365]]) { const c = changeSince(S.points, d, S.price); setChange($(id).parentElement, c ? c.pct : null); if (!c) $(id).textContent = '—'; }
   const y = changeSince(S.points, 365, S.price);
   if (!y) { $('seedText').textContent = 'We need a year of price history to grow your garden.'; return; }
-  const worth = 100 * (1 + y.pct / 100), pl = plantFor(worth / 100, true);
-  plant.setState(pl.stage, pl.droop);
-  $('stage').textContent = pl.name + (pl.droop > 0.35 ? ' · drooping 😟' : '');
+  const worth = 100 * (1 + y.pct / 100);
   S.yearSeed = { worth, pct: y.pct, date: y.ref.date }; renderSeedText();
 }
 
@@ -72,7 +68,7 @@ function renderSeedText() {
   if (S.range !== '1y') { const c = changeOver(S.series || []); if (!c) return; pct = c.pct; ref = ''; }
   if (pct == null) return;
   const worth = 100 * (1 + pct / 100), diff = worth - 100;
-  $('seedText').textContent = 'A £100 seed planted ' + AGO[S.range] + ref + ' would be worth ' + formatGBP(worth) + ' today — ' + (diff >= 0 ? 'up ' : 'down ') + formatGBP(Math.abs(diff)) + ' (' + signedPct(pct) + ').' + (S.range !== '1y' ? ' The plant above always shows the one-year result.' : '');
+  $('seedText').textContent = '🌱 A £100 seed planted ' + AGO[S.range] + ref + ' would be worth ' + formatGBP(worth) + ' today — ' + (diff >= 0 ? 'up ' : 'down ') + formatGBP(Math.abs(diff)) + ' (' + signedPct(pct) + ').' + (S.range !== '1y' ? '' : '');
 }
 // ---------------------------------------------------------------- charts
 async function loadRange(key) {

@@ -1,4 +1,4 @@
-// Bitcoin Grower — chart time ranges for the price page (v1.11.1). Pure helpers, no network.
+// Bitcoin Grower — chart time ranges for the price page (v1.11.2). Pure helpers, no network.
 import { addDays, dayNumber } from './time-machine-engine.js';
 
 /**

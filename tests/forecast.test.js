@@ -84,7 +84,7 @@ test('Kraken and CoinGecko responses are parsed; errors and junk are rejected', 
   assert.throws(() => parseCoinGecko({})); assert.throws(() => parseCoinGecko({ bitcoin: { gbp: 0 } }));
 });
 
-// ---------- v1.11.1 chart ranges ----------
+// ---------- v1.11.2 chart ranges ----------
 import { RANGES, RANGE_ORDER, historySeries, changeOver, trimToWindow, downsample } from '../price-ranges.js';
 import { parseKrakenOHLC, parseCoinGeckoChart } from '../live-price.js';
 test('range tabs: 1H, 24H, 1W, 1M, 1Y, All in order', () => {
