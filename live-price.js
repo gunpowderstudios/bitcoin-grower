@@ -1,4 +1,4 @@
-// Bitcoin Grower — live BTC/GBP price from public, key-free endpoints (v1.10.0).
+// Bitcoin Grower — live BTC/GBP price from public, key-free endpoints (v1.11.0).
 // Read-only GET requests to public price tickers. No accounts, no keys, no trading.
 const KRAKEN = 'https://api.kraken.com/0/public/Ticker?pair=XBTGBP';
 const COINGECKO = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=gbp&include_24hr_change=true';
@@ -38,4 +38,38 @@ export async function fetchLive() {
     try { return { ...parse(await getJSON(url)), at: Date.now() }; } catch (e) { last = e; }
   }
   throw last || new Error('No live price available');
+}
+
+// ---------------------------------------------------------------- short-term charts (1H, 24H, 1W, 1M)
+const KRAKEN_OHLC = interval => 'https://api.kraken.com/0/public/OHLC?pair=XBTGBP&interval=' + interval;
+const COINGECKO_CHART = days => 'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=gbp&days=' + days;
+
+/** Kraken OHLC -> last `count` closes as [{x (ms), v}] */
+export function parseKrakenOHLC(json, count) {
+  if (!json || (json.error && json.error.length) || !json.result) throw new Error('Kraken returned an error');
+  const key = Object.keys(json.result).find(k => k !== 'last'), rows = json.result[key];
+  if (!Array.isArray(rows) || rows.length < 2) throw new Error('Kraken chart data missing');
+  const out = rows.map(r => ({ x: Number(r[0]) * 1000, v: num(r[4]) })).filter(s => Number.isFinite(s.x) && Number.isFinite(s.v));
+  if (out.length < 2) throw new Error('Kraken chart data unreadable');
+  return out.slice(-count);
+}
+/** CoinGecko market_chart -> [{x (ms), v}] */
+export function parseCoinGeckoChart(json) {
+  const rows = json?.prices;
+  if (!Array.isArray(rows) || rows.length < 2) throw new Error('CoinGecko chart data missing');
+  const out = rows.map(r => ({ x: Number(r[0]), v: num(r[1]) })).filter(s => Number.isFinite(s.x) && Number.isFinite(s.v));
+  if (out.length < 2) throw new Error('CoinGecko chart data unreadable');
+  return out;
+}
+
+/** Short-term series for a range config from price-ranges.js. Tries Kraken, then CoinGecko. Resolves {series, source}. */
+export async function fetchSeries(range, trimToWindow) {
+  let last;
+  if (range.kraken) {
+    try { return { series: parseKrakenOHLC(await getJSON(KRAKEN_OHLC(range.kraken.interval)), range.kraken.count), source: 'Kraken' }; } catch (e) { last = e; }
+  }
+  if (range.gecko) {
+    try { return { series: trimToWindow(parseCoinGeckoChart(await getJSON(COINGECKO_CHART(range.gecko.days), 12000)), range.ms), source: 'CoinGecko' }; } catch (e) { last = e; }
+  }
+  throw last || new Error('No chart data available');
 }

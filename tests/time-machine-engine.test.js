@@ -202,14 +202,14 @@ test('signed money and percentages use real plus/minus signs', () => {
 
 // ---------- project hygiene ----------
 const read = f => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
-test('version is 1.10.0 everywhere it should be', () => {
-  assert.equal(VERSION, '1.10.0');
-  assert.equal(JSON.parse(read('version.json')).version, '1.10.0');
-  assert.equal(JSON.parse(read('package.json')).version, '1.10.0');
-  assert.equal(JSON.parse(read('bot/package.json')).version, '1.10.0');
-  assert.match(read('time-machine.html'), /id="version">v1\.10\.0</);
+test('version is 1.11.0 everywhere it should be', () => {
+  assert.equal(VERSION, '1.11.0');
+  assert.equal(JSON.parse(read('version.json')).version, '1.11.0');
+  assert.equal(JSON.parse(read('package.json')).version, '1.11.0');
+  assert.equal(JSON.parse(read('bot/package.json')).version, '1.11.0');
+  assert.match(read('time-machine.html'), /id="version">v1\.11\.0</);
   assert.match(read('README.md'), /1\.10\.0/);
-  assert.match(read('index.html'), /id="version">v1\.10\.0</);
+  assert.match(read('index.html'), /id="version">v1\.11\.0</);
 });
 test('every element id the page script uses exists in the HTML', () => {
   for (const [page, script] of [['time-machine.html', 'time-machine.js'], ['index.html', 'garden.js']]) {
@@ -228,7 +228,7 @@ test('time machine code has no secrets, exchange APIs or order placement', () =>
   assert.ok(urls.every(u => /raw\.githubusercontent\.com\/typedcypher|bitcoin-grower-bot|github/.test(u) || u.includes('w3.org')), urls.join('\n'));
   assert.doesNotMatch(read('live-price.js'), /api[_-]?key|api[_-]?secret|AddOrder|Authorization|\/private\/|Bearer /i);
   const live = [...read('live-price.js').matchAll(/https:\/\/[^'"\s)]+/g)].map(m => m[0]);
-  assert.ok(live.every(u => /^https:\/\/api\.(kraken\.com\/0\/public\/|coingecko\.com\/api\/v3\/simple\/price)/.test(u)), live.join('\n')); // public read-only endpoints only
+  assert.ok(live.every(u => /^https:\/\/api\.(kraken\.com\/0\/public\/|coingecko\.com\/api\/v3\/(simple\/price|coins\/bitcoin\/market_chart))/.test(u)), live.join('\n')); // public read-only endpoints only
 });
 test('optional bundled price file, if present, is valid daily BTC/GBP', { skip: !fs.existsSync(new URL('../data/btc-gbp-daily.csv', import.meta.url)) }, () => {
   const { points } = parseCSV(read('data/btc-gbp-daily.csv'));

@@ -31,7 +31,7 @@ Never put API keys into a public GitHub repository, browser JavaScript, a screen
 ## Sharing with friends
 You can share the GitHub Pages link; each visitor runs an independent simulated garden in their own browser. No account registration or access to your Kraken account is involved.
 
-Version: **1.10.0** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
+Version: **1.11.0** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
 \n## Cloudflare simulation Worker\nThe prepared v1.8.1 Worker (requires deployment with Wrangler) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its virtual trading now runs automatically and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
 ## Owner-only simulation dashboard
 After deploying the new Worker, open `https://bitcoin-grower-bot.tim-c02.workers.dev/dashboard` to view persistent virtual balances, decisions and trades. Protect the Worker using Cloudflare Access (All traffic). Public GitHub Pages is a separate, browser-only demo for friends, not this owner dashboard. No live trading is supported.
@@ -77,3 +77,11 @@ Time Machine sound is now **on by default** (browsers only allow audio after the
 
 ## v1.10.0 Pruning styles
 The Time Machine now offers three ready-made **pruning styles** (Light: sell a quarter of each purchase; Medium: half, the previous default; Heavy: sell it all) as picture cards in step 3. Buy/harvest steps stay at 5% down / 10% up so there is always something to watch. After every journey it runs **all three styles over the same dates** and shows them side by side with buy-and-hold, with a "Watch" button on each row. Editing the advanced numbers by hand switches to a custom row. Pure logic: `PRESETS` and `compareAll` in `time-machine-engine.js`.
+
+## v1.11.0 Today's Prices and chart tabs
+* The front page is renamed **Today's Prices** (was Today's Garden).
+* New tabs above the price chart: **1H, 24H, 1W, 1M, 1Y, All**, with the % change over the chosen period and a hover/touch tooltip.
+* 1Y and All use the daily history. 1H and 24H use public, key-free Kraken candles (CoinGecko as a fallback) and show a clear message if neither is reachable. 1W and 1M use finer live candles, falling back to daily history.
+* New files: `price-ranges.js` (range config and helpers). `live-price.js` gains `parseKrakenOHLC`, `parseCoinGeckoChart` and `fetchSeries` (public GETs only).
+* The Cloudflare Worker is untouched.
+* The **My Garden** link has been removed from the public pages' navigation for now. The Cloudflare Worker and its dashboard are untouched and still run.

@@ -83,3 +83,28 @@ test('Kraken and CoinGecko responses are parsed; errors and junk are rejected', 
   near(g.price, 61999); near(g.changePct, -2.5); assert.equal(parseCoinGecko({ bitcoin: { gbp: 5 } }).changePct, null);
   assert.throws(() => parseCoinGecko({})); assert.throws(() => parseCoinGecko({ bitcoin: { gbp: 0 } }));
 });
+
+// ---------- v1.11.0 chart ranges ----------
+import { RANGES, RANGE_ORDER, historySeries, changeOver, trimToWindow, downsample } from '../price-ranges.js';
+import { parseKrakenOHLC, parseCoinGeckoChart } from '../live-price.js';
+test('range tabs: 1H, 24H, 1W, 1M, 1Y, All in order', () => {
+  assert.deepEqual(RANGE_ORDER.map(k => RANGES[k].label), ['1H', '24H', '1W', '1M', '1Y', 'All']);
+});
+test('historySeries and changeOver', () => {
+  const pts = series(Array.from({ length: 400 }, (_, i) => 100 + i));
+  assert.equal(historySeries(pts, '1w').length, 8);
+  assert.equal(historySeries(pts, '1y').length, 366);
+  const c = changeOver(historySeries(pts, '1w')); near(c.pct, 100 * (499 / 492 - 1), 1e-9);
+  assert.equal(changeOver([{ x: 1, v: 1 }]), null);
+});
+test('trimToWindow and downsample', () => {
+  const s = Array.from({ length: 1000 }, (_, i) => ({ x: i * 60000, v: i + 1 }));
+  assert.equal(trimToWindow(s, 3600e3).length, 61);
+  const d = downsample(s, 100); assert.equal(d.length, 100); assert.equal(d[0], s[0]); assert.equal(d.at(-1), s.at(-1));
+});
+test('candle parsers', () => {
+  const k = parseKrakenOHLC({ error: [], result: { XXBTZGBP: [[1000, '1', '2', '0', '5'], [1060, '1', '2', '0', '6'], [1120, '1', '2', '0', '7']], last: 1 } }, 2);
+  assert.deepEqual(k, [{ x: 1060000, v: 6 }, { x: 1120000, v: 7 }]);
+  assert.deepEqual(parseCoinGeckoChart({ prices: [[1000, 5], [2000, 6]] }), [{ x: 1000, v: 5 }, { x: 2000, v: 6 }]);
+  assert.throws(() => parseKrakenOHLC({ error: ['x'] }, 5)); assert.throws(() => parseCoinGeckoChart({}));
+});

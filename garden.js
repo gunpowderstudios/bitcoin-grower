@@ -1,9 +1,10 @@
-// Bitcoin Grower — Today's Garden page controller (v1.10.0). Simulation only; read-only public price data.
-import { VERSION, plantFor, formatGBP, signedPct, addDays, dayNumber, describeData } from './time-machine-engine.js?v=1.10.0';
-import { createPlant } from './time-machine-plant.js?v=1.10.0';
-import { loadHistory } from './price-data.js?v=1.10.0';
-import { fetchLive } from './live-price.js?v=1.10.0';
-import { forecast, describe, changeSince, SINCE_CHOICES } from './forecast-engine.js?v=1.10.0';
+// Bitcoin Grower — Today's Prices page controller (v1.11.0). Simulation only; read-only public price data.
+import { VERSION, plantFor, formatGBP, signedPct, addDays, dayNumber, describeData } from './time-machine-engine.js?v=1.11.0';
+import { createPlant } from './time-machine-plant.js?v=1.11.0';
+import { loadHistory } from './price-data.js?v=1.11.0';
+import { fetchLive, fetchSeries } from './live-price.js?v=1.11.0';
+import { RANGES, RANGE_ORDER, historySeries, changeOver, trimToWindow, downsample, axisLabel, tooltipLabel } from './price-ranges.js?v=1.11.0';
+import { forecast, describe, changeSince, SINCE_CHOICES } from './forecast-engine.js?v=1.11.0';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -15,7 +16,8 @@ const axis = n => '£' + Math.round(n).toLocaleString('en-GB');
 
 $('version').textContent = 'v' + VERSION;
 const plant = createPlant($('plant'));
-const S = { points: null, live: null, price: null, horizon: 365, timer: 0, tick: 0 };
+const S = { points: null, live: null, price: null, horizon: 365, timer: 0, tick: 0, range: '1y', series: null, source: '', unavailable: {} };
+const shortCache = {};
 
 // ---------------------------------------------------------------- live price
 function setChange(el, pct) {
@@ -66,28 +68,73 @@ function renderSeed() {
 }
 
 // ---------------------------------------------------------------- charts
-function drawYearChart() {
-  const c = $('yearChart'); c.replaceChildren();
-  if (!S.points) return;
-  const end = S.points.at(-1).date, from = addDays(end, -365);
-  const pts = S.points.filter(p => p.date >= from);
-  if (pts.length < 30) return;
-  const series = pts.map(p => ({ d: dayNumber(p.date), v: p.price }));
-  if (Number.isFinite(S.price)) series.push({ d: series.at(-1).d + 0.001, v: S.price });
-  const X0 = 74, X1 = 688, Y0 = 14, Y1 = 192, d0 = series[0].d, d1 = series.at(-1).d;
-  let lo = Infinity, hi = -Infinity; for (const s of series) { lo = Math.min(lo, s.v); hi = Math.max(hi, s.v); }
-  const pad = (hi - lo) * 0.08; lo -= pad; hi += pad;
-  const X = d => X0 + (d - d0) / (d1 - d0) * (X1 - X0), Y = v => Y1 - (v - lo) / (hi - lo) * (Y1 - Y0);
-  for (const v of [hi, lo]) { svgEl('line', { x1: X0, x2: X1, y1: Y(v), y2: Y(v), stroke: '#2f5139' }, c); svgEl('text', { x: X0 - 6, y: Y(v) + 4, 'text-anchor': 'end' }, c).textContent = axis(v); }
-  const step = Math.max(1, Math.floor(series.length / 300)), line = series.filter((_, i) => i % step === 0 || i === series.length - 1).map((s, i) => (i ? 'L' : 'M') + X(s.d).toFixed(1) + ' ' + Y(s.v).toFixed(1)).join(' ');
-  svgEl('path', { d: line + ` L${X1} ${Y1} L${X0} ${Y1}Z`, fill: 'rgba(120,230,100,.18)' }, c);
-  svgEl('path', { d: line, fill: 'none', stroke: '#8cf06a', 'stroke-width': 3, 'stroke-linejoin': 'round' }, c);
-  svgEl('circle', { cx: X(d1), cy: Y(series.at(-1).v), r: 5.5, fill: '#fff', stroke: '#2a6a2a', 'stroke-width': 2 }, c);
-  for (let k = 0; k <= 4; k++) {
-    const dn = d0 + (d1 - d0) * k / 4, date = new Date(dn * 86400000).toISOString().slice(0, 10);
-    svgEl('text', { x: X(dn), y: 212, 'text-anchor': k === 0 ? 'start' : k === 4 ? 'end' : 'middle' }, c).textContent = MONTHS[Number(date.slice(5, 7)) - 1] + ' ' + date.slice(2, 4).replace(/^/, '’');
+async function loadRange(key) {
+  const r = RANGES[key];
+  if (!r.kraken) return { series: historySeries(S.points || [], key), source: 'daily history' };
+  const c = shortCache[key];
+  if (c && Date.now() - c.at < 60000) return c;
+  try {
+    const res = await fetchSeries(r, trimToWindow);
+    return (shortCache[key] = { ...res, at: Date.now() });
+  } catch (e) {
+    if (r.history && S.points) return { series: historySeries(S.points, key), source: 'daily history' };
+    throw e;
   }
 }
+let rangeToken = 0;
+async function drawYearChart() {
+  const key = S.range, tok = ++rangeToken;
+  let res;
+  try { res = await loadRange(key); }
+  catch { if (tok !== rangeToken) return; S.unavailable[key] = true; S.series = null; drawChart(); return; }
+  if (tok !== rangeToken) return;
+  delete S.unavailable[key];
+  let series = res.series.slice();
+  if (Number.isFinite(S.price) && series.length && Date.now() > series.at(-1).x) series.push({ x: Date.now(), v: S.price });
+  S.series = downsample(series, 400); S.source = res.source; drawChart();
+}
+function drawChart() {
+  const c = $('yearChart'); c.replaceChildren(); $('tip').hidden = true;
+  const r = RANGES[S.range];
+  document.querySelectorAll('#rangeTabs .tab').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.range === S.range)));
+  const ch = $('rangeChange');
+  if (!S.series || S.series.length < 2) {
+    ch.className = 'rangechg'; ch.textContent = S.unavailable[S.range] ? 'This view needs the live price feed, which isn’t reachable right now. Try 1W, 1M, 1Y or All.' : 'Loading…';
+    $('rangeLegend').textContent = 'Bitcoin’s price (£)'; return;
+  }
+  const series = S.series, chg = changeOver(series), up = chg.pct > 0.05, down = chg.pct < -0.05;
+  ch.className = 'rangechg ' + (up ? 'up' : down ? 'down' : '');
+  ch.textContent = (up ? '▲ ' : down ? '▼ ' : '■ ') + signedPct(chg.pct) + ' over ' + r.words;
+  $('rangeLegend').textContent = 'Bitcoin’s price over ' + r.words + ' (£) · from ' + S.source;
+  $('yearChart').setAttribute('aria-label', 'Bitcoin price over ' + r.words + ': ' + signedPct(chg.pct) + ', from ' + money0(chg.from) + ' to ' + money0(chg.to));
+  const X0 = 74, X1 = 688, Y0 = 14, Y1 = 192, d0 = series[0].x, d1 = series.at(-1).x, span = d1 - d0;
+  let lo = Infinity, hi = -Infinity; for (const s of series) { lo = Math.min(lo, s.v); hi = Math.max(hi, s.v); }
+  const pad = (hi - lo) * 0.08 || hi * 0.01; lo -= pad; hi += pad;
+  const X = x => X0 + (x - d0) / span * (X1 - X0), Y = v => Y1 - (v - lo) / (hi - lo) * (Y1 - Y0);
+  for (const v of [hi, lo]) { svgEl('line', { x1: X0, x2: X1, y1: Y(v), y2: Y(v), stroke: '#2f5139' }, c); svgEl('text', { x: X0 - 6, y: Y(v) + 4, 'text-anchor': 'end' }, c).textContent = axis(v); }
+  const line = series.map((s, i) => (i ? 'L' : 'M') + X(s.x).toFixed(1) + ' ' + Y(s.v).toFixed(1)).join(' ');
+  svgEl('path', { d: line + ` L${X1} ${Y1} L${X0} ${Y1}Z`, fill: 'rgba(120,230,100,.18)' }, c);
+  svgEl('path', { d: line, fill: 'none', stroke: down ? '#ff9b8a' : '#8cf06a', 'stroke-width': 3, 'stroke-linejoin': 'round' }, c);
+  svgEl('circle', { cx: X1, cy: Y(series.at(-1).v), r: 5.5, fill: '#fff', stroke: '#2a6a2a', 'stroke-width': 2 }, c);
+  for (let k = 0; k <= 4; k++) {
+    const x = d0 + span * k / 4;
+    svgEl('text', { x: X(x), y: 212, 'text-anchor': k === 0 ? 'start' : k === 4 ? 'end' : 'middle' }, c).textContent = axisLabel(x, span);
+  }
+  const cur = svgEl('line', { x1: 0, x2: 0, y1: Y0, y2: Y1, stroke: '#fff', 'stroke-dasharray': '4 4', visibility: 'hidden' }, c);
+  const dot = svgEl('circle', { r: 5, fill: '#fff', visibility: 'hidden' }, c);
+  const move = ev => {
+    const box = c.getBoundingClientRect(), px = (ev.clientX - box.left) / box.width * 700;
+    const x = d0 + Math.min(1, Math.max(0, (px - X0) / (X1 - X0))) * span;
+    let best = series[0]; for (const s of series) if (Math.abs(s.x - x) < Math.abs(best.x - x)) best = s;
+    cur.setAttribute('x1', X(best.x)); cur.setAttribute('x2', X(best.x)); cur.setAttribute('visibility', 'visible');
+    dot.setAttribute('cx', X(best.x)); dot.setAttribute('cy', Y(best.v)); dot.setAttribute('visibility', 'visible');
+    const tip = $('tip'); tip.hidden = false; tip.textContent = tooltipLabel(best.x, span) + ' · ' + formatGBP(best.v);
+    tip.style.left = Math.min(Math.max(8, X(best.x) / 700 * box.width - 60), box.width - 190) + 'px';
+  };
+  const leave = () => { cur.setAttribute('visibility', 'hidden'); dot.setAttribute('visibility', 'hidden'); $('tip').hidden = true; };
+  c.onpointermove = move; c.onpointerdown = move; c.onpointerleave = leave;
+}
+for (const b of document.querySelectorAll('#rangeTabs .tab')) b.onclick = () => { S.range = b.dataset.range; S.series = null; drawChart(); drawYearChart(); };
 function drawFan(f) {
   const c = $('fanChart'); c.replaceChildren();
   const X0 = 74, X1 = 612, Y0 = 16, Y1 = 238, H = f.horizonDays;
