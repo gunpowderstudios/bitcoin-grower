@@ -2,13 +2,13 @@
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.13.7';
-import { createPlant } from './time-machine-plant.js?v=1.13.7';
-import { createSound } from './time-machine-sound.js?v=1.13.7';
-import { loadHistory } from './price-data.js?v=1.13.7';
-import { createRace } from './time-machine-race.js?v=1.13.7';
-import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.7';
-import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.7';
+} from './time-machine-engine.js?v=1.13.8';
+import { createPlant } from './time-machine-plant.js?v=1.13.8';
+import { createSound } from './time-machine-sound.js?v=1.13.8';
+import { loadHistory } from './price-data.js?v=1.13.8';
+import { createRace } from './time-machine-race.js?v=1.13.8';
+import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.8';
+import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.8';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -515,7 +515,7 @@ $('fwGo').onclick = () => {
   try {
     const today = new Date().toISOString().slice(0, 10), amount = Number($('fwAmount').value);
     const f = forecast(S.data.points, { amount, horizonDays: FW.days, since: SINCE_CHOICES[$('fwSince').value] });
-    const beds = [['p10', '🌧️', 'A rough patch', '1 in 10 past cases ended here or lower'], ['p50', '⛅', 'A typical run', 'Half of past cases ended higher, half lower'], ['p90', '☀️', 'A good run', '1 in 10 past cases ended here or higher']].map(([k, emoji, name, sub]) => {
+    const beds = [['p10', '🐻', 'Tough Times', 'What if Bitcoin has a difficult bear market?'], ['p50', '🌤️', 'Middle Ground', 'What if Bitcoin performs somewhere in the middle?'], ['p90', '🐂', 'Boom Times', 'What if Bitcoin enjoys a strong bull market?']].map(([k, emoji, name, sub]) => {
       const frames = futureFrames(f.fan, k, today);
       return { key: k, emoji, name, sub, sim: { settings: { amount }, frames, events: [], summary: { end: frames.at(-1).total, maxDrawdown: 0 } } };
     });
