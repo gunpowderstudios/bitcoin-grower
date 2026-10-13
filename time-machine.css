@@ -188,3 +188,5 @@ table.cmp td:last-child,table.cmp th:last-child{text-align:right}
 table.cmp tr.played td{background:rgba(244,200,74,.13);font-weight:700}
 table.cmp .btn{min-height:40px;padding:6px 12px;font-size:14px}
 @media(max-width:640px){.presets{grid-template-columns:1fr}.style{flex-direction:row;align-items:center;gap:12px}}
+.sitefoot{text-align:center;margin:22px 0 8px;font-size:14px;color:var(--mute)}
+.sitefoot a{color:#ffd23f;font-weight:700;text-decoration:underline;text-underline-offset:3px;display:inline-block;padding:10px 2px}

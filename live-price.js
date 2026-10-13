@@ -1,4 +1,4 @@
-// Bitcoin Grower — live BTC/GBP price from public, key-free endpoints (v1.11.2).
+// Bitcoin Grower — live BTC/GBP price from public, key-free endpoints (v1.11.3).
 // Read-only GET requests to public price tickers. No accounts, no keys, no trading.
 const KRAKEN = 'https://api.kraken.com/0/public/Ticker?pair=XBTGBP';
 const COINGECKO = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=gbp&include_24hr_change=true';

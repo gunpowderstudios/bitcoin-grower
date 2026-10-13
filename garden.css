@@ -1,4 +1,4 @@
-/* Bitcoin Grower Today's Prices v1.11.2 — builds on time-machine.css */
+/* Bitcoin Grower Today's Prices v1.11.3 — builds on time-machine.css */
 .nowgrid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:center}
 .bigprice{font-size:clamp(40px,10vw,68px);font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.05}
 .chg{font-size:clamp(17px,4vw,22px);font-weight:750;margin:4px 0 6px}
@@ -26,7 +26,7 @@
 @media(max-width:700px){.nowgrid{grid-template-columns:1fr}.fcform{grid-template-columns:1fr}}
 .caution{color:#ffe9a0}
 
-/* v1.11.2 — chart range tabs */
+/* v1.11.3 — chart range tabs */
 .tabs{display:flex;gap:6px;margin:14px 0 6px;flex-wrap:wrap}
 .tab{flex:1 1 0;min-width:48px;min-height:44px;border:1px solid #3d6a4b;background:#0f2417;color:#d8ecd8;border-radius:12px;font:inherit;font-weight:700;cursor:pointer}
 .tab[aria-pressed="true"]{background:#2f7d3a;border-color:#8cf06a;color:#fff}

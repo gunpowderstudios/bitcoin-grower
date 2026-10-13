@@ -2,10 +2,10 @@
 import {
   VERSION, DEFAULTS, PRESETS, compareAll, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.11.2';
-import { createPlant } from './time-machine-plant.js?v=1.11.2';
-import { createSound } from './time-machine-sound.js?v=1.11.2';
-import { loadHistory } from './price-data.js?v=1.11.2';
+} from './time-machine-engine.js?v=1.11.3';
+import { createPlant } from './time-machine-plant.js?v=1.11.3';
+import { createSound } from './time-machine-sound.js?v=1.11.3';
+import { loadHistory } from './price-data.js?v=1.11.3';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
