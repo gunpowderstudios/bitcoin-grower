@@ -108,3 +108,17 @@ test('candle parsers', () => {
   assert.deepEqual(parseCoinGeckoChart({ prices: [[1000, 5], [2000, 6]] }), [{ x: 1000, v: 5 }, { x: 2000, v: 6 }]);
   assert.throws(() => parseKrakenOHLC({ error: ['x'] }, 5)); assert.throws(() => parseCoinGeckoChart({}));
 });
+
+// ---------- v1.13 forward frames ----------
+import { futureFrames } from '../forecast-engine.js';
+test('futureFrames: starts at the amount, ends at the band, in order, dated from today', () => {
+  const pts = series(Array.from({ length: 700 }, (_, i) => 100 * Math.exp(0.002 * i + 0.1 * Math.sin(i / 9))));
+  const f = forecast(pts, { amount: 100, horizonDays: 365, since: '2015-01-01' });
+  const fr = futureFrames(f.fan, 'p50', '2026-10-13', 50);
+  assert.equal(fr.length, 50); near(fr[0].total, 100); near(fr.at(-1).total, f.end.p50, 1e-6);
+  assert.equal(fr[0].date, '2026-10-13'); assert.equal(fr.at(-1).date, addDays('2026-10-13', 365));
+  for (let i = 1; i < fr.length; i++) assert.ok(fr[i].date >= fr[i - 1].date);
+  const lo = futureFrames(f.fan, 'p10', '2026-10-13'), hi = futureFrames(f.fan, 'p90', '2026-10-13');
+  assert.ok(lo.at(-1).total <= fr.at(-1).total && fr.at(-1).total <= hi.at(-1).total);
+  assert.throws(() => futureFrames(f.fan, 'p99', '2026-10-13'));
+});

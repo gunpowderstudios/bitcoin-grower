@@ -195,7 +195,7 @@ details.prune-help ul{margin:4px 0 8px;padding-left:20px}
 .style.hold{grid-column:1/-1}
 .vs[hidden]{display:none}
 
-/* v1.12.0 — the gardener and the four side-by-side gardens */
+/* v1.13.0 — the gardener and the four side-by-side gardens */
 .gardener{position:absolute;left:10px;bottom:52px;width:76px;z-index:2;pointer-events:none}
 .gardener .gsvg{display:block;width:76px;height:auto;overflow:visible;filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));animation:gbob 3s ease-in-out infinite;transform-origin:50% 100%}
 .gardener .garm{transform-origin:52px 64px}
@@ -220,3 +220,14 @@ details.prune-help ul{margin:4px 0 8px;padding-left:20px}
 .racenote{margin:12px 2px 0}
 @media(max-width:700px){.beds{grid-template-columns:repeat(2,1fr)}.gardener{width:62px;bottom:50px}.gardener .gsvg{width:62px}}
 @media(prefers-reduced-motion:reduce){.gardener .gsvg,.gardener.talking .garm{animation:none}}
+
+/* v1.13.0 — choosing a direction: back (🦖) or forward (🚀) */
+.modegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.mode{display:grid;gap:4px;justify-items:center;text-align:center;padding:16px 12px;border-radius:18px;border:2px solid #4f7b5a;background:#16301f;color:#e8f6e4;font:inherit;cursor:pointer;min-height:44px}
+.mode .big{font-size:46px;line-height:1}
+.mode b{font-size:18px}.mode small{color:var(--mute);font-size:13px;line-height:1.35}
+.mode[aria-pressed=true]{border-color:var(--gold);background:#2a4d36;box-shadow:0 0 0 3px rgba(244,200,74,.25)}
+.mode:hover{transform:translateY(-1px)}
+.beds.three{grid-template-columns:repeat(3,1fr)}
+#fwdMode[hidden],#backMode[hidden]{display:none}
+@media(max-width:700px){.modegrid{gap:8px}.mode .big{font-size:38px}.mode small{font-size:12px}.beds.three{grid-template-columns:1fr}}

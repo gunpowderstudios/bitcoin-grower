@@ -54,12 +54,13 @@ export function describe(f, fmt) {
   const e = f.end, H = f.horizonDays;
   const unit = H === 30 ? 'months' : H % 365 === 0 ? (H / 365) + '-year stretches' : H + '-day stretches';
   const spanDays = f.spanDays ?? 0, separate = Math.floor(spanDays / H);
+  const noun = H === 30 ? 'month' : H % 365 === 0 ? (H / 365) + '-year stretch' : H + '-day stretch';
   return {
     headline: 'In 8 out of 10 past ' + unit + ', ' + fmt(f.amount) + ' ended up somewhere between ' + fmt(e.p10) + ' and ' + fmt(e.p90) + '.',
     middle: 'The middle of the range was ' + fmt(e.p50) + '.',
     up: 'It finished higher in ' + Math.round(e.upShare * 100) + ' of every 100 periods and lower in ' + Math.round(e.lossShare * 100) + '.',
     extremes: 'The very best past period ended at ' + fmt(e.best) + ' and the very worst at ' + fmt(e.worst) + '.',
-    caution: 'Careful: this uses every starting day, but neighbouring days overlap. There are only about ' + separate + ' completely separate ' + (H === 30 ? 'months' : unit) + ' in the history used' + (separate < 20 ? ', so for this period treat it as a very rough guide.' : '.'),
+    caution: 'Careful: this uses every starting day, but neighbouring days overlap. There ' + (separate === 1 ? 'is' : 'are') + ' only about ' + separate + ' completely separate ' + (separate === 1 ? noun : noun + (noun.endsWith('stretch') ? 'es' : 's')) + ' in the history used' + (separate < 20 ? ', so for this period treat it as a very rough guide.' : '.'),
     samples: e.samples, separate
   };
 }
@@ -75,4 +76,20 @@ export function changeSince(points, days, price) {
     if (points[i].date <= target) return dayNumber(target) - dayNumber(points[i].date) <= 3 ? { pct: 100 * (price / points[i].price - 1), ref: points[i] } : null;
   }
   return null;
+}
+
+/**
+ * Turn one band of the forecast (p10 = rough patch, p50 = typical, p90 = good run) into smooth "frames" for the garden to play:
+ * `n` points from today to the end of the period, each {date, total, sells:0, events:0}. Straight-line steps between the forecast's own points.
+ */
+export function futureFrames(fan, key, today, n = 120) {
+  if (!fan?.length || !['p10', 'p25', 'p50', 'p75', 'p90'].includes(key)) throw new Error('Unknown forecast band.');
+  const H = fan.at(-1).day, out = [];
+  for (let i = 0; i < n; i++) {
+    const day = H * i / (n - 1);
+    let k = 1; while (k < fan.length - 1 && fan[k].day < day) k++;
+    const a = fan[k - 1], b = fan[k], t = b.day === a.day ? 1 : Math.min(1, Math.max(0, (day - a.day) / (b.day - a.day)));
+    out.push({ i, date: addDays(today, Math.round(day)), total: a[key] + (b[key] - a[key]) * t, sells: 0, events: 0 });
+  }
+  return out;
 }

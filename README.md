@@ -31,7 +31,7 @@ Never put API keys into a public GitHub repository, browser JavaScript, a screen
 ## Sharing with friends
 You can share the GitHub Pages link; each visitor runs an independent simulated garden in their own browser. No account registration or access to your Kraken account is involved.
 
-Version: **1.12.0** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
+Version: **1.13.0** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
 \n## Cloudflare simulation Worker\nThe prepared v1.8.1 Worker (requires deployment with Wrangler) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its virtual trading now runs automatically and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
 ## Owner-only simulation dashboard
 After deploying the new Worker, open `https://bitcoin-grower-bot.tim-c02.workers.dev/dashboard` to view persistent virtual balances, decisions and trades. Protect the Worker using Cloudflare Access (All traffic). Public GitHub Pages is a separate, browser-only demo for friends, not this owner dashboard. No live trading is supported.
@@ -105,22 +105,25 @@ The Time Machine now offers three ready-made **pruning styles** (Light: sell a q
 ## v1.11.6
 * Time Machine gets a fourth choice, **Just hold**: everything in on day one, never sold. It plays through the same plant, chart and summary, and the results table compares it with the three pruning styles. Engine: `simulate(steps, {strategy:"hold"})`.
 
-## v1.12.0
+## v1.13.0
 * "When would you like to travel back to?" gets a **The very start (2012)** button for the earliest day we have prices, with a plain warning that pre-2014 prices are thin and results can look enormous.
 * The date hint now also says what one Bitcoin cost on the chosen start day (when we have a price for it).
 
-## v1.12.0 · Historical price transparency
+## v1.13.0 · Historical price transparency
 Time Machine now shows the earliest date and first BTC/GBP price in the actually loaded data, the chosen start day's price, and an expandable breakdown of purchase fees, BTC acquired, final valuation and profit/loss. It distinguishes Bitcoin's 2009 launch from the beginning of reliable price coverage. Earlier unsupported data are not invented. Extending back before 2012 requires a validated earlier BTC/GBP price series.
 
-## v1.12.0 · Bitcoin Garden branding
+## v1.13.0 · Bitcoin Garden branding
 Renamed app-facing branding from Bitcoin Grower to Bitcoin Garden. Existing repository and deployment URLs are intentionally unchanged until the GitHub repository is renamed and hosting paths are updated. Historical strategy descriptions and the persistent Cloudflare bot remain operationally unchanged.
 
-## v1.12.0
+## v1.13.0
 * Wording: "The Bitcoin Garden" in page titles, header, notices and footer. Fixed the version unit test left on 1.11.7. The Cloudflare Worker files were not changed in this version.
 
-## v1.12.0
+## v1.13.0
 * Forecast box wording: "If I planted it today…".
 
-## v1.12.0
+## v1.13.0
 * **A little gardener** now narrates the Time Machine in speech bubbles: what the strategy is doing and why (plant on a dip, prune on a rise), storm and sunshine moments, and a closing line. Plain English, never advice. Files: `gardener-lines.js` (pure text), `time-machine-gardener.js` (character).
 * **Four gardens, side by side**: after a journey, a button grows Light, Medium, Heavy and Just hold at the same time from the same start, with the biggest pot and the smoothest ride flagged. File: `time-machine-race.js`. `createPlant(svg, uid)` can now be used several times per page.
+
+## v1.13.0
+* The Time Machine now asks which way to travel: **🦖 Back in time** (the existing journey) or **🚀 Forward in time**, a history-based forecast shown as three gardens (a rough patch, a typical run, a good run: the 10th, 50th and 90th percentile of what happened after every past planting day) with the same honesty notes as the Today's Prices forecast. `futureFrames()` in `forecast-engine.js`; `createRace()` can now mount any set of beds.

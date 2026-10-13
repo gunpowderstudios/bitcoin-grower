@@ -2,13 +2,14 @@
 import {
   VERSION, DEFAULTS, PRESETS, HOLD, compareAll, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.12.0';
-import { createPlant } from './time-machine-plant.js?v=1.12.0';
-import { createSound } from './time-machine-sound.js?v=1.12.0';
-import { loadHistory } from './price-data.js?v=1.12.0';
-import { createGardener } from './time-machine-gardener.js?v=1.12.0';
-import { createRace } from './time-machine-race.js?v=1.12.0';
-import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.12.0';
+} from './time-machine-engine.js?v=1.13.0';
+import { createPlant } from './time-machine-plant.js?v=1.13.0';
+import { createSound } from './time-machine-sound.js?v=1.13.0';
+import { loadHistory } from './price-data.js?v=1.13.0';
+import { createGardener } from './time-machine-gardener.js?v=1.13.0';
+import { createRace } from './time-machine-race.js?v=1.13.0';
+import { forecast, describe as describeForecast, futureFrames, SINCE_CHOICES } from './forecast-engine.js?v=1.13.0';
+import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.13.0';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -19,6 +20,9 @@ const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)
 const plant = createPlant($('plant'));
 const gardener = createGardener($('scene'));
 const race = createRace($);
+const fwRace = createRace($, { section: 'fwRace', beds: 'fwBeds', date: 'fwDate', scrub: 'fwScrub', play: 'fwPlay', restart: 'fwRestart', note: 'fwNote' }, {
+  uid: 'fw', finishNote: beds => 'Over the chosen time, the typical run ended at ' + formatGBP(beds[1].sim.summary.end) + ', the rough patch at ' + formatGBP(beds[0].sim.summary.end) + ' and the good run at ' + formatGBP(beds[2].sim.summary.end) + '. The real future could land anywhere, even outside this range.'
+});
 const sound = createSound();
 sound.enableWhenAllowed(); // sound is on by default; it starts with the visitor's first click or tap
 const S = {
@@ -67,7 +71,7 @@ function acceptData(points, note) {
   if (q.get('amount')) $('amount').value = q.get('amount');
   if ($('from').value < info.first || $('from').value > $('from').max) $('from').value = info.first <= '2017-01-01' ? '2017-01-01' : addYears(info.last, -5);
   syncPresets(); updateDateHint();
-  $('go').disabled = false; $('goHint').textContent = 'You’ll watch your plant grow as time moves forward. Nothing here uses real money.';
+  $('go').disabled = false; $('fwGo').disabled = false; $('goHint').textContent = 'You’ll watch your plant grow as time moves forward. Nothing here uses real money.';
   resetToIdle();
 }
 
@@ -556,7 +560,31 @@ let lastW = window.innerWidth;
 window.addEventListener('resize', () => { if (window.innerWidth === lastW) return; lastW = window.innerWidth; if (S.sim) { buildTimelineTicks(); buildChart(); render({ instant: true, quiet: true }); } });
 
 // test hook (read-only view of state; used by automated tests)
-window.__race = race;
+// ---------------------------------------------------------------- forward in time (a history-based forecast)
+const FW = { days: 365 };
+function setMode(mode) {
+  const fwd = mode === 'fwd';
+  $('backMode').hidden = fwd; $('fwdMode').hidden = !fwd;
+  $('modeBack').setAttribute('aria-pressed', String(!fwd)); $('modeFwd').setAttribute('aria-pressed', String(fwd));
+  if (fwd && S.state === 'playing') pause();
+}
+$('modeBack').onclick = () => setMode('back'); $('modeFwd').onclick = () => setMode('fwd');
+for (const b of $('fwHorizons').querySelectorAll('button')) b.onclick = () => { FW.days = Number(b.dataset.days); $('fwHorizons').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); };
+$('fwGo').onclick = () => {
+  $('fwError').hidden = true;
+  try {
+    const today = new Date().toISOString().slice(0, 10), amount = Number($('fwAmount').value);
+    const f = forecast(S.data.points, { amount, horizonDays: FW.days, since: SINCE_CHOICES[$('fwSince').value] });
+    const beds = [['p10', '🌧️', 'A rough patch', '1 in 10 past cases ended here or lower'], ['p50', '⛅', 'A typical run', 'Half of past cases ended higher, half lower'], ['p90', '☀️', 'A good run', '1 in 10 past cases ended here or higher']].map(([k, emoji, name, sub]) => {
+      const frames = futureFrames(f.fan, k, today);
+      return { key: k, emoji, name, sub, sim: { settings: { amount }, frames, events: [], summary: { end: frames.at(-1).total, maxDrawdown: 0 } } };
+    });
+    fwRace.openBeds(beds);
+    $('fwCaution').textContent = describeForecast(f, formatGBP).caution;
+    $('fwRace').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' }); $('fwrace-heading').focus({ preventScroll: true });
+  } catch (e) { $('fwError').textContent = e.message; $('fwError').hidden = false; }
+};
+window.__race = race; window.__fwRace = fwRace; window.__setMode = setMode;
 window.__tm = { gardener, get state() { return S.state; }, get cursor() { return S.cursor; }, get sim() { return S.sim; }, plant };
 
 showIdleFigures(); drawEmptyChart(); syncButtons();

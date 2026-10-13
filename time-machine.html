@@ -6,16 +6,16 @@
 <title>The Bitcoin Garden — Time Machine</title>
 <meta name="description" content="Plant an imaginary £100 in the past and watch it grow through real Bitcoin history. A friendly simulation — no real money, no real trades.">
 <meta name="theme-color" content="#0c1d14">
-<link rel="stylesheet" href="./time-machine.css?v=1.12.0">
+<link rel="stylesheet" href="./time-machine.css?v=1.13.0">
 </head>
 <body>
 <a class="skip" href="#plant-heading">Skip to the plant</a>
 <main>
 <header>
   <div>
-    <div class="sub">🌱 THE BITCOIN GARDEN <span class="vtag" id="version">v1.12.0</span></div>
+    <div class="sub">🌱 THE BITCOIN GARDEN <span class="vtag" id="version">v1.13.0</span></div>
     <h1>Time Machine ⏳</h1>
-    <div class="sub">Plant some pretend money in the past, then travel forward and watch it grow (or wilt!) through real Bitcoin history.</div>
+    <div class="sub">Travel back in time to see what really happened to pretend money, or forward to see the range of futures the past suggests.</div>
   </div>
   <span class="badge">SIMULATION · NO REAL MONEY OR TRADES</span>
 </header>
@@ -24,6 +24,16 @@
   <a class="active" href="./time-machine.html" aria-current="page">⏳ Time Machine</a>
 </nav>
 
+<!-- ============ WHICH WAY? ============ -->
+<section class="card modes" aria-labelledby="mode-heading">
+  <h2 id="mode-heading">Which way do you want to travel?</h2>
+  <div class="modegrid" role="group" aria-labelledby="mode-heading">
+    <button type="button" class="mode" id="modeBack" aria-pressed="true"><span class="big" aria-hidden="true">🦖</span><b>Back in time</b><small>Plant money in the past and watch what really happened.</small></button>
+    <button type="button" class="mode" id="modeFwd" aria-pressed="false"><span class="big" aria-hidden="true">🚀</span><b>Forward in time</b><small>See the range of futures the past suggests. A forecast, not a promise.</small></button>
+  </div>
+</section>
+
+<div id="backMode">
 <!-- ============ SET UP: THREE STEPS ============ -->
 <section class="card" aria-labelledby="setup-heading" id="setup">
   <h2 id="setup-heading">Plant your money in the past</h2>
@@ -170,6 +180,59 @@
     <div class="scroll"><table><thead><tr><th>Date</th><th>What happened</th><th>Bitcoin price</th><th>Amount</th></tr></thead><tbody id="journal"><tr><td colspan="4">Nothing yet — press play!</td></tr></tbody></table></div>
   </details>
 </section>
+</div>
+
+<!-- ============ FORWARD IN TIME ============ -->
+<div id="fwdMode" hidden>
+<section class="card" aria-labelledby="fw-heading" id="fwSetup">
+  <h2 id="fw-heading">🚀 Launch into the future</h2>
+  <p class="hint">Nobody can know what Bitcoin will do. So we look back at what happened after <b>every</b> past planting day, and show three futures from that history: a rough patch, a typical run and a good run. It’s a weather forecast, not a promise.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="num" aria-hidden="true">1</div>
+      <label for="fwAmount">If you planted this much today…</label>
+      <div class="money"><span aria-hidden="true">£</span><input id="fwAmount" type="number" inputmode="decimal" min="1" max="1000000" step="any" value="100" autocomplete="off"></div>
+    </div>
+    <div class="step">
+      <div class="num" aria-hidden="true">2</div>
+      <div class="lbl" id="fwHLabel">…how far ahead shall we travel?</div>
+      <div class="chips" id="fwHorizons" role="group" aria-labelledby="fwHLabel">
+        <button type="button" class="chip" data-days="30" aria-pressed="false">1 month</button>
+        <button type="button" class="chip" data-days="365" aria-pressed="true">1 year</button>
+        <button type="button" class="chip" data-days="1825" aria-pressed="false">5 years</button>
+      </div>
+    </div>
+    <div class="step">
+      <div class="num" aria-hidden="true">3</div>
+      <button class="go" id="fwGo" type="button" disabled>🚀 Launch into the future!</button>
+      <p class="hint">Pretend money again. Nothing here is a prediction or advice.</p>
+    </div>
+  </div>
+  <p class="err" id="fwError" role="alert" hidden></p>
+  <details class="advanced"><summary>⚙️ How the forecast is worked out (optional)</summary>
+    <p class="hint">Every past day since the start year you choose is treated as a pretend planting day. We see what the money was worth after your chosen time, then show the 10th, 50th and 90th best results out of 100.</p>
+    <div class="fields"><div><label for="fwSince">Use history since</label>
+      <select id="fwSince"><option value="y2017" selected>2017 (recommended)</option><option value="y2020">2020</option><option value="all">2014 (everything we trust)</option></select>
+      <p class="hint">Bitcoin’s earliest years had huge jumps that may never repeat, so older history can look rosier than it should.</p></div></div>
+  </details>
+</section>
+
+<section class="card race" id="fwRace" aria-labelledby="fwrace-heading" hidden>
+  <h2 id="fwrace-heading" tabindex="-1">🔭 Three possible futures</h2>
+  <p class="hint">Each garden is one slice of what happened in the past, replayed forward from today. They are examples of the range, not the only things that could happen.</p>
+  <div class="racebar">
+    <div class="racedate" id="fwDate" aria-hidden="true">—</div>
+    <button class="btn primary" id="fwPlay" type="button">⏸ Pause</button>
+    <button class="btn" id="fwRestart" type="button">↺ Again</button>
+    <input type="range" id="fwScrub" min="0" max="0" value="0" aria-label="Move through the future">
+  </div>
+  <div class="beds three" id="fwBeds"></div>
+  <p class="racenote" id="fwNote" aria-live="polite"></p>
+  <p class="fine caution" id="fwCaution"></p>
+  <div class="warn">This is a <b>history lesson, not a prediction</b>. Past results are no guide to the future, and Bitcoin can lose most of its value. Fees and tax are ignored. Not financial advice.</div>
+</section>
+</div>
+
 
 <section class="card">
   <h2>About the prices</h2>
@@ -188,6 +251,6 @@
 </div>
 <footer class="sitefoot">The Bitcoin Garden © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
 </main>
-<script type="module" src="./time-machine.js?v=1.12.0"></script>
+<script type="module" src="./time-machine.js?v=1.13.0"></script>
 </body>
 </html>
