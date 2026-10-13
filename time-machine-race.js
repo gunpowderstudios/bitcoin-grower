@@ -1,6 +1,6 @@
 // The Bitcoin Garden — side-by-side gardens (used for the forward-in-time forecast).
-import { plantFor, formatGBP, signedPct } from './time-machine-engine.js?v=1.13.7';
-import { createPlant } from './time-machine-plant.js?v=1.13.7';
+import { plantFor, formatGBP, signedPct } from './time-machine-engine.js?v=1.13.10';
+import { createPlant } from './time-machine-plant.js?v=1.13.10';
 
 const NS = 'http://www.w3.org/2000/svg';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -31,10 +31,13 @@ export function createRace($, ids = {}, opts = {}) {
     idx = Math.max(0, Math.min(R.N - 1, Math.round(idx)));
     $(I.date).textContent = fmtDate(R.beds[0].sim.frames[idx].date);
     $(I.scrub).value = idx;
+    let fallingCoins = 0;
     for (const b of R.beds) {
+      const beforeCoins = b.plant.coins;
       const f = b.sim.frames[idx], start = b.sim.settings.amount, ratio = f.total / start, pl = plantFor(ratio, true);
       b.plant.setState(pl.stage, pl.droop);
       b.plant.setFruit(ratio, animate && !reduceMotion());
+      if (animate && !reduceMotion() && b.plant.coins > beforeCoins) fallingCoins += b.plant.coins - beforeCoins;
       b.v.textContent = formatGBP(f.total);
       const pnl = f.total - start, up = pnl > 0.004, down = pnl < -0.004;
       b.g.className = 'bg ' + (up ? 'gain' : down ? 'loss' : '');
@@ -42,6 +45,7 @@ export function createRace($, ids = {}, opts = {}) {
       b.s.textContent = b.sub ? b.sub : f.sells + (f.sells === 1 ? ' sale' : ' sales') + (f.sells ? ' · ' + formatGBP(b.banked[idx]).replace(/\.00$/, '') + ' banked' : '');
       b.el.querySelector('.bn').title = pl.name;
     }
+    if (fallingCoins && typeof opts.onCoinsFall === 'function') opts.onCoinsFall(fallingCoins);
   }
 
   function finish() {
