@@ -31,7 +31,7 @@ Never put API keys into a public GitHub repository, browser JavaScript, a screen
 ## Sharing with friends
 You can share the GitHub Pages link; each visitor runs an independent simulated garden in their own browser. No account registration or access to your Kraken account is involved.
 
-Version: **1.13.12** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
+Version: **1.13.13** (displayed in the app from `version.json`).\n\n## Versioning\nFor each app update, increment the semantic version in `version.json` and keep `bot/package.json` and this README synchronized. The app displays the version in the header and footer. Never place credentials in the repository.
 \n## Cloudflare simulation Worker\nThe prepared v1.8.1 Worker (requires deployment with Wrangler) is in `cloudflare/`. It uses a five-minute scheduled public Kraken price check and SQLite-backed Durable Object state; its virtual trading now runs automatically and it cannot place real orders. See `cloudflare/README.md` for deployment instructions.\n
 ## Owner-only simulation dashboard
 After deploying the new Worker, open `https://bitcoin-grower-bot.tim-c02.workers.dev/dashboard` to view persistent virtual balances, decisions and trades. Protect the Worker using Cloudflare Access (All traffic). Public GitHub Pages is a separate, browser-only demo for friends, not this owner dashboard. No live trading is supported.
@@ -104,6 +104,10 @@ The Time Machine now offers three ready-made **pruning styles** (Light: sell a q
 
 ## v1.11.6
 * Time Machine gets a fourth choice, **Just hold**: everything in on day one, never sold. It plays through the same plant, chart and summary, and the results table compares it with the three pruning styles. Engine: `simulate(steps, {strategy:"hold"})`.
+
+## v1.13.13 · Trees grow sooner
+- Small tree now appears at 1.2× what you planted and the oak at 2× (was 1.5× and 3×), so typical forecasts visibly grow.
+- Coins now ripen at 1.1×, 1.25×, 1.5×, 2×, 3×, 5×, 10× and 25×.
 
 ## v1.13.12 · Review fixes
 - Made every version number and `?v=` cache-buster match (the pages had drifted between 1.13.7, 1.13.10 and 1.13.11, so browsers could keep stale scripts).

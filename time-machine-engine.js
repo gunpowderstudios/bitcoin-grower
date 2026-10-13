@@ -1,7 +1,7 @@
 // Bitcoin Garden Time Machine — pure simulation logic (v1.13.3).
 // No DOM, no network, no credentials, no exchange access: this module only does
 // arithmetic on historical prices so it can be tested in Node and reused by the page.
-export const VERSION = '1.13.12';
+export const VERSION = '1.13.13';
 
 export const DEFAULTS = Object.freeze({
   amount: 100,   // £ planted at the start
@@ -168,9 +168,9 @@ export function simulate(steps, rawSettings) {
 // ---------- plant growth ----------
 export const STAGES = Object.freeze(['Shoot', 'Small tree', 'Oak']);
 /** Lowest pot ratio (value / starting pot) for stages 1-2. Below the first it is still a little shoot. */
-export const STAGE_RATIOS = Object.freeze([1.5, 3]);
+export const STAGE_RATIOS = Object.freeze([1.2, 2]);
 /** Milestones (x what you planted). Each one, once passed, ripens a coin that drops from the leaves to the ground. */
-export const MILESTONES = Object.freeze([1.5, 2, 3, 5, 10, 25]);
+export const MILESTONES = Object.freeze([1.1, 1.25, 1.5, 2, 3, 5, 10, 25]);
 /** How many milestone coins are on the ground for a pot worth `ratio` times what was planted. */
 export function coinsFor(ratio) {
   if (!Number.isFinite(ratio)) return 0;

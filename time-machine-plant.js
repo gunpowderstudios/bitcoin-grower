@@ -1,14 +1,14 @@
-// Bitcoin Garden Time Machine — the living plant (v1.13.12).
+// Bitcoin Garden Time Machine — the living plant (v1.13.13).
 // Three simple stages: a shoot, a small tree, then an oak. One persistent SVG; parts cross-fade and sway with CSS.
 // Milestone coins ripen on the leaves and drop to the ground like apples.
-import { coinsFor } from './time-machine-engine.js?v=1.13.12';
+import { coinsFor } from './time-machine-engine.js?v=1.13.13';
 const NS = 'http://www.w3.org/2000/svg';
 const LEAF = 'M0 0 C6 -7 20 -8 30 0 C20 8 6 7 0 0Z';
 const GROUND = 270; // y where fallen coins rest
-const SLOT_DX = [-62, 58, -34, 36, -88, 84]; // where fallen coins land, either side of the trunk
-// Where coins can ripen, per stage (leaf tips on the crown). The shoot is too young for fruit.
+const SLOT_DX = [-62, 58, -34, 36, -88, 84, -112, 110]; // where fallen coins land, either side of the trunk
+// Where coins can ripen, per stage (leaf tips on the crown).
 const SPOTS = [
-  [],
+  [[166, 226], [198, 226]],
   [[150, 180], [210, 180], [165, 146], [196, 144], [180, 112]],
   [[110, 118], [250, 118], [150, 66], [212, 66], [180, 92], [180, 134], [104, 148], [260, 150], [140, 134]]
 ];
