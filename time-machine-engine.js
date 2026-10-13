@@ -1,7 +1,7 @@
-// Bitcoin Garden Time Machine — pure simulation logic (v1.13.2).
+// Bitcoin Garden Time Machine — pure simulation logic (v1.13.3).
 // No DOM, no network, no credentials, no exchange access: this module only does
 // arithmetic on historical prices so it can be tested in Node and reused by the page.
-export const VERSION = '1.13.2';
+export const VERSION = '1.13.3';
 
 export const DEFAULTS = Object.freeze({
   amount: 100,   // £ planted at the start
@@ -71,6 +71,7 @@ export function describeData(points) {
 // ---------- settings ----------
 export function validateSettings(input = {}) {
   const s = {
+    strategy: input.strategy === 'hold' ? 'hold' : 'grow',
     amount: Number(input.amount ?? DEFAULTS.amount), buyPct: Number(input.buyPct ?? DEFAULTS.buyPct),
     dipPct: Number(input.dipPct ?? DEFAULTS.dipPct), risePct: Number(input.risePct ?? DEFAULTS.risePct),
     sellPct: Number(input.sellPct ?? DEFAULTS.sellPct), feePct: Number(input.feePct ?? DEFAULTS.feePct)
@@ -128,7 +129,13 @@ export function simulate(steps, rawSettings) {
   const events = [], frames = [];
   for (let i = 0; i < steps.length; i++) {
     const { date, price } = steps[i];
-    if (lot && price >= lot.price * (1 + s.risePct / 100) - 1e-9) {
+    if (s.strategy === 'hold') {
+      if (i === 0) {
+        const qty = s.amount * (1 - fee) / price;
+        cash = 0; btc = qty; buys = 1; feesPaid += s.amount * fee;
+        events.push({ i, date, side: 'BUY', price, gbp: s.amount, btc: qty });
+      }
+    } else if (lot && price >= lot.price * (1 + s.risePct / 100) - 1e-9) {
       const qty = Math.min(btc, lot.btc * sellFrac), gross = qty * price, net = gross * (1 - fee);
       btc = Math.max(0, btc - qty); cash += net; feesPaid += gross - net; sells++;
       events.push({ i, date, side: 'SELL', price, gbp: net, btc: qty });
