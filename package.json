@@ -1,6 +1,6 @@
 {
   "name": "bitcoin-grower",
-  "version": "1.13.10",
+  "version": "1.13.11",
   "private": true,
   "type": "module",
   "description": "Bitcoin Garden public simulator and Time Machine (simulation only).",
