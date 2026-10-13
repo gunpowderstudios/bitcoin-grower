@@ -214,7 +214,13 @@ code{background:#10261a;padding:1px 6px;border-radius:6px}
 #fwdMode[hidden],#backMode[hidden]{display:none}
 @media(max-width:700px){.modegrid{gap:6px}.mode{padding:12px 6px}.mode .big{font-size:34px}.mode b{font-size:15px}.mode small{font-size:11px}.beds.three{grid-template-columns:1fr}}
 
-/* v1.14.0 — Cash in: pick apples as the tree grows */
-.cashline{margin:10px 2px 0;padding:11px 14px;border-radius:14px;background:#2a3f2b;color:#ffe9a0;font-size:15px;line-height:1.5;text-align:center}
-.cashline b{color:#fff}
-.cashline[hidden],.step[hidden]{display:none}
+/* v1.14.0 — Cash in: plant today and pick apples as the tree grows (forward-looking) */
+.step[hidden]{display:none}
+.cashsum{margin:12px 0 4px;padding:14px;border-radius:14px;background:#14291c;border:1px solid #36543e;font-size:15px;line-height:1.5}
+.cashsum[hidden]{display:none}
+.cashsum h3{margin:0 0 8px;font-size:17px}
+.cashsum table{width:100%;border-collapse:collapse;font-size:14.5px}
+.cashsum th,.cashsum td{padding:7px 6px;border-bottom:1px solid #2f4a37;text-align:right}
+.cashsum th:first-child,.cashsum td:first-child{text-align:left}
+.cashsum td.win{color:#8cf06a;font-weight:700}
+.cashsum p{margin:10px 0 0;color:#dde9d5}

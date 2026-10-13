@@ -1,7 +1,7 @@
 // Bitcoin Grower — "weather forecast" engine (v1.11.7). Pure arithmetic on historical prices.
 // It does NOT predict the price. It answers: "in the past, after an amount was planted, how
 // did the value look N days later?" and reports the spread of what really happened.
-import { dayNumber, addDays } from './time-machine-engine.js';
+import { dayNumber, addDays, simulate } from './time-machine-engine.js';
 
 export const HORIZONS = Object.freeze({ month: 30, year: 365, fiveYears: 1825 });
 export const MIN_SAMPLES = 150;
@@ -92,4 +92,49 @@ export function futureFrames(fan, key, today, n = 120) {
     out.push({ i, date: addDays(today, Math.round(day)), total: a[key] + (b[key] - a[key]) * t, sells: 0, events: 0 });
   }
   return out;
+}
+
+/**
+ * "Cash in" forecast: what would picking apples have done over the next `horizonDays`?
+ * For every past planting day (since `since`) we replay the real prices that followed, with the cash-in rule
+ * (sell `amount` of Bitcoin each time the pot's Bitcoin is worth `cashAt` x what you planted) and with simply holding.
+ * The three gardens are real past stretches, picked by their cash-in result: a rough patch (10th), a typical one (50th) and a good one (90th).
+ * They are re-dated to start today. Still history, not a prediction.
+ */
+export function cashInForecast(points, { amount = 100, horizonDays = 365, since = '2014-01-01', cashAt = 2, feePct = 0.4 } = {}, today = new Date().toISOString().slice(0, 10)) {
+  if (!Number.isFinite(amount) || amount <= 0) throw new Error('Please enter an amount above £0.');
+  if (!Number.isInteger(horizonDays) || horizonDays < 7 || horizonDays > 3650) throw new Error('Please choose a period between a week and ten years.');
+  const fee = feePct / 100, stride = Math.max(1, Math.round(horizonDays / 365)), runs = [];
+  for (let i = 0; i < points.length; i += stride) {
+    if (points[i].date < since) continue;
+    const j = i + horizonDays;
+    if (j >= points.length) break;
+    if (dayNumber(points[j].date) - dayNumber(points[i].date) !== horizonDays) continue;
+    // light version of simulate(): same arithmetic, no frames
+    let btc = amount * (1 - fee) / points[i].price, cash = 0, sells = 0;
+    for (let k = i + 1; k <= j; k++) {
+      const price = points[k].price;
+      if (btc * price >= cashAt * amount - 1e-9) { const q = Math.min(btc, amount / price), net = q * price * (1 - fee); btc -= q; cash += net; sells++; }
+    }
+    const last = points[j].price;
+    runs.push({ i, j, end: cash + btc * last, hold: amount * (1 - fee) * last / points[i].price, sells });
+  }
+  if (runs.length < 40) throw new Error('Not enough price history for that period. Try a shorter period or an earlier "history since" choice.');
+  const byEnd = [...runs].sort((a, b) => a.end - b.end), pick = p => byEnd[Math.round((byEnd.length - 1) * p / 100)];
+  const beds = {};
+  for (const [key, p] of [['p10', 10], ['p50', 50], ['p90', 90]]) {
+    const r = pick(p), steps = points.slice(r.i, r.j + 1);
+    const sim = simulate(steps, { strategy: 'cashin', amount, cashAt, feePct });
+    const d0 = dayNumber(steps[0].date);
+    const frames = sim.frames.map(f => ({ ...f, date: addDays(today, dayNumber(f.date) - d0) }));
+    beds[key] = { sim: { ...sim, frames }, hold: sim.summary.hold, pastFrom: steps[0].date, pastTo: steps.at(-1).date };
+  }
+  const ends = byEnd.map(r => r.end), holds = runs.map(r => r.hold).sort((a, b) => a - b);
+  return {
+    amount, horizonDays, since, cashAt, samples: runs.length, beds,
+    cashIn: { p10: percentile(ends, 10), p50: percentile(ends, 50), p90: percentile(ends, 90) },
+    holding: { p10: percentile(holds, 10), p50: percentile(holds, 50), p90: percentile(holds, 90) },
+    aheadShare: runs.filter(r => r.end > r.hold + 1e-9).length / runs.length,
+    pickedShare: runs.filter(r => r.sells > 0).length / runs.length
+  };
 }

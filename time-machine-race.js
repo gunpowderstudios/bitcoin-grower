@@ -1,6 +1,6 @@
 // The Bitcoin Garden — side-by-side gardens (used for the forward-in-time forecast).
-import { plantFor, formatGBP, signedPct } from './time-machine-engine.js?v=1.14.0';
-import { createPlant } from './time-machine-plant.js?v=1.14.0';
+import { plantFor, formatGBP, signedPct } from './time-machine-engine.js?v=1.14.1';
+import { createPlant } from './time-machine-plant.js?v=1.14.1';
 
 const NS = 'http://www.w3.org/2000/svg';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -36,13 +36,14 @@ export function createRace($, ids = {}, opts = {}) {
       const beforeCoins = b.plant.coins;
       const f = b.sim.frames[idx], start = b.sim.settings.amount, ratio = f.total / start, pl = plantFor(ratio, true);
       b.plant.setState(pl.stage, pl.droop);
-      b.plant.setFruit(ratio, animate && !reduceMotion());
+      // normal gardens: coins mark milestones; cash-in gardens: coins are apples really picked
+      b.plant.setFruit(ratio, animate && !reduceMotion(), b.cash ? { count: f.sells, label: '' } : {});
       if (animate && !reduceMotion() && b.plant.coins > beforeCoins) fallingCoins += b.plant.coins - beforeCoins;
       b.v.textContent = formatGBP(f.total);
       const pnl = f.total - start, up = pnl > 0.004, down = pnl < -0.004;
       b.g.className = 'bg ' + (up ? 'gain' : down ? 'loss' : '');
       b.g.textContent = (up ? '▲ ' : down ? '▼ ' : '■ ') + signedPct(100 * (f.total / start - 1));
-      b.s.textContent = b.sub ? b.sub : f.sells + (f.sells === 1 ? ' sale' : ' sales') + (f.sells ? ' · ' + formatGBP(b.banked[idx]).replace(/\.00$/, '') + ' banked' : '');
+      b.s.textContent = b.cash ? (f.sells ? '🍎 ' + f.sells + (f.sells === 1 ? ' apple' : ' apples') + ' picked · ' + formatGBP(f.cash).replace(/\.00$/, '') + ' in pocket' : '🍎 no apples picked yet') : b.sub ? b.sub : f.sells + (f.sells === 1 ? ' sale' : ' sales') + (f.sells ? ' · ' + formatGBP(b.banked[idx]).replace(/\.00$/, '') + ' banked' : '');
       b.el.querySelector('.bn').title = pl.name;
     }
     if (fallingCoins && typeof opts.onCoinsFall === 'function') opts.onCoinsFall(fallingCoins);

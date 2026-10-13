@@ -6,14 +6,14 @@
 <title>The Bitcoin Garden — Time Machine</title>
 <meta name="description" content="Plant an imaginary £100 in the past and watch it grow through real Bitcoin history. A friendly simulation — no real money, no real trades.">
 <meta name="theme-color" content="#0c1d14">
-<link rel="stylesheet" href="./time-machine.css?v=1.14.0">
+<link rel="stylesheet" href="./time-machine.css?v=1.14.1">
 </head>
 <body>
 <a class="skip" href="#plant-heading">Skip to the plant</a>
 <main>
 <header>
   <div>
-    <div class="sub">🌱 THE BITCOIN GARDEN <span class="vtag" id="version">v1.14.0</span></div>
+    <div class="sub">🌱 THE BITCOIN GARDEN <span class="vtag" id="version">v1.14.1</span></div>
     <h1>Time Machine ⏳</h1>
     <div class="sub">Travel back in time to see what really happened to pretend money, or forward to see the range of futures the past suggests.</div>
   </div>
@@ -53,25 +53,14 @@
       <div class="explain" id="firstPrice" aria-live="polite">Loading the earliest available Bitcoin prices…</div>
       <p class="hint" id="dateHint">You'll travel forward from that day to the newest price we have.</p>
     </div>
-    <div class="step" id="cashStep" hidden>
-      <div class="num" aria-hidden="true">3</div>
-      <div class="lbl" id="cashLabel">When should we pick apples?</div>
-      <div class="chips" id="cashChips" role="group" aria-labelledby="cashLabel">
-        <button type="button" class="chip" data-at="1.5" aria-pressed="false">At ×1.5</button>
-        <button type="button" class="chip" data-at="2" aria-pressed="true">At ×2</button>
-        <button type="button" class="chip" data-at="3" aria-pressed="false">At ×3</button>
-        <button type="button" class="chip" data-at="5" aria-pressed="false">At ×5</button>
-      </div>
-      <p class="hint" id="cashHint"></p>
-    </div>
     <div class="step">
-      <div class="num" id="goNum" aria-hidden="true">3</div>
+      <div class="num" aria-hidden="true">3</div>
       <button class="go" id="go" type="button" disabled>🌱 Plant my money &amp; travel forward!</button>
       <p class="hint" id="goHint">Loading Bitcoin's history…</p>
     </div>
   </div>
   <p class="err" id="error" role="alert" hidden></p>
-  <div class="explain" id="modeExplain"><b>Plant once, then watch:</b> imagine buying Bitcoin on your chosen date and keeping it. Travel through real historical prices to see what it would be worth. No trading strategies, pruning or selling along the way.</div><details class="advanced" id="advanced" hidden>
+  <div class="explain"><b>Plant once, then watch:</b> imagine buying Bitcoin on your chosen date and keeping it. Travel through real historical prices to see what it would be worth. No trading strategies, pruning or selling along the way.</div><details class="advanced" id="advanced" hidden>
     <summary>⚙️ Advanced settings (optional — safe to ignore!)</summary>
     <div class="fields">
       <div><label for="buyPct">Spend per buy (% of your pot)</label><input id="buyPct" type="number" inputmode="decimal" value="10" min="1" max="100" step="any"><p class="hint">Each buy spends this share of what you planted.</p></div>
@@ -104,8 +93,6 @@
     <div class="fig" id="figPnl"><small id="pnlLabel">So far I've made</small><strong id="pnl">£0.00</strong><span class="pct" id="pnlPct">Press the green button to begin</span></div>
   </div>
 
-  <p class="cashline" id="cashLine" hidden></p>
-
   <div class="card">
     <div class="controls" role="group" aria-label="Journey controls">
       <button class="btn primary" id="play" type="button" disabled>▶ Play</button>
@@ -125,7 +112,7 @@
       <svg class="chart" id="chart" viewBox="0 0 700 250" role="img" aria-label="Chart of your pot's value over time"></svg>
       <div class="legend">
         <span><b style="color:#8cf06a">━</b> Your Bitcoin investment</span>
-        <span id="lgBuy">● Bought Bitcoin once</span><span id="lgPick" hidden><b style="color:#f4c84a">●</b> Apples picked</span><span id="lgHold" hidden><b style="color:#f4c84a">╌</b> If you had just held</span>
+        <span>● Bought Bitcoin once</span><span></span>
         <label hidden><input type="checkbox" id="showHold">Compare</label>
       </div>
     </div>
@@ -141,7 +128,7 @@
     <div class="fig"><small>Starting money</small><strong id="sStart"></strong></div>
     <div class="fig"><small>Final pot value</small><strong id="sEnd"></strong></div>
     <div class="fig" id="sPnlBox"><small id="sPnlLabel">Total profit</small><strong id="sPnl"></strong><span class="pct" id="sPct"></span></div>
-    <div class="fig"><small id="sTradesLabel">Bitcoin purchases</small><strong id="sTrades"></strong></div>
+    <div class="fig"><small>Bitcoin purchases</small><strong id="sTrades"></strong></div>
   </div>
   <h3 id="vsHead" hidden>Comparison</h3><div id="vsBox" hidden><span id="vsMe"></span><span id="vsMePct"></span><span id="vsHold"></span><span id="vsHoldPct"></span></div><p id="vsText" hidden></p>
   <details class="advanced" id="purchaseMath"><summary>🧾 How was my final amount calculated?</summary><div class="explain" id="purchaseMathBody"></div></details>
@@ -152,7 +139,7 @@
 
 <section class="card">
   <details id="logbox">
-    <summary id="logSummary">📒 See your original Bitcoin purchase</summary>
+    <summary>📒 See your original Bitcoin purchase</summary>
     <div class="scroll"><table><thead><tr><th>Date</th><th>What happened</th><th>Bitcoin price</th><th>Amount</th></tr></thead><tbody id="journal"><tr><td colspan="4">Nothing yet — press play!</td></tr></tbody></table></div>
   </details>
 </section>
@@ -167,7 +154,7 @@
     <p class="hint"><b>Why four years?</b> In some earlier cycles Bitcoin recovered, grew for several years, then experienced a big downturn. Bitcoin's mining reward also halves approximately every four years. But this isn't a reliable schedule: prices can rise or fall at any time.</p>
     <p class="hint"><b>Important:</b> Tough Times, Middle Ground and Boom Times are historical 10th, 50th and 90th percentile examples, not guaranteed outcomes or a prediction that the next bull or bear market will happen on schedule. The future could be outside this range.</p>
   </details>
-  <p class="hint">Nobody can know what Bitcoin will do. So we look back at what happened after <b>every</b> past planting day, and show three futures from that history: a rough patch, a typical run and a good run. It’s a weather forecast, not a promise.</p>
+  <p class="hint" id="fwIntro">Nobody can know what Bitcoin will do. So we look back at what happened after <b>every</b> past planting day, and show three futures from that history: a rough patch, a typical run and a good run. It’s a weather forecast, not a promise.</p>
   <div class="steps">
     <div class="step">
       <div class="num" aria-hidden="true">1</div>
@@ -183,8 +170,19 @@
         <button type="button" class="chip" data-days="1825" aria-pressed="false">5 years</button>
       </div>
     </div>
-    <div class="step">
+    <div class="step" id="fwCashStep" hidden>
       <div class="num" aria-hidden="true">3</div>
+      <div class="lbl" id="fwCashLabel">…and pick apples when the tree is worth…</div>
+      <div class="chips" id="fwCashChips" role="group" aria-labelledby="fwCashLabel">
+        <button type="button" class="chip" data-at="1.5" aria-pressed="false">×1.5</button>
+        <button type="button" class="chip" data-at="2" aria-pressed="true">×2</button>
+        <button type="button" class="chip" data-at="3" aria-pressed="false">×3</button>
+        <button type="button" class="chip" data-at="5" aria-pressed="false">×5</button>
+      </div>
+      <p class="hint" id="fwCashHint"></p>
+    </div>
+    <div class="step">
+      <div class="num" id="fwGoNum" aria-hidden="true">3</div>
       <button class="go" id="fwGo" type="button" disabled>🚀 Launch into the future!</button>
       <p class="hint">Pretend money again. Nothing here is a prediction or advice.</p>
     </div>
@@ -200,7 +198,7 @@
 
 <section class="card race" id="fwRace" aria-labelledby="fwrace-heading" hidden>
   <h2 id="fwrace-heading" tabindex="-1">🔭 Three possible futures</h2>
-  <p class="hint">Each garden is one slice of what happened in the past, replayed forward from today. They are examples of the range, not the only things that could happen.</p>
+  <p class="hint" id="fwRaceIntro">Each garden is one slice of what happened in the past, replayed forward from today. They are examples of the range, not the only things that could happen.</p>
   <div class="racebar">
     <div class="racedate" id="fwDate" aria-hidden="true">—</div>
     <button class="btn primary" id="fwPlay" type="button">⏸ Pause</button>
@@ -209,6 +207,7 @@
   </div>
   <div class="beds three" id="fwBeds"></div>
   <p class="racenote" id="fwNote" aria-live="polite"></p>
+  <div class="cashsum" id="fwCashSum" hidden></div>
   <p class="fine caution" id="fwCaution"></p>
   <div class="warn">This is a <b>history lesson, not a prediction</b>. Past results are no guide to the future, and Bitcoin can lose most of its value. Fees and tax are ignored. Not financial advice.</div>
 </section>
@@ -232,6 +231,6 @@
 </div>
 <footer class="sitefoot">The Bitcoin Garden © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
 </main>
-<script type="module" src="./time-machine.js?v=1.14.0"></script>
+<script type="module" src="./time-machine.js?v=1.14.1"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { percentile, windowRatios, forecast, describe, changeSince, HORIZONS, MIN_SAMPLES } from '../forecast-engine.js';
+import { cashInForecast, percentile, windowRatios, forecast, describe, changeSince, HORIZONS, MIN_SAMPLES } from '../forecast-engine.js';
 import { parseKraken, parseCoinGecko } from '../live-price.js';
 import { addDays, formatGBP } from '../time-machine-engine.js';
 
@@ -121,4 +121,30 @@ test('futureFrames: starts at the amount, ends at the band, in order, dated from
   const lo = futureFrames(f.fan, 'p10', '2026-10-13'), hi = futureFrames(f.fan, 'p90', '2026-10-13');
   assert.ok(lo.at(-1).total <= fr.at(-1).total && fr.at(-1).total <= hi.at(-1).total);
   assert.throws(() => futureFrames(f.fan, 'p99', '2026-10-13'));
+});
+
+// ---------- v1.14.1 cash in, looking forward ----------
+test('cashInForecast replays real past stretches with apples picked and re-dates them to start today', () => {
+  const prices = Array.from({ length: 900 }, (_, i) => 100 * Math.exp(0.004 * i + 0.4 * Math.sin(i / 17)));
+  const pts = series(prices), today = '2030-01-01';
+  const c = cashInForecast(pts, { amount: 1000, horizonDays: 365, since: '2015-01-01', cashAt: 2, feePct: 0.4 }, today);
+  assert.ok(c.samples >= 500 && c.samples <= 536);
+  for (const k of ['p10', 'p50', 'p90']) {
+    const b = c.beds[k], f = b.sim.frames, s = b.sim.summary;
+    assert.equal(f[0].date, today); assert.equal(f.length, 366); assert.equal(f.at(-1).date, addDays(today, 365));
+    near(s.end, f.at(-1).cash + f.at(-1).btc * pts.find(p => p.date === b.pastTo).price, 1e-6);
+    near(b.hold, s.hold, 1e-9); assert.equal(b.sim.settings.strategy, 'cashin');
+  }
+  assert.ok(c.beds.p10.sim.summary.end <= c.beds.p50.sim.summary.end && c.beds.p50.sim.summary.end <= c.beds.p90.sim.summary.end);
+  assert.ok(c.cashIn.p10 <= c.cashIn.p50 && c.cashIn.p50 <= c.cashIn.p90);
+  assert.ok(c.aheadShare >= 0 && c.aheadShare <= 1 && c.pickedShare > 0, 'a rising market triggers some picks');
+  near(c.beds.p50.sim.summary.end, c.cashIn.p50, 0.01); // the typical garden really is the median stretch
+});
+test('cashInForecast with an unreachable multiple equals holding, and it validates input', () => {
+  const pts = series(Array.from({ length: 700 }, (_, i) => 100 + (i % 50)));
+  const c = cashInForecast(pts, { amount: 100, horizonDays: 30, since: '2015-01-01', cashAt: 50 }, '2030-01-01');
+  near(c.cashIn.p50, c.holding.p50, 1e-6); assert.equal(c.pickedShare, 0); assert.equal(c.aheadShare, 0);
+  assert.throws(() => cashInForecast(pts, { amount: 0 }), /amount/);
+  assert.throws(() => cashInForecast(pts, { horizonDays: 3 }), /between a week/);
+  assert.throws(() => cashInForecast(series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), { horizonDays: 7 }), /Not enough/);
 });
