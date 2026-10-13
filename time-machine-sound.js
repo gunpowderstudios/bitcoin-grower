@@ -1,4 +1,4 @@
-// Bitcoin Grower Time Machine — gentle synthesised sounds (v1.11.4).
+// Bitcoin Grower Time Machine — gentle synthesised sounds (v1.11.5).
 // No audio files, no downloads, no tracking. Sound is ON by default, but browsers (Safari/iOS, Chrome) only
 // allow audio after a click/tap, so it starts with the visitor's first click or tap anywhere on the page. Effects are rate-limited so fast-forwarding stays pleasant.
 export function createSound() {

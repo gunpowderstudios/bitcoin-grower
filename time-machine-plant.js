@@ -1,4 +1,4 @@
-// Bitcoin Grower Time Machine — the living plant (v1.11.4).
+// Bitcoin Grower Time Machine — the living plant (v1.11.5).
 // One persistent SVG: parts grow, fade and sway with CSS transitions instead of being redrawn.
 // The picture is driven only by stage (0-6) and droop (0-1), both derived from the pot's real value.
 const NS = 'http://www.w3.org/2000/svg';
@@ -9,7 +9,6 @@ const COIN_SLOTS = (() => { // harvest coins stack up in a little pyramid beside
   rows.forEach((n, r) => { for (let i = 0; i < n; i++) out.push({ x: 262 + (i - (n - 1) / 2) * 17 + 8, y: 276 - r * 13 }); });
   return out;
 })();
-const CANOPY_COINS = [[150, 70], [196, 52], [226, 88], [128, 104], [174, 100], [212, 124], [150, 134], [100, 76], [252, 70]];
 
 function rng(seed) { return () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -121,14 +120,6 @@ export function createPlant(svg) {
   [['M176 214 C158 202 142 190 124 172', 8], ['M186 196 C206 182 224 170 244 150', 8], ['M180 160 C168 140 158 124 146 106', 6], ['M184 150 C196 130 206 114 220 96', 6]].forEach(([d, w]) => stem(p6, d, w, '#774d2f'));
   [[180, 96, 88, 62], [118, 120, 52, 40], [244, 118, 54, 42], [150, 58, 52, 36], [214, 56, 52, 38], [180, 146, 56, 28]].forEach(a => blob(p6, ...a));
   ring(p6, 180, 92, 104, 70, 46, 1.35);
-  const canopy = el('g', { class: 'tm-canopy-coins' }, p6);
-  CANOPY_COINS.forEach(([x, y], i) => {
-    const c = el('g', { transform: `translate(${x} ${y})` }, canopy);
-    const bob = el('g', { class: 'tm-hang', style: `animation-delay:${(i * 0.37).toFixed(2)}s` }, c);
-    coinShape(bob, 9);
-    el('path', { class: 'tm-spark', d: SPARK, fill: '#fff6c0', style: `animation-delay:${(i * 0.53).toFixed(2)}s` }, c);
-  });
-
   function coinShape(parent, r) {
     el('circle', { r, fill: 'url(#tmCoin)', stroke: '#b4801a', 'stroke-width': 1.2 }, parent);
     el('circle', { r: r * 0.72, fill: 'none', stroke: '#fbe89a', 'stroke-width': 0.8 }, parent);
@@ -140,7 +131,7 @@ export function createPlant(svg) {
   const pile = el('g', { class: 'tm-pile' }, svg);
   const pileLabel = el('text', { x: 270, y: 296, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, fill: '#ffe9a0', 'font-family': 'system-ui,sans-serif' }, svg);
 
-  function setCoins(n, animate = true) {
+  function setCoins(n, animate = true, banked = null) {
     n = Math.max(0, n);
     const shown = Math.min(n, COIN_SLOTS.length), had = Math.min(coins, COIN_SLOTS.length);
     if (n < coins) pile.replaceChildren();
@@ -152,7 +143,7 @@ export function createPlant(svg) {
       if (animate) el('path', { class: 'tm-spark once', d: SPARK, fill: '#fff6c0' }, g);
     }
     coins = n;
-    pileLabel.textContent = n ? (n === 1 ? '1 harvest' : n + ' harvests') : '';
+    pileLabel.textContent = n ? (n === 1 ? '1 sale' : n + ' sales') + (Number.isFinite(banked) ? ' · £' + Math.round(banked).toLocaleString('en-GB') + ' banked' : ' banked') : '';
   }
 
   // ----- public controls -----

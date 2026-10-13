@@ -6,14 +6,14 @@
 <title>Bitcoin Grower — Time Machine</title>
 <meta name="description" content="Plant an imaginary £100 in the past and watch it grow through real Bitcoin history. A friendly simulation — no real money, no real trades.">
 <meta name="theme-color" content="#0c1d14">
-<link rel="stylesheet" href="./time-machine.css?v=1.11.4">
+<link rel="stylesheet" href="./time-machine.css?v=1.11.5">
 </head>
 <body>
 <a class="skip" href="#plant-heading">Skip to the plant</a>
 <main>
 <header>
   <div>
-    <div class="sub">🌱 BITCOIN GROWER <span class="vtag" id="version">v1.11.4</span></div>
+    <div class="sub">🌱 BITCOIN GROWER <span class="vtag" id="version">v1.11.5</span></div>
     <h1>Time Machine ⏳</h1>
     <div class="sub">Plant some pretend money in the past, then travel forward and watch it grow (or wilt!) through real Bitcoin history.</div>
   </div>
@@ -60,7 +60,7 @@
   </div>
   <p class="err" id="error" role="alert" hidden></p>
   <div class="explain">
-    <b>How it works:</b> your plant grows using the <b>Grower strategy</b> — it buys a small amount of Bitcoin after the price drops, then sells some after the price rises (that's a "harvest" 🪙). The big pot and profit numbers come from that strategy. <b>Buying Bitcoin outright and just waiting is a different thing</b> — we show it separately at the end so you can compare.
+    <b>How it works:</b> your plant grows using the <b>Grower strategy</b> — it buys a small amount of Bitcoin after the price drops, then sells some after the price rises (that's a "harvest": a sale that banks some profit 🪙). The big pot and profit numbers come from that strategy. <b>Buying Bitcoin outright and just waiting is a different thing</b> — we show it separately at the end so you can compare.
   </div>
   <details class="advanced" id="advanced">
     <summary>⚙️ Advanced settings (optional — safe to ignore!)</summary>
@@ -115,7 +115,7 @@
       <svg class="chart" id="chart" viewBox="0 0 700 250" role="img" aria-label="Chart of your pot's value over time"></svg>
       <div class="legend">
         <span><b style="color:#8cf06a">━</b> Your pot (Grower strategy)</span>
-        <span>▼ planted a little Bitcoin</span><span>● harvested 🪙</span>
+        <span>▼ planted a little Bitcoin</span><span>● harvested = sold some, banked the profit 🪙</span>
         <label><input type="checkbox" id="showHold"> Also show "just buy Bitcoin &amp; wait"</label>
       </div>
     </div>
@@ -131,7 +131,7 @@
     <div class="fig"><small>Starting money</small><strong id="sStart"></strong></div>
     <div class="fig"><small>Final pot value</small><strong id="sEnd"></strong></div>
     <div class="fig" id="sPnlBox"><small id="sPnlLabel">Total profit</small><strong id="sPnl"></strong><span class="pct" id="sPct"></span></div>
-    <div class="fig"><small>Virtual buys / harvests</small><strong id="sTrades"></strong></div>
+    <div class="fig"><small>Virtual buys / harvests (sales)</small><strong id="sTrades"></strong></div>
   </div>
   <h3>Compared with buying Bitcoin and waiting</h3>
   <div class="vs">
@@ -170,6 +170,6 @@
 </div>
 <footer class="sitefoot">Bitcoin Grower © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
 </main>
-<script type="module" src="./time-machine.js?v=1.11.4"></script>
+<script type="module" src="./time-machine.js?v=1.11.5"></script>
 </body>
 </html>

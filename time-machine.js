@@ -2,10 +2,10 @@
 import {
   VERSION, DEFAULTS, PRESETS, compareAll, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.11.4';
-import { createPlant } from './time-machine-plant.js?v=1.11.4';
-import { createSound } from './time-machine-sound.js?v=1.11.4';
-import { loadHistory } from './price-data.js?v=1.11.4';
+} from './time-machine-engine.js?v=1.11.5';
+import { createPlant } from './time-machine-plant.js?v=1.11.5';
+import { createSound } from './time-machine-sound.js?v=1.11.5';
+import { loadHistory } from './price-data.js?v=1.11.5';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -280,7 +280,7 @@ function render({ instant = false, fast = false, quiet = false, steps = 1 } = {}
   if (f.events !== seen || S.shownLog < 0) {
     const fresh = events.slice(Math.min(seen, f.events), f.events);
     const sells = fresh.filter(e => e.side === 'SELL'), buys = fresh.filter(e => e.side === 'BUY');
-    plant.setCoins(f.sells, !instant && !quiet && fresh.length > 0 && !reduceMotion());
+    plant.setCoins(f.sells, !instant && !quiet && fresh.length > 0 && !reduceMotion(), events.slice(0, f.events).reduce((a, e) => a + (e.side === 'SELL' ? e.gbp : 0), 0));
     if (!instant && !quiet && fresh.length) {
       if (sells.length) sound.play('clink', { fast }); else if (buys.length) sound.play('plant', { fast });
       announceTrades(fresh, fast);
@@ -298,8 +298,8 @@ function announceTrades(fresh, fast) {
   let text;
   if (fresh.length === 1) {
     const e = fresh[0];
-    text = e.side === 'SELL' ? '🪙 Harvested ' + formatGBP(e.gbp) + ' · ' + fmtDate(e.date) : '🌱 Planted ' + formatGBP(e.gbp) + ' of Bitcoin · ' + fmtDate(e.date);
-  } else text = (buys.length ? '🌱 ' + buys.length + ' planted' : '') + (buys.length && sells.length ? ' · ' : '') + (sells.length ? '🪙 ' + sells.length + ' harvested' : '');
+    text = e.side === 'SELL' ? '🪙 Harvest: sold some and banked ' + formatGBP(e.gbp) + ' · ' + fmtDate(e.date) : '🌱 Planted ' + formatGBP(e.gbp) + ' of Bitcoin · ' + fmtDate(e.date);
+  } else text = (buys.length ? '🌱 ' + buys.length + ' planted' : '') + (buys.length && sells.length ? ' · ' : '') + (sells.length ? '🪙 ' + sells.length + ' harvests (sold some)' : '');
   toast(text, sells.length ? 'sell' : 'buy');
   setStatus(text.replace(/[🪙🌱]/gu, '').trim());
 }
