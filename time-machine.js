@@ -2,10 +2,10 @@
 import {
   VERSION, DEFAULTS, PRESETS, HOLD, compareAll, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.11.6';
-import { createPlant } from './time-machine-plant.js?v=1.11.6';
-import { createSound } from './time-machine-sound.js?v=1.11.6';
-import { loadHistory } from './price-data.js?v=1.11.6';
+} from './time-machine-engine.js?v=1.11.7';
+import { createPlant } from './time-machine-plant.js?v=1.11.7';
+import { createSound } from './time-machine-sound.js?v=1.11.7';
+import { loadHistory } from './price-data.js?v=1.11.7';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -69,7 +69,7 @@ function acceptData(points, note) {
 // ---------------------------------------------------------------- presets & inputs
 function buildPresets() {
   const last = todayish();
-  const list = [['2017', '2017-01-01'], ['2020', '2020-01-01'], ['2022', '2022-01-01'], ['5 years ago', addYears(last, -5)]];
+  const list = [['The very start (' + S.data.first.slice(0, 4) + ')', S.data.first], ['2017', '2017-01-01'], ['2020', '2020-01-01'], ['2022', '2022-01-01'], ['5 years ago', addYears(last, -5)]];
   const box = $('presets'); box.replaceChildren();
   for (const [label, date] of list) {
     if (date < S.data.first || date > addDays(S.data.last, -7)) continue;
@@ -88,6 +88,9 @@ function updateDateHint() {
   $('dateHint').textContent = yrs > 0
     ? 'You’ll travel from ' + fmtLong(from) + ' to ' + fmtLong(end) + ' (about ' + (yrs >= 1.5 ? yrs.toFixed(1) + ' years' : Math.round(yrs * 12) + ' months') + ').'
     : 'Pick a date before ' + fmtLong(end) + '.';
+  const day = yrs > 0 ? S.data.points.find(p => p.date >= from) : null;
+  if (day && dayNumber(day.date) - dayNumber(from) <= 3) $('dateHint').textContent += ' One Bitcoin cost ' + formatGBP(day.price) + ' on ' + (day.date === from ? 'that day' : fmtLong(day.date)) + '.';
+  if (yrs > 0 && from < '2014-01-01') $('dateHint').textContent += ' Heads up: prices before 2014 are sparse and less reliable, and Bitcoin was tiny then, so results can look enormous. Bitcoin began in 2009, but ' + fmtLong(S.data.first) + ' is the earliest day we have prices for.';
 }
 function readSettings() {
   return validateSettings({

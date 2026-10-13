@@ -1,4 +1,4 @@
-// Bitcoin Grower — "weather forecast" engine (v1.11.6). Pure arithmetic on historical prices.
+// Bitcoin Grower — "weather forecast" engine (v1.11.7). Pure arithmetic on historical prices.
 // It does NOT predict the price. It answers: "in the past, after an amount was planted, how
 // did the value look N days later?" and reports the spread of what really happened.
 import { dayNumber, addDays } from './time-machine-engine.js';
