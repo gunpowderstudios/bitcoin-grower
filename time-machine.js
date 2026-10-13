@@ -1,11 +1,11 @@
 // Bitcoin Grower Time Machine — page controller (v1.8.3). Simulation only: no accounts, keys or trading.
 import {
-  VERSION, DEFAULTS, PRESETS, compareAll, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
+  VERSION, DEFAULTS, PRESETS, HOLD, compareAll, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.11.5';
-import { createPlant } from './time-machine-plant.js?v=1.11.5';
-import { createSound } from './time-machine-sound.js?v=1.11.5';
-import { loadHistory } from './price-data.js?v=1.11.5';
+} from './time-machine-engine.js?v=1.11.6';
+import { createPlant } from './time-machine-plant.js?v=1.11.6';
+import { createSound } from './time-machine-sound.js?v=1.11.6';
+import { loadHistory } from './price-data.js?v=1.11.6';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -92,7 +92,8 @@ function updateDateHint() {
 function readSettings() {
   return validateSettings({
     amount: $('amount').value === '' ? NaN : $('amount').value, buyPct: $('buyPct').value, dipPct: $('dipPct').value,
-    risePct: $('risePct').value, sellPct: $('sellPct').value, feePct: $('feePct').value
+    risePct: $('risePct').value, sellPct: $('sellPct').value, feePct: $('feePct').value,
+    strategy: S.preset === 'hold' ? 'hold' : 'grow'
   });
 }
 $('from').addEventListener('input', () => { showError(''); syncPresets(); updateDateHint(); });
@@ -110,9 +111,9 @@ function choosePreset(key) {
 }
 (function buildStyles() {
   const box = $('styles');
-  for (const p of Object.values(PRESETS)) {
+  for (const p of [...Object.values(PRESETS), HOLD]) {
     const b = document.createElement('button');
-    b.type = 'button'; b.className = 'style'; b.dataset.preset = p.key; b.setAttribute('aria-pressed', 'false');
+    b.type = 'button'; b.className = 'style' + (p.hold ? ' hold' : ''); b.dataset.preset = p.key; b.setAttribute('aria-pressed', 'false');
     b.innerHTML = '<span class="em" aria-hidden="true">' + p.emoji + '</span><span class="tx"><b></b><small></small></span>';
     b.querySelector('b').textContent = p.name; b.querySelector('small').textContent = p.blurb;
     b.onclick = () => { choosePreset(p.key); showError(''); };
@@ -159,6 +160,7 @@ function begin(autoplay) {
     S.sim = simulate(steps, settings); S.steps = steps;
   } catch (e) { showError(e.message); $('error').scrollIntoView({ block: 'nearest' }); return false; }
   if (sound.enabled) sound.unlock();
+  { const holding = S.sim.settings.strategy === 'hold', cb = $('showHold'); if (holding) cb.checked = false; cb.closest('label').hidden = holding; }
   $('figStart').textContent = formatGBP(S.sim.settings.amount);
   buildTimelineTicks(); buildChart();
   restart(autoplay);
@@ -427,18 +429,21 @@ function renderCompare() {
   const all = compareAll(S.steps, base), mine = S.sim.summary;
   const rows = Object.values(PRESETS).map(p => ({ key: p.key, label: p.emoji + ' ' + p.name, r: all[p.key] }));
   if (S.preset === 'custom') rows.push({ key: 'custom', label: '⚙️ Your custom settings', r: mine });
-  rows.push({ key: 'hold', label: '📦 Just buy & hold', hold: true, r: mine });
+  rows.push({ key: 'hold', label: HOLD.emoji + ' ' + HOLD.name, hold: true, r: mine });
   for (const row of rows) {
     const tr = body.insertRow(); if (row.key === S.preset) tr.className = 'played';
     const end = row.hold ? mine.hold : row.r.end, pct = row.hold ? mine.holdPct : row.r.pct;
-    const cells = [row.label + (row.key === S.preset ? ' (you watched this)' : ''), formatGBP(end), signedPct(pct), row.hold ? '1 / 0' : row.r.buys + ' / ' + row.r.sells, row.hold ? '—' : row.r.maxDrawdown.toFixed(0) + '%'];
+    const cells = [row.label + (row.key === S.preset ? ' (you watched this)' : ''), formatGBP(end), signedPct(pct), row.hold ? '1 / 0' : row.r.buys + ' / ' + row.r.sells, row.hold ? (S.preset === 'hold' ? mine.maxDrawdown.toFixed(0) + '%' : '—') : row.r.maxDrawdown.toFixed(0) + '%'];
     for (const v of cells) tr.insertCell().textContent = v;
     const last = tr.insertCell();
-    if (PRESETS[row.key] && row.key !== S.preset) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = '▶ Watch'; b.onclick = () => { choosePreset(row.key); begin(true); }; last.appendChild(b); }
+    if ((PRESETS[row.key] || row.key === 'hold') && row.key !== S.preset) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = '▶ Watch'; b.onclick = () => { choosePreset(row.key); begin(true); }; last.appendChild(b); }
   }
   const L = all.light, M = all.medium, H = all.heavy;
   const best = Object.values(PRESETS).reduce((a, p) => (all[p.key].end > all[a.key].end ? p : a), PRESETS.light);
   $('cmpText').textContent = 'Over this journey ' + best.name.toLowerCase() + ' finished top of the three. The trade-off to notice: the lighter the pruning, the more of your plant is left in Bitcoin, so the bigger the dips on the way (biggest fall: light ' + L.maxDrawdown.toFixed(0) + '%, medium ' + M.maxDrawdown.toFixed(0) + '%, heavy ' + H.maxDrawdown.toFixed(0) + '%). A different period could rank them differently.';
+  const holding = S.preset === 'hold';
+  $('cmpHead').textContent = holding ? 'Just holding, compared with the pruning styles' : 'All three pruning styles, same dates';
+  if (holding) $('cmpText').textContent = 'You watched Just hold, which finished on ' + formatGBP(mine.end) + '. The best pruning style, ' + best.name.toLowerCase() + ', finished on ' + formatGBP(all[best.key].end) + '. Pruning sells some Bitcoin along the way, so it usually rides out the falls better but gives up some of the gains. Try watching one to see the difference.';
 }
 function showSummary() {
   renderCompare();
@@ -457,6 +462,13 @@ function showSummary() {
   $('sTrades').textContent = s.buys + ' / ' + s.sells;
   $('vsMe').textContent = formatGBP(s.end); $('vsMePct').textContent = signedPct(s.pct);
   $('vsHold').textContent = formatGBP(s.hold); $('vsHoldPct').textContent = signedPct(s.holdPct);
+  const holdingRun = S.preset === 'hold';
+  $('vsHead').hidden = $('vsBox').hidden = holdingRun;
+  if (holdingRun) {
+    $('vsText').textContent = 'This is the whole story of just holding: everything went in on day one and was never touched. The pruning styles below show what selling some along the way would have done.';
+    $('sumFine').textContent = 'Fee paid: ' + formatGBP(s.feesPaid) + ' (once, on day one) · Biggest fall from a high point: ' + s.maxDrawdown.toFixed(1) + '%. Measured at the final day’s closing price.';
+    return;
+  }
   const d = s.vsHold, close = Math.abs(d) < s.start * 0.005;
   $('vsText').textContent = close ? 'The two ended up almost exactly the same.'
     : d > 0 ? 'In this period the Grower strategy finished ' + formatGBP(d) + ' ahead of simply buying Bitcoin on day one and waiting.'

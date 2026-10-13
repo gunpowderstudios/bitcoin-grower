@@ -69,7 +69,7 @@ test('selectRange tolerates a weekend-sized hole at the start but not a big one'
 
 // ---------- settings ----------
 test('validateSettings applies defaults and rejects nonsense', () => {
-  assert.deepEqual(validateSettings({}), DEFAULTS);
+  assert.deepEqual(validateSettings({}), { ...DEFAULTS, strategy: 'grow' });
   for (const bad of [{ amount: 0 }, { amount: -5 }, { amount: NaN }, { amount: 2e6 }, { buyPct: 0 }, { buyPct: 101 }, { dipPct: 0 }, { dipPct: 95 },
     { risePct: 0 }, { sellPct: 0 }, { sellPct: 101 }, { feePct: -1 }, { feePct: 11 }, { amount: 'abc' }])
     assert.throws(() => validateSettings(bad), /Please|must be/, JSON.stringify(bad));
@@ -202,14 +202,14 @@ test('signed money and percentages use real plus/minus signs', () => {
 
 // ---------- project hygiene ----------
 const read = f => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
-test('version is 1.11.5 everywhere it should be', () => {
-  assert.equal(VERSION, '1.11.5');
-  assert.equal(JSON.parse(read('version.json')).version, '1.11.5');
-  assert.equal(JSON.parse(read('package.json')).version, '1.11.5');
-  assert.equal(JSON.parse(read('bot/package.json')).version, '1.11.5');
-  assert.match(read('time-machine.html'), /id="version">v1\.11\.5</);
+test('version is 1.11.6 everywhere it should be', () => {
+  assert.equal(VERSION, '1.11.6');
+  assert.equal(JSON.parse(read('version.json')).version, '1.11.6');
+  assert.equal(JSON.parse(read('package.json')).version, '1.11.6');
+  assert.equal(JSON.parse(read('bot/package.json')).version, '1.11.6');
+  assert.match(read('time-machine.html'), /id="version">v1\.11\.6</);
   assert.match(read('README.md'), /1\.10\.0/);
-  assert.match(read('index.html'), /id="version">v1\.11\.5</);
+  assert.match(read('index.html'), /id="version">v1\.11\.6</);
 });
 test('every element id the page script uses exists in the HTML', () => {
   for (const [page, script] of [['time-machine.html', 'time-machine.js'], ['index.html', 'garden.js']]) {
@@ -258,4 +258,19 @@ test('heavy pruning sells everything it harvests; light keeps most of it', () =>
   const all = compareAll(steps, {});
   near(all.heavy.btc, 0, 1e-12);
   assert.ok(all.light.btc > all.medium.btc && all.medium.btc > all.heavy.btc);
+});
+
+// ---------- just hold ----------
+import { HOLD } from '../time-machine-engine.js';
+test('just hold: all in on day one, never sells, equals buy-and-hold', () => {
+  const steps = [100, 90, 120, 80, 150, 140, 160, 130, 170].map((price, i) => ({ date: addDays('2020-01-01', i), price }));
+  const r = simulate(steps, { amount: 1000, feePct: 0.4, strategy: 'hold' });
+  assert.equal(r.events.length, 1); assert.equal(r.events[0].side, 'BUY'); assert.equal(r.events[0].i, 0);
+  assert.equal(r.summary.buys, 1); assert.equal(r.summary.sells, 0);
+  assert.ok(Math.abs(r.summary.end - r.summary.hold) < 1e-9);
+  assert.ok(Math.abs(r.summary.end - 1000 * 0.996 * 170 / 100) < 1e-9);
+  assert.ok(Math.abs(r.summary.feesPaid - 4) < 1e-9);
+  for (const f of r.frames) assert.ok(Math.abs(f.total - f.hold) < 1e-9);
+  assert.equal(HOLD.key, 'hold'); assert.ok(!('hold' in PRESETS));
+  assert.equal(simulate(steps, { strategy: 'bogus' }).settings.strategy, 'grow');
 });

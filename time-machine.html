@@ -6,14 +6,14 @@
 <title>Bitcoin Grower — Time Machine</title>
 <meta name="description" content="Plant an imaginary £100 in the past and watch it grow through real Bitcoin history. A friendly simulation — no real money, no real trades.">
 <meta name="theme-color" content="#0c1d14">
-<link rel="stylesheet" href="./time-machine.css?v=1.11.5">
+<link rel="stylesheet" href="./time-machine.css?v=1.11.6">
 </head>
 <body>
 <a class="skip" href="#plant-heading">Skip to the plant</a>
 <main>
 <header>
   <div>
-    <div class="sub">🌱 BITCOIN GROWER <span class="vtag" id="version">v1.11.5</span></div>
+    <div class="sub">🌱 BITCOIN GROWER <span class="vtag" id="version">v1.11.6</span></div>
     <h1>Time Machine ⏳</h1>
     <div class="sub">Plant some pretend money in the past, then travel forward and watch it grow (or wilt!) through real Bitcoin history.</div>
   </div>
@@ -44,7 +44,7 @@
     <div class="step">
       <div class="num" aria-hidden="true">3</div>
       <div class="lbl" id="pruneLabel">How much would you like to prune?</div>
-      <p class="hint">“Pruning” means selling some of what your plant has gained. Think of a gardener: prune a little and you bank some profit but keep most of the plant growing; prune a lot and you bank more, but have less left to grow if prices keep climbing. Pick a style — we’ll also compare all three at the end.</p>
+      <p class="hint">“Pruning” means selling some of what your plant has gained. Think of a gardener: prune a little and you bank some profit but keep most of the plant growing; prune a lot and you bank more, but have less left to grow if prices keep climbing. Pick a style — we’ll also compare all three at the end. Or choose <b>Just hold</b> to skip pruning altogether and see how Bitcoin itself did.</p>
       <details class="prune-help"><summary>What’s pruning? (worked example)</summary>
         <p class="hint">Say the plant bought £10 of Bitcoin, and the price then rises 10%, so that bit is now worth £11. That’s when it’s time to prune:</p>
         <ul class="hint"><li><b>Light:</b> sells a quarter (£2.75) and keeps £8.25 growing.</li><li><b>Medium:</b> sells half (£5.50) and keeps £5.50 growing.</li><li><b>Heavy:</b> sells all £11 and starts fresh.</li></ul>
@@ -133,13 +133,13 @@
     <div class="fig" id="sPnlBox"><small id="sPnlLabel">Total profit</small><strong id="sPnl"></strong><span class="pct" id="sPct"></span></div>
     <div class="fig"><small>Virtual buys / harvests (sales)</small><strong id="sTrades"></strong></div>
   </div>
-  <h3>Compared with buying Bitcoin and waiting</h3>
-  <div class="vs">
+  <h3 id="vsHead">Compared with buying Bitcoin and waiting</h3>
+  <div class="vs" id="vsBox">
     <div class="fig me"><small>🌱 Grower strategy</small><strong id="vsMe"></strong><span class="pct" id="vsMePct"></span></div>
     <div class="fig"><small>📦 Just buying &amp; holding</small><strong id="vsHold"></strong><span class="pct" id="vsHoldPct"></span></div>
   </div>
   <p id="vsText"></p>
-  <h3>All three pruning styles, same dates</h3>
+  <h3 id="cmpHead">All three pruning styles, same dates</h3>
   <div class="scroll"><table class="cmp"><thead><tr><th>Style</th><th>Final pot</th><th>Gain</th><th>Buys / harvests</th><th>Biggest fall</th><th></th></tr></thead><tbody id="cmpBody"></tbody></table></div>
   <p class="fine" id="cmpText"></p>
   <p class="fine" id="sumFine"></p>
@@ -170,6 +170,6 @@
 </div>
 <footer class="sitefoot">Bitcoin Grower © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
 </main>
-<script type="module" src="./time-machine.js?v=1.11.5"></script>
+<script type="module" src="./time-machine.js?v=1.11.6"></script>
 </body>
 </html>
