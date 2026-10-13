@@ -1,7 +1,7 @@
-// Bitcoin Garden Time Machine — the living plant (v1.14.1).
+// Bitcoin Garden Time Machine — the living plant (v1.14.2).
 // Three simple stages: a shoot, a small tree, then an oak. One persistent SVG; parts cross-fade and sway with CSS.
 // Milestone coins ripen on the leaves and drop to the ground like apples.
-import { coinsFor } from './time-machine-engine.js?v=1.14.1';
+import { coinsFor } from './time-machine-engine.js?v=1.14.2';
 const NS = 'http://www.w3.org/2000/svg';
 const LEAF = 'M0 0 C6 -7 20 -8 30 0 C20 8 6 7 0 0Z';
 const GROUND = 270; // y where fallen coins rest
@@ -80,7 +80,9 @@ export function createPlant(svg, uid = 'tm') {
   el('path', { d: 'M166 268 C174 244 176 204 174 150 L194 150 C192 204 194 244 204 268Z', fill: TRUNK }, p2);
   [[180, 90, 54], [122, 116, 40], [240, 116, 42], [150, 66, 34], [212, 66, 34], [180, 132, 52], [104, 148, 28], [258, 150, 28]].forEach(a => disc(p2, ...a));
   stem(p2, 'M184 240 L184 118', 9); stem(p2, 'M182 200 L152 160', 7); stem(p2, 'M186 190 L218 150', 7); stem(p2, 'M183 150 L150 118', 6);
-  function coinShape(parent, r) { // the classic flat orange Bitcoin coin
+  function coinShape(parent, r) { // a flat orange Bitcoin coin with a little stem and leaf on top, like an apple
+    el('path', { d: `M0 ${-r + 1} C0 ${-r - 3} 1 ${-r - 5} 3 ${-r - 7}`, fill: 'none', stroke: '#6b4a2b', 'stroke-width': 1.8, 'stroke-linecap': 'round' }, parent);
+    el('path', { d: `M2 ${-r - 4} C6 ${-r - 11} ${r * 0.9} ${-r - 8} ${r * 0.95} ${-r - 3} C${r * 0.7} ${-r + 1} 6 ${-r} 2 ${-r - 4}Z`, fill: '#6aaa48' }, parent);
     el('circle', { r, fill: '#f7931a' }, parent);
     el('circle', { r: r * 0.82, fill: 'none', stroke: '#ffffff', 'stroke-opacity': 0.35, 'stroke-width': 0.9 }, parent);
     const t = el('text', { y: r * 0.38, 'text-anchor': 'middle', 'font-size': r * 1.2, 'font-weight': 800, fill: '#ffffff', 'font-family': 'system-ui,sans-serif', transform: 'rotate(-12)' }, parent);

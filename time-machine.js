@@ -1,14 +1,14 @@
-// Bitcoin Garden Time Machine — page controller (v1.14.1). Simulation only: no accounts, keys or trading.
+// Bitcoin Garden Time Machine — page controller (v1.14.2). Simulation only: no accounts, keys or trading.
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.14.1';
-import { createPlant } from './time-machine-plant.js?v=1.14.1';
-import { createSound } from './time-machine-sound.js?v=1.14.1';
-import { loadHistory } from './price-data.js?v=1.14.1';
-import { createRace } from './time-machine-race.js?v=1.14.1';
-import { forecast, describe as describeForecast, futureFrames, cashInForecast, SINCE_CHOICES } from './forecast-engine.js?v=1.14.1';
-import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.14.1';
+} from './time-machine-engine.js?v=1.14.2';
+import { createPlant } from './time-machine-plant.js?v=1.14.2';
+import { createSound } from './time-machine-sound.js?v=1.14.2';
+import { loadHistory } from './price-data.js?v=1.14.2';
+import { createRace } from './time-machine-race.js?v=1.14.2';
+import { forecast, describe as describeForecast, futureFrames, cashInForecast, SINCE_CHOICES } from './forecast-engine.js?v=1.14.2';
+import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.14.2';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -19,7 +19,7 @@ const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)
 const plant = createPlant($('plant'));
 const gardener = { say() {}, clear() {}, text: '' }; // the little gardener and speech bubbles are switched off for now (code kept in time-machine-gardener.js)
 const fwRace = createRace($, { section: 'fwRace', beds: 'fwBeds', date: 'fwDate', scrub: 'fwScrub', play: 'fwPlay', restart: 'fwRestart', note: 'fwNote' }, {
-  uid: 'fw', onCoinsFall: () => { if (sound.enabled) window.setTimeout(() => sound.play('clink', { fast: false }), 1900); }, finishNote: beds => (beds[0].cash ? 'Picking apples along the way, ' : 'Over the chosen time, ') + 'the typical run ended at ' + formatGBP(beds[1].sim.summary.end) + ', the rough patch at ' + formatGBP(beds[0].sim.summary.end) + ' and the good run at ' + formatGBP(beds[2].sim.summary.end) + '. The real future could land anywhere, even outside this range.'
+  uid: 'fw', onCoinsFall: () => { if (sound.enabled) window.setTimeout(() => sound.play('clink', { fast: false }), 1900); }, finishNote: beds => (beds[0].cash ? 'Pruning along the way, ' : 'Over the chosen time, ') + 'the typical run ended at ' + formatGBP(beds[1].sim.summary.end) + ', the rough patch at ' + formatGBP(beds[0].sim.summary.end) + ' and the good run at ' + formatGBP(beds[2].sim.summary.end) + '. The real future could land anywhere, even outside this range.'
 });
 const sound = createSound();
 sound.enableWhenAllowed(); // sound is on by default; it starts with the visitor's first click or tap
@@ -507,14 +507,14 @@ const money0 = n => formatGBP(n).replace(/\.00$/, '');
 function updateModeText() {
   const cash = isCash(), a = Number($('fwAmount').value), amt = money0(Number.isFinite(a) && a > 0 ? a : DEFAULTS.amount);
   $('fwCashStep').hidden = !cash; $('fwGoNum').textContent = cash ? '4' : '3';
-  $('fw-heading').textContent = cash ? '🍎 Plant today, pick apples as it grows' : '🚀 Launch into the future';
+  $('fw-heading').textContent = cash ? '✂️ Plant today, prune as it grows' : '🚀 Launch into the future';
   $('fwIntro').textContent = cash
-    ? 'Nobody can know what Bitcoin will do. So we look at what happened after every past planting day if you had picked apples along the way (selling what you planted each time the tree hit your chosen multiple), then replay a rough patch, a typical run and a good run from today. A weather forecast, not a promise.'
+    ? 'Nobody can know what Bitcoin will do. So we look at what happened after every past planting day if you had pruned along the way (selling what you planted each time the tree hit your chosen multiple), then replay a rough patch, a typical run and a good run from today. A weather forecast, not a promise.'
     : 'Nobody can know what Bitcoin will do. So we look back at what happened after every past planting day, and show three futures from that history: a rough patch, a typical run and a good run. It’s a weather forecast, not a promise.';
-  $('fwCashHint').textContent = 'Whenever the tree is worth ' + S.cashAt + '× what you planted, we pick ' + amt + ' of apples (sell ' + amt + ' of Bitcoin) into your pocket. The rest keeps growing.';
-  $('fwGo').textContent = cash ? '🍎 Plant today & start picking!' : '🚀 Launch into the future!';
-  $('fwrace-heading').textContent = cash ? '🍎 Three possible futures, picking apples' : '🔭 Three possible futures';
-  $('fwRaceIntro').textContent = cash ? 'Each garden is a real stretch from the past, replayed forward from today with apples picked along the way. They are examples of the range, not the only things that could happen.' : 'Each garden is one slice of what happened in the past, replayed forward from today. They are examples of the range, not the only things that could happen.';
+  $('fwCashHint').textContent = 'Whenever the tree is worth ' + S.cashAt + '× what you planted, we prune ' + amt + ' of coins (sell ' + amt + ' of Bitcoin) into your pocket. The rest keeps growing.';
+  $('fwGo').textContent = cash ? '✂️ Plant today & start pruning!' : '🚀 Launch into the future!';
+  $('fwrace-heading').textContent = cash ? '✂️ Three possible futures, with pruning' : '🔭 Three possible futures';
+  $('fwRaceIntro').textContent = cash ? 'Each garden is a real stretch from the past, replayed forward from today with coins pruned along the way. They are examples of the range, not the only things that could happen.' : 'Each garden is one slice of what happened in the past, replayed forward from today. They are examples of the range, not the only things that could happen.';
 }
 function setMode(mode) {
   const back = mode === 'back', changed = mode !== S.mode;
@@ -550,7 +550,7 @@ $('fwGo').onclick = () => {
     $('fwRace').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' }); $('fwrace-heading').focus({ preventScroll: true });
   } catch (e) { $('fwError').textContent = e.message; $('fwError').hidden = false; }
 };
-// Cash in, forward: three real past stretches (by their cash-in result) replayed from today, with the apples picked along the way.
+// Cash in, forward: three real past stretches (by their cash-in result) replayed from today, with the coins pruned along the way.
 function launchCashIn(amount, today) {
   const c = cashInForecast(S.data.points, { amount, horizonDays: FW.days, since: SINCE_CHOICES[$('fwSince').value], cashAt: S.cashAt }, today);
   const names = { p10: ['🐻', 'Tough Times'], p50: ['🌤️', 'Middle Ground'], p90: ['🐂', 'Boom Times'] };
@@ -562,9 +562,9 @@ function launchCashIn(amount, today) {
 }
 function showCashSummary(c) {
   const box = $('fwCashSum'); box.replaceChildren();
-  const h = document.createElement('h3'); h.textContent = 'Cashing in vs. just holding'; box.appendChild(h);
+  const h = document.createElement('h3'); h.textContent = 'Pruning vs. just holding'; box.appendChild(h);
   const t = document.createElement('table'), head = t.createTHead().insertRow();
-  for (const x of ['', 'Pick apples at ×' + c.cashAt, 'Just hold']) { const th = document.createElement('th'); th.textContent = x; head.appendChild(th); }
+  for (const x of ['', 'Prune at ×' + c.cashAt, 'Just hold']) { const th = document.createElement('th'); th.textContent = x; head.appendChild(th); }
   const body = t.createTBody();
   for (const [k, label] of [['p10', '🐻 Tough Times'], ['p50', '🌤️ Middle Ground'], ['p90', '🐂 Boom Times']]) {
     const r = body.insertRow(), a = c.beds[k].sim.summary.end, hd = c.beds[k].hold;
@@ -574,9 +574,9 @@ function showCashSummary(c) {
   }
   box.appendChild(t);
   const p = document.createElement('p'), pct = Math.round(c.aheadShare * 100), pick = Math.round(c.pickedShare * 100);
-  p.textContent = 'Across ' + c.samples.toLocaleString('en-GB') + ' past start days, cashing in ended ahead of simply holding in ' + pct + ' out of every 100 stretches, and picked at least one apple in ' + pick + '. ' +
+  p.textContent = 'Across ' + c.samples.toLocaleString('en-GB') + ' past start days, pruning ended ahead of simply holding in ' + pct + ' out of every 100 stretches, and pruned at least once in ' + pick + '. ' +
     (c.horizonDays <= 30 ? 'Over a month the tree rarely reaches your multiple, so the two are almost the same. ' : '') +
-    'Picking apples locks money in your pocket where it can’t fall, but it also gives up growth when Bitcoin keeps climbing. History, not a prediction.';
+    'Pruning locks money in your pocket where it can’t fall, but it also gives up growth when Bitcoin keeps climbing. History, not a prediction.';
   box.appendChild(p); box.hidden = false;
 }
 window.__fwRace = fwRace; window.__setMode = setMode;

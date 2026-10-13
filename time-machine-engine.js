@@ -1,7 +1,7 @@
 // Bitcoin Garden Time Machine — pure simulation logic (v1.13.3).
 // No DOM, no network, no credentials, no exchange access: this module only does
 // arithmetic on historical prices so it can be tested in Node and reused by the page.
-export const VERSION = '1.14.1';
+export const VERSION = '1.14.2';
 
 export const DEFAULTS = Object.freeze({
   amount: 100,   // £ planted at the start
@@ -85,7 +85,7 @@ export function validateSettings(input = {}) {
   if (bad('risePct', 0.5, 500)) throw new Error('"Harvest after a rise of" must be between 0.5% and 500%.');
   if (bad('sellPct', 1, 100)) throw new Error('"Harvest this much" must be between 1% and 100%.');
   if (bad('feePct', 0, 10)) throw new Error('The fee must be between 0% and 10%.');
-  if (bad('cashAt', 1.1, 100)) throw new Error('“Cash in at” must be between 1.1× and 100× what you planted.');
+  if (bad('cashAt', 1.1, 100)) throw new Error('“Prune at” must be between 1.1× and 100× what you planted.');
   return s;
 }
 

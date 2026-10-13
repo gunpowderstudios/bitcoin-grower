@@ -6,14 +6,14 @@
 <title>The Bitcoin Garden — Time Machine</title>
 <meta name="description" content="Plant an imaginary £100 in the past and watch it grow through real Bitcoin history. A friendly simulation — no real money, no real trades.">
 <meta name="theme-color" content="#0c1d14">
-<link rel="stylesheet" href="./time-machine.css?v=1.14.1">
+<link rel="stylesheet" href="./time-machine.css?v=1.14.2">
 </head>
 <body>
 <a class="skip" href="#plant-heading">Skip to the plant</a>
 <main>
 <header>
   <div>
-    <div class="sub">🌱 THE BITCOIN GARDEN <span class="vtag" id="version">v1.14.1</span></div>
+    <div class="sub">🌱 THE BITCOIN GARDEN <span class="vtag" id="version">v1.14.2</span></div>
     <h1>Time Machine ⏳</h1>
     <div class="sub">Travel back in time to see what really happened to pretend money, or forward to see the range of futures the past suggests.</div>
   </div>
@@ -30,7 +30,7 @@
   <div class="modegrid" role="group" aria-labelledby="mode-heading">
     <button type="button" class="mode" id="modeFwd" aria-pressed="true"><span class="big" aria-hidden="true">🚀</span><b>Forward in time</b><small>See the range of futures the past suggests. A forecast, not a promise.</small></button>
     <button type="button" class="mode" id="modeBack" aria-pressed="false"><span class="big" aria-hidden="true">🦖</span><b>Back in time</b><small>Plant money in the past and watch what really happened.</small></button>
-    <button type="button" class="mode" id="modeCash" aria-pressed="false"><span class="big" aria-hidden="true">🍎</span><b>Cash in</b><small>Pick apples: take your money back out as the tree grows.</small></button>
+    <button type="button" class="mode" id="modeCash" aria-pressed="false"><span class="big" aria-hidden="true">✂️</span><b>Pruning</b><small>Snip coins off the tree and keep that money safe in your pocket.</small></button>
   </div>
 </section>
 
@@ -172,7 +172,7 @@
     </div>
     <div class="step" id="fwCashStep" hidden>
       <div class="num" aria-hidden="true">3</div>
-      <div class="lbl" id="fwCashLabel">…and pick apples when the tree is worth…</div>
+      <div class="lbl" id="fwCashLabel">…and prune when the tree is worth…</div>
       <div class="chips" id="fwCashChips" role="group" aria-labelledby="fwCashLabel">
         <button type="button" class="chip" data-at="1.5" aria-pressed="false">×1.5</button>
         <button type="button" class="chip" data-at="2" aria-pressed="true">×2</button>
@@ -231,6 +231,6 @@
 </div>
 <footer class="sitefoot">The Bitcoin Garden © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
 </main>
-<script type="module" src="./time-machine.js?v=1.14.1"></script>
+<script type="module" src="./time-machine.js?v=1.14.2"></script>
 </body>
 </html>

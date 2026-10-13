@@ -123,7 +123,7 @@ test('futureFrames: starts at the amount, ends at the band, in order, dated from
   assert.throws(() => futureFrames(f.fan, 'p99', '2026-10-13'));
 });
 
-// ---------- v1.14.1 cash in, looking forward ----------
+// ---------- v1.14.2 cash in, looking forward ----------
 test('cashInForecast replays real past stretches with apples picked and re-dates them to start today', () => {
   const prices = Array.from({ length: 900 }, (_, i) => 100 * Math.exp(0.004 * i + 0.4 * Math.sin(i / 17)));
   const pts = series(prices), today = '2030-01-01';
