@@ -3,10 +3,10 @@ import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
 } from './time-machine-engine.js?v=1.14.3';
-import { createPlant } from './time-machine-plant.js?v=1.14.3';
+import { createPlant } from './time-machine-plant.js?v=1.14.3-fruit-2';
 import { createSound } from './time-machine-sound.js?v=1.14.3';
 import { loadHistory } from './price-data.js?v=1.14.3';
-import { createRace } from './time-machine-race.js?v=1.14.3';
+import { createRace } from './time-machine-race.js?v=1.14.3-fruit-2';
 import { forecast, describe as describeForecast, futureFrames, cashInForecast, SINCE_CHOICES } from './forecast-engine.js?v=1.14.3';
 
 const $ = id => document.getElementById(id);
