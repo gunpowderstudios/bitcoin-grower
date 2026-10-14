@@ -70,8 +70,8 @@ function renderSeedText() {
   let pct = S.yearSeed?.pct, ref = S.yearSeed ? ' (' + fmtDate(S.yearSeed.date) + ')' : '';
   if (S.range !== '1y') { const c = changeOver(S.series || []); if (!c) return; pct = c.pct; ref = ''; }
   if (pct == null) return;
-  const worth = 100 * (1 + pct / 100), diff = worth - 100;
-  $('seedText').textContent = '🌱 A ' + money(100) + ' seed planted ' + AGO[S.range] + ref + ' would be worth ' + formatGBP(worth) + ' today — ' + (diff >= 0 ? 'up ' : 'down ') + formatGBP(Math.abs(diff)) + ' (' + signedPct(pct) + ').' + (S.range !== '1y' ? '' : '');
+  const startingAmount = toGBP(100), worth = startingAmount * (1 + pct / 100), diff = worth - startingAmount;
+  $('seedText').textContent = '🌱 A ' + money(startingAmount) + ' seed planted ' + AGO[S.range] + ref + ' would be worth ' + formatGBP(worth) + ' today — ' + (diff >= 0 ? 'up ' : 'down ') + formatGBP(Math.abs(diff)) + ' (' + signedPct(pct) + ').' + (S.range !== '1y' ? '' : '');
 }
 // ---------------------------------------------------------------- charts
 async function loadRange(key) {
