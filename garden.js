@@ -166,7 +166,7 @@ function drawFan(f) {
 // Colour only the values that change with the selected amount or time period.
 function markForecastChanges(target, copy) {
   target.replaceChildren();
-  const pattern = /(£[\\d,]+(?:\\.\\d+)?|\\b\\d+-year(?:\\s+stretches?|\\s+stretch)?|\\b\\d+\\s+(?:months?|days?|years?)\\b|\\b\\d+(?=\\s+of every 100)|\\b\\d+(?=\\s+completely separate))/g;
+  const pattern = /(£[\d,]+(?:\.\d+)?|\b\d+-year(?:\s+stretches?|\s+stretch)?|\b\d+\s+(?:months?|days?|years?)\b|\b\d+(?=\s+of every 100)|\b\d+(?=\s+completely separate))/g;
   let start = 0;
   for (const match of copy.matchAll(pattern)) {
     const at = match.index;

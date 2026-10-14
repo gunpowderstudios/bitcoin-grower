@@ -39,7 +39,7 @@
 .nowgrid.single{grid-template-columns:1fr}
 
 /* Forecast: changing amounts and selected period share the selected button's gold. */
-#fResult .forecast-changing-value{color:#f7ce4d}
-#fResult.forecast-updated .forecast-changing-value{animation:forecast-highlight .55s ease-out both}
-@keyframes forecast-highlight{0%{background:rgba(247,206,77,.32);text-shadow:0 0 14px rgba(247,206,77,.75)}100%{background:transparent;text-shadow:none}}
+#fResult .forecast-changing-value{color:#f7ce4d;font-weight:800}
+#fResult.forecast-updated .forecast-changing-value{animation:forecast-highlight .9s ease-out both}
+@keyframes forecast-highlight{0%{background:rgba(247,206,77,.55);text-shadow:0 0 18px rgba(247,206,77,.95)}100%{background:transparent;text-shadow:none}}
 @media(prefers-reduced-motion:reduce){#fResult.forecast-updated .forecast-changing-value{animation:none}}
