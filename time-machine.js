@@ -254,7 +254,14 @@ function render({ instant = false, fast = false, quiet = false, steps = 1 } = {}
   // plant
   const ratio = f.total / start, pl = plantFor(ratio, true);
   plant.setState(pl.stage, pl.droop);
-  plant.setFruit(ratio, !instant && !quiet && !reduceMotion());
+  const coinsBefore = plant.coins;
+  const coinsAnimated = !instant && !quiet && !reduceMotion();
+  plant.setFruit(ratio, coinsAnimated);
+  // Back in Time: match the existing falling-coin chime used by Forward in Time.
+  // Only chime for new animated milestones, not on scrubbing or instant jumps.
+  if (coinsAnimated && plant.coins > coinsBefore && sound.enabled) {
+    window.setTimeout(() => sound.play('clink', { fast: false }), 1900);
+  }
   $('stage').textContent = pl.name + (pl.droop > 0.35 ? ' · drooping 😟' : '');
   const now = performance.now();
   if (now - S.droopMark.t > 1500) { if (S.droopMark.v - pl.droop > 0.1 && now - S.lastPerk > 3000) { plant.perk(); S.lastPerk = now; } S.droopMark = { t: now, v: pl.droop }; }
