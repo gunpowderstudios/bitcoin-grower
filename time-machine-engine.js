@@ -1,7 +1,7 @@
-// Bitcoin Garden Time Machine — pure simulation logic (v1.13.3).
+// Bitcoin Garden Time Machine — pure simulation logic (v1.14.3).
 // No DOM, no network, no credentials, no exchange access: this module only does
 // arithmetic on historical prices so it can be tested in Node and reused by the page.
-export const VERSION = '1.14.2';
+export const VERSION = '1.14.3';
 
 export const DEFAULTS = Object.freeze({
   amount: 100,   // £ planted at the start
@@ -10,7 +10,7 @@ export const DEFAULTS = Object.freeze({
   risePct: 10,   // harvest after the price rises this % above the buy price
   sellPct: 50,   // harvest this % of the bitcoin bought in that purchase
   feePct: 0.4,   // fee charged on every virtual trade
-  cashAt: 2      // 'cash in' mode: pick apples (sell what you planted) whenever the tree is worth this many times what you planted
+  cashAt: 2      // Pruning: sell what you planted whenever the tree is worth this many times what you planted
 });
 
 const DAY = 86400000;
@@ -113,7 +113,9 @@ export function selectRange(points, from, to) {
   return steps;
 }
 
-// ---------- the Grower strategy ----------
+// ---------- strategies ----------
+// 'hold' (Back in time) and 'cashin' (Pruning) are what the pages use. The original 'grow' rule below (buy on dips, sell on rises)
+// is kept, tested and unused by the pages; nothing outside this folder imports it (the Cloudflare bot has its own engine in bot/).
 /**
  * Replays the Grower strategy over daily closing prices (simulation only).
  *  - Wait for the price to fall `dipPct` below the reference price (the start price, then the last buy/harvest price).
@@ -138,7 +140,7 @@ export function simulate(steps, rawSettings) {
         cash = 0; btc = qty; buys = 1; feesPaid += s.amount * fee;
         events.push({ i, date, side: 'BUY', price, gbp: s.amount, btc: qty });
       } else if (s.strategy === 'cashin' && btc * price >= s.cashAt * s.amount - 1e-9) {
-        // pick apples: sell what you planted (at today's price) and put it in your pocket; the rest keeps growing
+        // prune: sell what you planted (at today's price) and put it in your pocket; the rest keeps growing
         const qty = Math.min(btc, s.amount / price), gross = qty * price, net = gross * (1 - fee);
         btc = Math.max(0, btc - qty); cash += net; feesPaid += gross - net; sells++;
         events.push({ i, date, side: 'SELL', price, gbp: net, btc: qty });

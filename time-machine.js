@@ -1,14 +1,13 @@
-// Bitcoin Garden Time Machine — page controller (v1.14.2). Simulation only: no accounts, keys or trading.
+// Bitcoin Garden Time Machine — page controller (v1.14.3). Simulation only: no accounts, keys or trading.
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
-} from './time-machine-engine.js?v=1.14.2';
-import { createPlant } from './time-machine-plant.js?v=1.14.2';
-import { createSound } from './time-machine-sound.js?v=1.14.2';
-import { loadHistory } from './price-data.js?v=1.14.2';
-import { createRace } from './time-machine-race.js?v=1.14.2';
-import { forecast, describe as describeForecast, futureFrames, cashInForecast, SINCE_CHOICES } from './forecast-engine.js?v=1.14.2';
-import { startLine, buyLine, sellLine, moodLine, endLine } from './gardener-lines.js?v=1.14.2';
+} from './time-machine-engine.js?v=1.14.3';
+import { createPlant } from './time-machine-plant.js?v=1.14.3';
+import { createSound } from './time-machine-sound.js?v=1.14.3';
+import { loadHistory } from './price-data.js?v=1.14.3';
+import { createRace } from './time-machine-race.js?v=1.14.3';
+import { forecast, describe as describeForecast, futureFrames, cashInForecast, SINCE_CHOICES } from './forecast-engine.js?v=1.14.3';
 
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -17,7 +16,6 @@ const MIN_FRAMES_PER_SEC = 4;
 const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 const plant = createPlant($('plant'));
-const gardener = { say() {}, clear() {}, text: '' }; // the little gardener and speech bubbles are switched off for now (code kept in time-machine-gardener.js)
 const fwRace = createRace($, { section: 'fwRace', beds: 'fwBeds', date: 'fwDate', scrub: 'fwScrub', play: 'fwPlay', restart: 'fwRestart', note: 'fwNote' }, {
   uid: 'fw', onCoinsFall: () => { if (sound.enabled) window.setTimeout(() => sound.play('clink', { fast: false }), 1900); }, finishNote: beds => (beds[0].cash ? 'Pruning along the way, ' : 'Over the chosen time, ') + 'the typical run ended at ' + formatGBP(beds[1].sim.summary.end) + ', the rough patch at ' + formatGBP(beds[0].sim.summary.end) + ' and the good run at ' + formatGBP(beds[2].sim.summary.end) + '. The real future could land anywhere, even outside this range.'
 });
@@ -62,11 +60,9 @@ function acceptData(points, note) {
     (info.gaps.length ? ' · ' + info.gaps.length + ' gap' + (info.gaps.length > 1 ? 's' : '') + ' in the data (journeys that cross a big gap are refused)' : ' · no gaps') +
     (stale ? ' · newest price is from ' + fmtLong(info.last) : '') + (info.first < '2014-01-01' ? ' · prices before 2014 are sparse and less reliable.' : '');
   $('from').min = info.first; $('from').max = addDays(info.last, -7);
-  $('to').min = addDays(info.first, 7); $('to').max = info.last;
   buildPresets();
   const q = new URLSearchParams(location.search);
   if (q.get('from')) $('from').value = q.get('from');
-  if (q.get('to')) $('to').value = q.get('to');
   if (q.get('amount')) $('amount').value = q.get('amount');
   if ($('from').value < info.first || $('from').value > $('from').max) $('from').value = info.first <= '2017-01-01' ? '2017-01-01' : addYears(info.last, -5);
   syncPresets(); updateDateHint();
@@ -101,7 +97,7 @@ function updateDateHint() {
   updateFirstPrice();
   const from = $('from').value;
   if (!from || !S.data) return;
-  const end = $('to').value || S.data.last;
+  const end = S.data.last;
   const yrs = (dayNumber(end) - dayNumber(from)) / 365.25;
   $('dateHint').textContent = yrs > 0
     ? 'You’ll travel from ' + fmtLong(from) + ' to ' + fmtLong(end) + ' (about ' + (yrs >= 1.5 ? yrs.toFixed(1) + ' years' : Math.round(yrs * 12) + ' months') + ').'
@@ -111,15 +107,10 @@ function updateDateHint() {
   if (yrs > 0 && from < '2014-01-01') $('dateHint').textContent += ' Heads up: prices before 2014 are sparse and less reliable, and Bitcoin was tiny then, so results can look enormous. Bitcoin began in 2009, but ' + fmtLong(S.data.first) + ' is the earliest day we have prices for.';
 }
 function readSettings() {
-  return validateSettings({
-    amount: $('amount').value === '' ? NaN : $('amount').value, buyPct: $('buyPct').value, dipPct: $('dipPct').value,
-    risePct: $('risePct').value, sellPct: $('sellPct').value, feePct: $('feePct').value, strategy: 'hold'
-  });
+  return validateSettings({ amount: $('amount').value === '' ? NaN : $('amount').value, strategy: 'hold' });
 }
 $('from').addEventListener('input', () => { showError(''); syncPresets(); updateDateHint(); });
-$('to').addEventListener('input', () => { showError(''); updateDateHint(); });
 $('amount').addEventListener('input', () => { showError(''); if (S.state === 'idle') showIdleFigures(); });
-$('defaults').onclick = () => { for (const k of ['buyPct', 'dipPct', 'risePct', 'sellPct', 'feePct']) $(k).value = DEFAULTS[k]; showError(''); };
 
 // ---------------------------------------------------------------- idle (nothing running yet)
 function showIdleFigures() {
@@ -154,7 +145,7 @@ function begin(autoplay) {
   showError('');
   try {
     const settings = readSettings();
-    const steps = selectRange(S.data.points, $('from').value, $('to').value || undefined);
+    const steps = selectRange(S.data.points, $('from').value);
     S.sim = simulate(steps, settings); S.steps = steps;
   } catch (e) { showError(e.message); $('error').scrollIntoView({ block: 'nearest' }); return false; }
   if (sound.enabled) sound.unlock();
@@ -167,11 +158,10 @@ function begin(autoplay) {
 function restart(autoplay) {
   stopLoop(); S.cursor = 0; S.state = 'ready'; S.lastStage = 0; S.shownLog = -1; S.markers = 0; S.acc = 0;
   plant.reset(); S.droopMark = { t: performance.now(), v: 0 };
-  $('summary').hidden = true; gardener.clear(); S.mood = new Set(); S.prevRatio = 1;
+  $('summary').hidden = true;
   for (const id of ['play', 'month', 'finish', 'restart']) $(id).disabled = false;
   $('chart').querySelectorAll('.mk').forEach(n => n.remove());
   render({ instant: true });
-  { const st = S.sim.settings; gardener.say(startLine({ amount: st.amount, fromLabel: fmtLong(S.sim.frames[0].date) }), { priority: 2, ms: 6500 }); }
   setStatus('Ready! Press play to start travelling forward.');
   syncButtons();
   if (autoplay) play();
@@ -238,7 +228,6 @@ for (const b of $('speed').querySelectorAll('button')) b.onclick = () => {
   S.speed = b.dataset.speed;
   $('speed').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
 };
-$('showHold').onchange = () => { if (!S.sim) return; buildChart(); render({ instant: true, quiet: true }); };
 $('sound').onclick = () => {
   const on = sound.setEnabled(!sound.enabled);
   $('sound').setAttribute('aria-pressed', String(on));
@@ -276,36 +265,23 @@ function render({ instant = false, fast = false, quiet = false, steps = 1 } = {}
   $('scene').style.setProperty('--sky1', mixHex('#1b1f4a', '#3f86c4', prog)); $('scene').style.setProperty('--sky2', mixHex('#37306b', '#f6d58a', prog));
   // timeline
   $('tlFill').style.width = (prog * 100).toFixed(2) + '%'; $('tlKnob').style.left = (prog * 100).toFixed(2) + '%';
-  { const line = moodLine({ ratio, prevRatio: S.prevRatio ?? 1, seen: S.mood || (S.mood = new Set()) }); S.prevRatio = ratio; if (line && !instant && !quiet) gardener.say(line, { priority: 1 }); }
   // trades since last render
   const seen = S.shownLog < 0 ? 0 : S.shownLog;
   if (f.events !== seen || S.shownLog < 0) {
     const fresh = events.slice(Math.min(seen, f.events), f.events);
-    const sells = fresh.filter(e => e.side === 'SELL'), buys = fresh.filter(e => e.side === 'BUY');
-    if (!instant && !quiet && fresh.length) {
-      const e = fresh.at(-1), at = events.indexOf(e), prev = events[at - 1];
-      if (e.side === 'BUY') gardener.say(buyLine({ price: e.price, prevPrice: prev ? prev.price : frames[0].price, amount: e.gbp }), { priority: 2 });
-      else { let b = null; for (let k = at - 1; k >= 0; k--) if (events[k].side === 'BUY') { b = events[k]; break; } gardener.say(sellLine({ price: e.price, buyPrice: b?.price, sellPct: settings.sellPct, gbp: e.gbp }), { priority: 2 }); }
-      if (sells.length) sound.play('clink', { fast }); else if (buys.length) sound.play('plant', { fast });
-      announceTrades(fresh, fast);
-    }
+    if (!instant && !quiet && fresh.length) { sound.play('plant', { fast }); announceTrades(fresh); }
     renderLog(events, f.events);
     S.shownLog = f.events;
   }
   updateChart();
 }
-function announceTrades(fresh, fast) {
+function announceTrades(fresh) { // Back in time buys once, on day one
   const now = performance.now();
   if (now - S.lastToast < 700) return;
   S.lastToast = now;
-  const sells = fresh.filter(e => e.side === 'SELL'), buys = fresh.filter(e => e.side === 'BUY');
-  let text;
-  if (fresh.length === 1) {
-    const e = fresh[0];
-    text = e.side === 'SELL' ? '🪙 Harvest: sold some and banked ' + formatGBP(e.gbp) + ' · ' + fmtDate(e.date) : '🌱 Planted ' + formatGBP(e.gbp) + ' of Bitcoin · ' + fmtDate(e.date);
-  } else text = (buys.length ? '🌱 ' + buys.length + ' planted' : '') + (buys.length && sells.length ? ' · ' : '') + (sells.length ? '🪙 ' + sells.length + ' harvests (sold some)' : '');
-  toast(text, sells.length ? 'sell' : 'buy');
-  setStatus(text.replace(/[🪙🌱]/gu, '').trim());
+  const e = fresh[0], text = '🌱 Planted ' + formatGBP(e.gbp) + ' of Bitcoin · ' + fmtDate(e.date);
+  toast(text, 'buy');
+  setStatus(text.replace('🌱', '').trim());
 }
 function toast(text, cls) {
   const box = $('toasts'), t = document.createElement('div');
@@ -315,10 +291,10 @@ function toast(text, cls) {
 }
 function renderLog(events, count) {
   const body = $('journal'); body.replaceChildren();
-  if (!count) { body.insertRow().insertCell().colSpan = 4; body.rows[0].cells[0].textContent = 'No buys or harvests yet.'; return; }
-  for (let i = count - 1, shown = 0; i >= 0 && shown < 300; i--, shown++) {
+  if (!count) { body.insertRow().insertCell().colSpan = 4; body.rows[0].cells[0].textContent = 'No purchase yet.'; return; }
+  for (let i = count - 1; i >= 0; i--) {
     const e = events[i], row = body.insertRow();
-    for (const v of [fmtDate(e.date), e.side === 'BUY' ? '🌱 Planted Bitcoin' : '🪙 Harvested', formatGBP(e.price), formatGBP(e.gbp)]) row.insertCell().textContent = v;
+    for (const v of [fmtDate(e.date), '🌱 Planted Bitcoin', formatGBP(e.price), formatGBP(e.gbp)]) row.insertCell().textContent = v;
   }
 }
 function mixHex(a, b, t) {
@@ -355,17 +331,17 @@ function buildTimelineTicks() {
 }
 const W = 700, X0 = 62, X1 = 688, Y0 = 16, Y1 = 214;
 function buildChart() {
-  const { frames, events, settings } = S.sim, N = frames.length, start = settings.amount, showHold = false;
+  const { frames, events, settings } = S.sim, N = frames.length, start = settings.amount;
   const d0 = dayNumber(frames[0].date), d1 = dayNumber(frames.at(-1).date);
   let lo = start, hi = start;
-  for (const f of frames) { lo = Math.min(lo, f.total); hi = Math.max(hi, f.total); if (showHold) { lo = Math.min(lo, f.hold); hi = Math.max(hi, f.hold); } }
+  for (const f of frames) { lo = Math.min(lo, f.total); hi = Math.max(hi, f.total); }
   const pad = (hi - lo) * 0.08 || start * 0.05; lo = Math.max(0, lo - pad); hi += pad;
   const X = f => X0 + (dayNumber(f.date) - d0) / (d1 - d0) * (X1 - X0), Y = v => Y1 - (v - lo) / (hi - lo) * (Y1 - Y0);
   const keep = new Set([0, N - 1]); const stepSz = Math.max(1, Math.floor(N / 340));
   for (let i = 0; i < N; i += stepSz) keep.add(i); for (const e of events) keep.add(e.i);
   const idx = [...keep].sort((a, b) => a - b);
   const base = Y(start);
-  S.chart = { idx, X, Y, base, lo, hi, d0, d1, px: idx.map(i => X(frames[i]).toFixed(1)), py: idx.map(i => Y(frames[i].total).toFixed(1)), hy: idx.map(i => Y(frames[i].hold).toFixed(1)), showHold };
+  S.chart = { idx, X, Y, base, lo, hi, d0, d1, px: idx.map(i => X(frames[i]).toFixed(1)), py: idx.map(i => Y(frames[i].total).toFixed(1)) };
   const c = $('chart'); c.replaceChildren();
   const defs = svgEl('defs', {}, c);
   svgEl('rect', { x: X0, y: Y0 - 8, width: X1 - X0 + 8, height: base - Y0 + 8 }, svgEl('clipPath', { id: 'tmUp' }, defs));
@@ -383,7 +359,6 @@ function buildChart() {
   }
   S.chart.areaUp = svgEl('path', { fill: 'rgba(120,230,100,.26)', 'clip-path': 'url(#tmUp)' }, c);
   S.chart.areaDown = svgEl('path', { fill: 'rgba(255,120,110,.30)', 'clip-path': 'url(#tmDown)' }, c);
-  S.chart.hold = svgEl('path', { fill: 'none', stroke: '#f4c84a', 'stroke-width': 2, 'stroke-dasharray': '5 4', display: showHold ? 'inline' : 'none' }, c);
   S.chart.lineUp = svgEl('path', { fill: 'none', stroke: '#8cf06a', 'stroke-width': 3, 'stroke-linejoin': 'round', 'clip-path': 'url(#tmUp)' }, c);
   S.chart.lineDown = svgEl('path', { fill: 'none', stroke: '#ff8f86', 'stroke-width': 3, 'stroke-linejoin': 'round', 'clip-path': 'url(#tmDown)' }, c);
   S.chart.mk = svgEl('g', {}, c); S.chart.dot = svgEl('circle', { r: 5.5, fill: '#fff', stroke: '#2a6a2a', 'stroke-width': 2 }, c);
@@ -393,22 +368,19 @@ function updateChart() {
   const ch = S.chart; if (!ch) return;
   const { frames, events } = S.sim, cur = S.cursor, f = frames[cur];
   let k = 0; while (k < ch.idx.length && ch.idx[k] <= cur) k++;
-  const xs = ch.px.slice(0, k), ys = ch.py.slice(0, k), hs = ch.hy.slice(0, k);
+  const xs = ch.px.slice(0, k), ys = ch.py.slice(0, k);
   const cx = ch.X(f).toFixed(1), cy = ch.Y(f.total).toFixed(1);
-  if (ch.idx[k - 1] !== cur) { xs.push(cx); ys.push(cy); hs.push(ch.Y(f.hold).toFixed(1)); }
+  if (ch.idx[k - 1] !== cur) { xs.push(cx); ys.push(cy); }
   const line = xs.map((x, i) => (i ? 'L' : 'M') + x + ' ' + ys[i]).join(' ');
   ch.lineUp.setAttribute('d', line); ch.lineDown.setAttribute('d', line);
   const area = line + ' L' + xs.at(-1) + ' ' + ch.base.toFixed(1) + ' L' + xs[0] + ' ' + ch.base.toFixed(1) + 'Z';
   ch.areaUp.setAttribute('d', area); ch.areaDown.setAttribute('d', area);
-  if (ch.showHold) ch.hold.setAttribute('d', xs.map((x, i) => (i ? 'L' : 'M') + x + ' ' + hs[i]).join(' '));
   ch.dot.setAttribute('cx', cx); ch.dot.setAttribute('cy', cy);
-  // buy / harvest markers
+  // purchase marker
   if (S.markers > f.events) { ch.mk.replaceChildren(); S.markers = 0; }
   for (; S.markers < f.events; S.markers++) {
     const e = events[S.markers], x = ch.X(frames[e.i]), y = ch.Y(frames[e.i].total);
-    if (S.markers > 150 && S.markers % 2) continue; // keep very busy charts readable
-    if (e.side === 'SELL') svgEl('circle', { cx: x, cy: y, r: 5, fill: '#f4c84a', stroke: '#7a5200', 'stroke-width': 1.5 }, ch.mk);
-    else svgEl('path', { d: `M${x - 5} ${y - 9} L${x + 5} ${y - 9} L${x} ${y - 1}Z`, fill: '#bfeaa0', stroke: '#2a6a2a', 'stroke-width': 1.2 }, ch.mk);
+    svgEl('path', { d: `M${x - 5} ${y - 9} L${x + 5} ${y - 9} L${x} ${y - 1}Z`, fill: '#bfeaa0', stroke: '#2a6a2a', 'stroke-width': 1.2 }, ch.mk);
   }
 }
 
@@ -416,7 +388,6 @@ function showPurchaseMath() {
   const sim = S.sim;
   if (!sim?.frames?.length) return;
   const frames = sim.frames, s = sim.summary, first = frames[0], last = frames.at(-1);
-  const fee = sim.settings.feePct / 100;
   const buys = sim.events.filter(e => e.side === 'BUY');
   const box = $('purchaseMathBody');
   box.replaceChildren();
@@ -428,18 +399,9 @@ function showPurchaseMath() {
   line('Starting price', formatGBP(first.price) + ' per BTC on ' + fmtLong(first.date));
   line('Ending price', formatGBP(last.price) + ' per BTC on ' + fmtLong(last.date));
   line('Original pot', formatGBP(s.start));
-  if (sim.settings.strategy === 'hold') {
-    line('Original purchase', buys[0] ? fmtLong(buys[0].date) + ': ' + formatGBP(buys[0].gbp) + ' bought ' + buys[0].btc.toFixed(8) + ' BTC at ' + formatGBP(buys[0].price) + '/BTC' : '—');
-    line('Purchase fee', formatGBP(s.feesPaid));
-    line('Final Bitcoin value', s.btc.toFixed(8) + ' BTC × ' + formatGBP(last.price) + ' = ' + formatGBP(s.end));
-  } else {
-    line('First purchase', buys[0] ? fmtLong(buys[0].date) + ': ' + formatGBP(buys[0].gbp) + ' at ' + formatGBP(buys[0].price) + '/BTC, buying ' + buys[0].btc.toFixed(8) + ' BTC after fees' : 'No dip triggered a purchase');
-    line('Total virtual purchases and sales', s.buys + ' purchases / ' + s.sells + ' sales');
-    line('Total estimated trading fees', formatGBP(s.feesPaid));
-    line('Final cash', formatGBP(s.cash));
-    line('Bitcoin still held', s.btc.toFixed(8) + ' BTC × ' + formatGBP(last.price) + ' = ' + formatGBP(s.btc * last.price));
-    line('Final pot value', formatGBP(s.cash) + ' cash + ' + formatGBP(s.btc * last.price) + ' Bitcoin = ' + formatGBP(s.end));
-  }
+  line('Original purchase', buys[0] ? fmtLong(buys[0].date) + ': ' + formatGBP(buys[0].gbp) + ' bought ' + buys[0].btc.toFixed(8) + ' BTC at ' + formatGBP(buys[0].price) + '/BTC' : '—');
+  line('Purchase fee', formatGBP(s.feesPaid));
+  line('Final Bitcoin value', s.btc.toFixed(8) + ' BTC × ' + formatGBP(last.price) + ' = ' + formatGBP(s.end));
   line('Profit or loss', formatGBP(s.end) + ' − ' + formatGBP(s.start) + ' = ' + signedGBP(s.profit) + ' (' + signedPct(s.pct) + ')');
   const note = document.createElement('p');note.className='hint';
   note.textContent='Calculations use historical daily prices provided by the selected dataset, with estimated fees. They are not proof these trades could have been executed. Especially early Bitcoin prices may be sparse.';
@@ -460,7 +422,6 @@ function complete(instant = false) {
   $('sum-heading').focus({ preventScroll: true });
 }
 function showSummary() {
-  gardener.say('Your historical Bitcoin journey is complete!', { priority: 3, ms: 7000 });
   showPurchaseMath();
   const s = S.sim.summary, up = s.profit > 0.004, down = s.profit < -0.004;
   const years = s.days / 365.25, span = years >= 1.5 ? years.toFixed(1) + ' years' : Math.round(s.days / 30.44) + ' months';
@@ -475,15 +436,7 @@ function showSummary() {
   $('sPnl').textContent = signedGBP(s.profit);
   $('sPct').textContent = (up ? '▲ ' : down ? '▼ ' : '■ ') + signedPct(s.pct);
   $('sTrades').textContent = '1 purchase';
-  $('vsMe').textContent = formatGBP(s.end); $('vsMePct').textContent = signedPct(s.pct);
-  $('vsHold').textContent = formatGBP(s.hold); $('vsHoldPct').textContent = signedPct(s.holdPct);
-  const d = s.vsHold, close = Math.abs(d) < s.start * 0.005;
-  $('vsText').textContent = close ? 'The two ended up almost exactly the same.'
-    : d > 0 ? 'In this period the Grower strategy finished ' + formatGBP(d) + ' ahead of simply buying Bitcoin on day one and waiting.'
-      : 'In this period, simply buying Bitcoin on day one and waiting would have finished ' + formatGBP(-d) + ' ahead of the Grower strategy. Buy-and-hold puts everything into Bitcoin straight away, so it gains more when Bitcoin climbs — and falls further when it drops.';
-  $('sumFine').textContent = 'One-time purchase fee: ' + formatGBP(s.feesPaid) + ' · Biggest fall from a high point: ' + s.maxDrawdown.toFixed(1) + '%' +
-    (s.skippedBuys ? ' · ' + s.skippedBuys + ' time' + (s.skippedBuys > 1 ? 's' : '') + ' the strategy wanted to buy but had no cash left' : '') +
-    '. Buy-and-hold pays the same fee once. Both numbers are measured at the final day’s closing price.';
+  $('sumFine').textContent = 'One-time purchase fee: ' + formatGBP(s.feesPaid) + ' · Biggest fall from a high point: ' + s.maxDrawdown.toFixed(1) + '%. Measured at the final day’s closing price; tax is not included.';
 }
 
 // ---------------------------------------------------------------- your own price file
@@ -580,7 +533,7 @@ function showCashSummary(c) {
   box.appendChild(p); box.hidden = false;
 }
 window.__fwRace = fwRace; window.__setMode = setMode;
-window.__tm = { gardener, get state() { return S.state; }, get cursor() { return S.cursor; }, get sim() { return S.sim; }, plant };
+window.__tm = { get state() { return S.state; }, get cursor() { return S.cursor; }, get sim() { return S.sim; }, plant };
 
 showIdleFigures(); drawEmptyChart(); syncButtons();
 loadPrices();

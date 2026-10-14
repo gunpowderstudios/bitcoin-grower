@@ -122,8 +122,6 @@ details summary{cursor:pointer;font-weight:700;padding:12px 0;min-height:44px}
 .big .gain{color:var(--gain)}.big .loss{color:var(--loss)}
 .sumgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:14px 0}
 .sumgrid .fig strong{font-size:clamp(20px,4.6vw,26px)}
-.vs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
-.vs .fig.me{border-color:#8fd88a}
 .fine{font-size:13px;color:#b9d2bb}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 
@@ -147,7 +145,7 @@ code{background:#10261a;padding:1px 6px;border-radius:6px}
 @keyframes unfurl{from{scale:.1;opacity:.2}to{scale:1;opacity:1}}
 .grew .tm-part.on,.perk .tm-part.on{animation:swell .9s ease}
 @keyframes swell{0%{transform:scale(1)}40%{transform:scale(1.06,1.09)}100%{transform:scale(1)}}
-/* apples: a coin ripens on a leaf, hangs a moment, then drops and bounces on the ground */
+/* fruit: a coin ripens on a leaf, hangs a moment, then drops and bounces on the ground */
 .tm-coin.apple{animation:appledrop 2.4s both}
 @keyframes appledrop{
   0%{transform:translate(var(--dx),var(--dy)) scale(.1);opacity:0;animation-timing-function:ease-out}
@@ -167,7 +165,6 @@ code{background:#10261a;padding:1px 6px;border-radius:6px}
   .fig small{grid-column:1/-1}
   .fig strong{grid-column:1}.fig .pct{grid-column:2;text-align:right}
   .step{grid-template-columns:1fr}.step>:not(.num){grid-column:1}.num{grid-row:auto;width:34px;height:34px;font-size:18px}
-  .vs{grid-template-columns:1fr}
   .toasts{max-width:75%}
 }
 @media(prefers-reduced-motion:reduce){
@@ -177,18 +174,8 @@ code{background:#10261a;padding:1px 6px;border-radius:6px}
 .lbl{font-size:19px;font-weight:750;line-height:1.3}
 .sitefoot{text-align:center;margin:22px 0 8px;font-size:14px;color:var(--mute)}
 .sitefoot a{color:#ffd23f;font-weight:700;text-decoration:underline;text-underline-offset:3px;display:inline-block;padding:10px 2px}
-.vs[hidden]{display:none}
 
-/* v1.13.2 — the gardener and the four side-by-side gardens */
-.gardener{position:absolute;left:10px;bottom:52px;width:76px;z-index:2;pointer-events:none}
-.gardener .gsvg{display:block;width:76px;height:auto;overflow:visible;filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));animation:gbob 3s ease-in-out infinite;transform-origin:50% 100%}
-.gardener .garm{transform-origin:52px 64px}
-.gardener.talking .garm{animation:gwave .6s ease-in-out 4}
-.gardener .bubble{position:absolute;left:4px;bottom:calc(100% + 8px);width:max-content;max-width:min(230px,56vw);background:#fffbe6;color:#2b2a12;border-radius:14px;padding:9px 12px;font-size:14px;line-height:1.35;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.35)}
-.gardener .bubble::after{content:"";position:absolute;left:26px;bottom:-8px;border:8px solid transparent;border-top-color:#fffbe6;border-bottom:0}
-.gardener .bubble[hidden]{display:none}
-@keyframes gbob{50%{transform:translateY(-3px)}}
-@keyframes gwave{50%{transform:rotate(-28deg)}}
+/* side-by-side gardens (the forward forecast and Pruning) */
 .race[hidden]{display:none}
 .racebar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:8px 0 12px}
 .racedate{font-size:26px;font-weight:900;min-width:150px}
@@ -200,8 +187,7 @@ code{background:#10261a;padding:1px 6px;border-radius:6px}
 .bedinfo{display:grid;gap:2px;background:rgba(10,30,18,.88);padding:8px 10px 10px}
 .bedinfo .bn{font-size:14px}.bedinfo .bv{font-size:20px}.bedinfo .bg{font-weight:800;font-size:15px}.bedinfo .bg.gain{color:var(--gain)}.bedinfo .bg.loss{color:var(--loss)}.bedinfo .bs{color:var(--mute);font-size:12px}
 .racenote{margin:12px 2px 0}
-@media(max-width:700px){.beds{grid-template-columns:repeat(2,1fr)}.gardener{width:62px;bottom:50px}.gardener .gsvg{width:62px}}
-@media(prefers-reduced-motion:reduce){.gardener .gsvg,.gardener.talking .garm{animation:none}}
+@media(max-width:700px){.beds{grid-template-columns:repeat(2,1fr)}}
 
 /* v1.13.2 — choosing a direction: back (🦖) or forward (🚀) */
 .modegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
@@ -214,7 +200,7 @@ code{background:#10261a;padding:1px 6px;border-radius:6px}
 #fwdMode[hidden],#backMode[hidden]{display:none}
 @media(max-width:700px){.modegrid{gap:6px}.mode{padding:12px 6px}.mode .big{font-size:34px}.mode b{font-size:15px}.mode small{font-size:11px}.beds.three{grid-template-columns:1fr}}
 
-/* v1.14.0 — Cash in: plant today and pick apples as the tree grows (forward-looking) */
+/* Pruning: plant today and prune coins as the tree grows (forward-looking) */
 .step[hidden]{display:none}
 .cashsum{margin:12px 0 4px;padding:14px;border-radius:14px;background:#14291c;border:1px solid #36543e;font-size:15px;line-height:1.5}
 .cashsum[hidden]{display:none}

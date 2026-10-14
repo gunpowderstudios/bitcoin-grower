@@ -1,4 +1,4 @@
-// Bitcoin Garden Time Machine — gentle synthesised sounds (v1.14.2).
+// Bitcoin Garden Time Machine — gentle synthesised sounds (v1.14.3).
 // No audio files, no downloads, no tracking. Sound is ON by default, but browsers (Safari/iOS, Chrome) only
 // allow audio after a click/tap, so it starts with the visitor's first click or tap anywhere on the page. Effects are rate-limited so fast-forwarding stays pleasant.
 export function createSound() {
@@ -54,7 +54,7 @@ export function createSound() {
   }
 
   const effects = {
-    // soft metallic "clink" for a harvest
+    // soft metallic "clink" for a coin landing
     clink(fast) {
       if (!allowed('clink', fast ? 700 : 220, 4)) return;
       const p = 1 + (Math.random() - 0.5) * 0.06;

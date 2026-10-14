@@ -1,4 +1,4 @@
-/* Bitcoin Grower Today's Prices v1.11.7 — builds on time-machine.css */
+/* The Bitcoin Garden — Today's Prices — builds on time-machine.css */
 .nowgrid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:center}
 .bigprice{font-size:clamp(40px,10vw,68px);font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.05}
 .chg{font-size:clamp(17px,4vw,22px);font-weight:750;margin:4px 0 6px}

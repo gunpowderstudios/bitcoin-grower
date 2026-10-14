@@ -1,4 +1,4 @@
-// Bitcoin Grower — "weather forecast" engine (v1.11.7). Pure arithmetic on historical prices.
+// The Bitcoin Garden — "weather forecast" engine. Pure arithmetic on historical prices.
 // It does NOT predict the price. It answers: "in the past, after an amount was planted, how
 // did the value look N days later?" and reports the spread of what really happened.
 import { dayNumber, addDays, simulate } from './time-machine-engine.js';
@@ -95,7 +95,7 @@ export function futureFrames(fan, key, today, n = 120) {
 }
 
 /**
- * "Cash in" forecast: what would picking apples have done over the next `horizonDays`?
+ * "Cash in" forecast: what would pruning have done over the next `horizonDays`?
  * For every past planting day (since `since`) we replay the real prices that followed, with the cash-in rule
  * (sell `amount` of Bitcoin each time the pot's Bitcoin is worth `cashAt` x what you planted) and with simply holding.
  * The three gardens are real past stretches, picked by their cash-in result: a rough patch (10th), a typical one (50th) and a good one (90th).

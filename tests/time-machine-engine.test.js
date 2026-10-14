@@ -209,7 +209,7 @@ test('signed money and percentages use real plus/minus signs', () => {
   assert.equal(formatGBP(1234567.5), '£1,234,567.50'); assert.equal(formatGBP(NaN), '—');
 });
 
-// ---------- v1.14.2 cash in (pick apples as the tree grows) ----------
+// ---------- v1.14.3 cash in (pick apples as the tree grows) ----------
 const mk = prices => prices.map((price, i) => ({ date: '2020-01-' + String(i + 1).padStart(2, '0'), price }));
 test('cash in sells what you planted each time the tree reaches the chosen multiple', () => {
   const r = simulate(mk([100, 100, 150, 200, 200, 400, 100]), { strategy: 'cashin', amount: 100, cashAt: 2, feePct: 0 });
@@ -236,14 +236,14 @@ test('cashAt is validated and defaults to 2x', () => {
 
 // ---------- project hygiene ----------
 const read = f => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
-test('version is 1.14.2 everywhere it should be', () => {
-  assert.equal(VERSION, '1.14.2');
-  assert.equal(JSON.parse(read('version.json')).version, '1.14.2');
-  assert.equal(JSON.parse(read('package.json')).version, '1.14.2');
-  assert.equal(JSON.parse(read('bot/package.json')).version, '1.14.2');
-  assert.match(read('time-machine.html'), /id="version">v1\.14\.2</);
-  assert.match(read('README.md'), /1\.10\.0/);
-  assert.match(read('index.html'), /id="version">v1\.14\.2</);
+test('version is 1.14.3 everywhere it should be', () => {
+  assert.equal(VERSION, '1.14.3');
+  assert.equal(JSON.parse(read('version.json')).version, '1.14.3');
+  assert.equal(JSON.parse(read('package.json')).version, '1.14.3');
+  assert.equal(JSON.parse(read('bot/package.json')).version, '1.14.3');
+  assert.match(read('time-machine.html'), /id="version">v1\.14\.3</);
+  assert.match(read('README.md'), /Version: \*\*1\.14\.3\*\*/);
+  assert.match(read('index.html'), /id="version">v1\.14\.3</);
 });
 test('every element id the page script uses exists in the HTML', () => {
   for (const [page, script] of [['time-machine.html', 'time-machine.js'], ['time-machine.html', 'time-machine-race.js'], ['index.html', 'garden.js']]) {
@@ -267,26 +267,4 @@ test('time machine code has no secrets, exchange APIs or order placement', () =>
 test('optional bundled price file, if present, is valid daily BTC/GBP', { skip: !fs.existsSync(new URL('../data/btc-gbp-daily.csv', import.meta.url)) }, () => {
   const { points } = parseCSV(read('data/btc-gbp-daily.csv'));
   assert.ok(describeData(points).maxGap <= 3);
-});
-
-// ---------- the gardener's lines ----------
-import { startLine, buyLine, sellLine, moodLine, endLine } from '../gardener-lines.js';
-test('gardener lines: plain English, correct numbers, no advice', () => {
-  assert.match(startLine({ amount: 1000, fromLabel: '1 January 2017' }), /planting £1,000 on 1 January 2017/);
-  assert.match(buyLine({ price: 90, prevPrice: 100, amount: 10 }), /dropped about 10%.*£10 of Bitcoin/);
-  assert.match(sellLine({ price: 110, buyPrice: 100, sellPct: 50, gbp: 5.5 }), /up about 10%.*selling half of it.*£5\.50.*rest keeps growing/);
-  assert.match(sellLine({ price: 110, buyPrice: 100, sellPct: 100, gbp: 11 }), /all of it/);
-  assert.doesNotMatch(sellLine({ price: 110, buyPrice: 100, sellPct: 100, gbp: 11 }), /rest keeps growing/);
-  const all = [startLine({ amount: 1, fromLabel: 'x' }), buyLine({ price: 1, prevPrice: 2, amount: 1 }), sellLine({ price: 2, buyPrice: 1, sellPct: 25, gbp: 1 }), endLine({ profit: 5, end: 105, maxDrawdown: 40 })].join(' ');
-  assert.doesNotMatch(all, /you should|guarantee|will rise|get rich/i);
-});
-test('gardener mood lines fire once each and mention storms honestly', () => {
-  const seen = new Set();
-  assert.equal(moodLine({ ratio: 1.1, prevRatio: 1, seen }), null);
-  assert.match(moodLine({ ratio: 0.79, prevRatio: 0.9, seen }), /Storm clouds.*down about 21%/);
-  assert.equal(moodLine({ ratio: 0.78, prevRatio: 0.79, seen }), null);
-  assert.match(moodLine({ ratio: 0.49, prevRatio: 0.6, seen }), /half its value.*might not come back/);
-  assert.match(moodLine({ ratio: 1.02, prevRatio: 0.9, seen }), /sun’s back out/);
-  assert.match(moodLine({ ratio: 2.1, prevRatio: 1.9, seen }), /doubled/);
-  assert.match(endLine({ profit: -5, end: 95, maxDrawdown: 30 }), /below what we planted/);
 });

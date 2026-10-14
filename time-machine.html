@@ -6,14 +6,14 @@
 <title>The Bitcoin Garden — Time Machine</title>
 <meta name="description" content="Plant an imaginary £100 in the past and watch it grow through real Bitcoin history. A friendly simulation — no real money, no real trades.">
 <meta name="theme-color" content="#0c1d14">
-<link rel="stylesheet" href="./time-machine.css?v=1.14.2">
+<link rel="stylesheet" href="./time-machine.css?v=1.14.3">
 </head>
 <body>
 <a class="skip" href="#plant-heading">Skip to the plant</a>
 <main>
 <header>
   <div>
-    <div class="sub">🌱 THE BITCOIN GARDEN <span class="vtag" id="version">v1.14.2</span></div>
+    <div class="sub">🌱 THE BITCOIN GARDEN <span class="vtag" id="version">v1.14.3</span></div>
     <h1>Time Machine ⏳</h1>
     <div class="sub">Travel back in time to see what really happened to pretend money, or forward to see the range of futures the past suggests.</div>
   </div>
@@ -60,18 +60,7 @@
     </div>
   </div>
   <p class="err" id="error" role="alert" hidden></p>
-  <div class="explain"><b>Plant once, then watch:</b> imagine buying Bitcoin on your chosen date and keeping it. Travel through real historical prices to see what it would be worth. No trading strategies, pruning or selling along the way.</div><details class="advanced" id="advanced" hidden>
-    <summary>⚙️ Advanced settings (optional — safe to ignore!)</summary>
-    <div class="fields">
-      <div><label for="buyPct">Spend per buy (% of your pot)</label><input id="buyPct" type="number" inputmode="decimal" value="10" min="1" max="100" step="any"><p class="hint">Each buy spends this share of what you planted.</p></div>
-      <div><label for="dipPct">Buy after the price falls (%)</label><input id="dipPct" type="number" inputmode="decimal" value="5" min="0.5" max="90" step="any"><p class="hint">Measured from the last price we bought or sold at.</p></div>
-      <div><label for="risePct">Harvest after the price rises (%)</label><input id="risePct" type="number" inputmode="decimal" value="10" min="0.5" max="500" step="any"><p class="hint">Measured from the price we bought at.</p></div>
-      <div><label for="sellPct">Sell this much of each buy when it rises (%)</label><input id="sellPct" type="number" inputmode="decimal" value="50" min="1" max="100" step="any"><p class="hint">The rest is kept and keeps growing.</p></div>
-      <div><label for="feePct">Cost of each trade (%)</label><input id="feePct" type="number" inputmode="decimal" value="0.4" min="0" max="10" step="any"><p class="hint">Real exchanges charge a small fee.</p></div>
-      <div><label for="to">Stop travelling at (optional)</label><input id="to" type="date"><p class="hint">Leave empty to travel to the newest price.</p></div>
-    </div>
-    <button class="btn" id="defaults" type="button">Put the usual settings back</button>
-  </details>
+  <div class="explain"><b>Plant once, then watch:</b> imagine buying Bitcoin on your chosen date and keeping it. Travel through real historical prices to see what it would be worth. No trading strategies, pruning or selling along the way.</div>
 </section>
 
 <!-- ============ THE JOURNEY ============ -->
@@ -113,7 +102,6 @@
       <div class="legend">
         <span><b style="color:#8cf06a">━</b> Your Bitcoin investment</span>
         <span>● Bought Bitcoin once</span><span></span>
-        <label hidden><input type="checkbox" id="showHold">Compare</label>
       </div>
     </div>
     <p class="status" id="status" aria-live="polite">Loading Bitcoin's history…</p>
@@ -130,7 +118,6 @@
     <div class="fig" id="sPnlBox"><small id="sPnlLabel">Total profit</small><strong id="sPnl"></strong><span class="pct" id="sPct"></span></div>
     <div class="fig"><small>Bitcoin purchases</small><strong id="sTrades"></strong></div>
   </div>
-  <h3 id="vsHead" hidden>Comparison</h3><div id="vsBox" hidden><span id="vsMe"></span><span id="vsMePct"></span><span id="vsHold"></span><span id="vsHoldPct"></span></div><p id="vsText" hidden></p>
   <details class="advanced" id="purchaseMath"><summary>🧾 How was my final amount calculated?</summary><div class="explain" id="purchaseMathBody"></div></details>
   <p class="fine" id="sumFine"></p>
   <p class="fine"><b>Remember:</b> this is a history lesson, not a promise. What happened in the past is no guide to what will happen next, and Bitcoin can lose a lot of its value.</p>
@@ -231,6 +218,6 @@
 </div>
 <footer class="sitefoot">The Bitcoin Garden © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
 </main>
-<script type="module" src="./time-machine.js?v=1.14.2"></script>
+<script type="module" src="./time-machine.js?v=1.14.3"></script>
 </body>
 </html>
