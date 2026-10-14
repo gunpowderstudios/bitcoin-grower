@@ -1,0 +1,17 @@
+{
+  "name": "The Bitcoin Garden",
+  "short_name": "Bitcoin Garden",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0c1d14",
+  "theme_color": "#0c1d14",
+  "icons": [
+    {
+      "src": "./the_bitcoin_garden_app_icon.png",
+      "type": "image/png",
+      "sizes": "any",
+      "purpose": "any"
+    }
+  ]
+}
