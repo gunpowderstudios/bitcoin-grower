@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>How Green Is Your Garden? — The Bitcoin Garden</title>
+<meta name="description" content="The good, the bad and the complicated facts about Bitcoin mining, renewable electricity and emissions. An independent, source-backed guide.">
+<meta name="theme-color" content="#0c1d14">
+<link rel="icon" type="image/png" href="./the_bitcoin_garden_app_icon.png?v=1.14.4">
+<link rel="apple-touch-icon" href="./the_bitcoin_garden_app_icon.png?v=1.14.4">
+<link rel="manifest" href="./site.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Bitcoin Garden">
+<link rel="stylesheet" href="./time-machine.css?v=1.14.4">
+<style>
+.garden-hero{display:grid;grid-template-columns:clamp(128px,21vw,210px) minmax(0,1fr);gap:clamp(14px,3vw,32px);align-items:center}
+.garden-brand-mark{grid-column:1;grid-row:1;min-width:0;display:block;line-height:0;border-radius:12px}
+.garden-brand-mark:focus-visible{outline:3px solid #f7ce4d;outline-offset:4px}
+.garden-header-logo{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain;background:transparent;border:0;box-shadow:none}
+.garden-header-copy{grid-column:2;grid-row:1;min-width:0}
+.green-title{margin:0 0 8px;font-size:clamp(27px,3.8vw,47px);line-height:1.14}
+.green-title .vtag{font-size:12px;white-space:nowrap}
+.green-kicker{font-size:clamp(15px,1.7vw,21px);line-height:1.3;font-weight:800;margin:0 0 10px}
+.green-description{margin:0;color:#c5d9c1;font-size:clamp(13px,1.35vw,16px);line-height:1.5}
+.green-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.green-stat{padding:19px;border-radius:17px;border:1px solid #497c58;background:#142b1e}
+.green-number{font-size:clamp(26px,4.5vw,43px);font-weight:900;color:#f7ce4d;line-height:1.1}
+.green-stat p{margin:10px 0 0;font-size:14px;line-height:1.5}
+.green-note{color:#bed4bf;font-size:13px;line-height:1.6}
+.green-meter{display:flex;height:30px;border-radius:999px;overflow:hidden;border:2px solid #688368;margin-top:10px}
+.green-meter span{display:block;height:100%}
+.green-meter .renewable{width:42.6%;background:#78c58c}.green-meter .nuclear{width:9.8%;background:#e5c961}.green-meter .fossil{width:47.6%;background:#9c7771}
+.green-key{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}.green-key span{font-size:13px}.green-key b{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px}
+.green-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.green-panel{padding:18px;border:1px solid #497c58;background:#142b1e;border-radius:15px;line-height:1.6}
+.green-panel h3{margin:0 0 9px;font-size:20px}.green-panel p{margin:0}
+.green-faq details{border-bottom:1px solid #416c4b;padding:12px 0}
+.green-faq summary{cursor:pointer;font-weight:700;padding:7px 0}
+.green-faq details p{margin:8px 0 12px;line-height:1.6}
+.green-sources a,.green-panel a,.green-faq a{color:#f7ce4d}
+.green-facts{padding-left:22px;line-height:1.7}.green-facts li{margin-bottom:10px}
+.green-conclusion{font-size:18px;line-height:1.6}
+@media(max-width:640px){.garden-hero{grid-template-columns:clamp(88px,26vw,132px) minmax(0,1fr);gap:12px}.green-title{font-size:clamp(23px,6vw,35px)}.green-panels{grid-template-columns:1fr}.green-grid{grid-template-columns:1fr}}
+@media(max-width:360px){.garden-hero{grid-template-columns:76px minmax(0,1fr);gap:9px}.green-title{font-size:22px}}
+</style>
+</head>
+<body><main>
+<header class="garden-hero">
+<a class="garden-brand-mark" href="./" aria-label="Return to Bitcoin Garden home"><img class="garden-header-logo" src="./the_bitcoin_garden_app_icon.png?v=transparent-2" alt="The Bitcoin Garden tree logo" width="142" height="142"></a>
+<div class="garden-header-copy"><h1 class="green-title">How Green Is Your Garden? 🌍 <span class="vtag">v1.14.4</span></h1><h2 class="green-kicker">THE GOOD, THE BAD &amp; THE BITCOIN</h2><p class="green-description">Bitcoin uses real electricity. How much, where does it come from, and can mining actually help renewable energy?</p></div>
+</header>
+<nav aria-label="The Bitcoin Garden sections">
+<a href="./">🌱 Today’s Prices</a><a href="./time-machine.html">⏳ Time Machine</a><a href="./bitcoin-chatter.html">🗞️ Bitcoin Chatter</a><a class="active" href="./green-garden.html" aria-current="page">🌍 How Green Is Your Garden?</a>
+</nav>
+<section class="card" aria-labelledby="facts-heading"><h2 id="facts-heading">⚡ Bitcoin's electricity in numbers</h2><p>Here's a balanced snapshot from the <strong>Cambridge Digital Mining Industry Report, published April 2025</strong>. These are historical estimates, <strong>not live measurements</strong>.</p>
+<div class="green-grid">
+<div class="green-stat"><div class="green-number">138 TWh</div><p>Estimated electricity used by Bitcoin mining in a year, worldwide.</p></div>
+<div class="green-stat"><div class="green-number">0.54%</div><p>Estimated share of all electricity used globally.</p></div>
+<div class="green-stat"><div class="green-number">42.6%</div><p>Renewable electricity reported by surveyed miners (wind, solar, hydro and more).</p></div>
+<div class="green-stat"><div class="green-number">47.6%</div><p>Fossil-fuel electricity reported by surveyed miners (mainly natural gas and coal).</p></div>
+</div>
+<p class="green-note">Important: Cambridge surveyed 49 firms representing around 48% of Bitcoin's mining computing power. Their reported energy mix is not a full global census. Electricity use and greenhouse-gas emissions are modelled network-wide estimates. <a href="https://www.jbs.cam.ac.uk/faculty-research/centres/alternative-finance/publications/cambridge-digital-mining-industry-report/" target="_blank" rel="noopener noreferrer">Read Cambridge's methodology and findings ↗</a></p>
+</section>
+<section class="card" aria-labelledby="mix-heading"><h2 id="mix-heading">🌬️ Where does mining's power come from?</h2><p>According to the Cambridge 2025 survey, just over half the reported electricity came from renewable <em>and nuclear</em> sources combined. Nuclear is low-carbon, but it is <strong>not renewable</strong>.</p>
+<div class="green-meter" role="img" aria-label="Surveyed Bitcoin mining electricity mix: 42.6 percent renewable, 9.8 percent nuclear and 47.6 percent fossil fuels."><span class="renewable"></span><span class="nuclear"></span><span class="fossil"></span></div>
+<div class="green-key"><span><b style="background:#78c58c"></b>42.6% renewables</span><span><b style="background:#e5c961"></b>9.8% nuclear</span><span><b style="background:#9c7771"></b>47.6% fossil fuels</span></div>
+<p class="green-note">Within the surveyed mix: hydro 23.4%, wind 15.4%, solar 3.2%, other renewables around 0.5%, natural gas 38.2%, coal 8.9%, and oil around 0.5%. Rounded figures may not sum exactly to 100%. Source: <a href="https://www.jbs.cam.ac.uk/2025/cambridge-study-sustainable-energy-rising-in-bitcoin-mining/" target="_blank" rel="noopener noreferrer">University of Cambridge ↗</a>.</p></section>
+<section class="card"><h2>🌱 The good, the bad &amp; the complicated</h2>
+<div class="green-panels">
+<div class="green-panel"><h3>🌱 The good</h3><p>Mining can use renewable electricity, make use of electricity that would otherwise be curtailed, and switch off quickly when the grid needs power. Cambridge recorded miners reporting 888 GWh of curtailed load in 2023. These benefits depend on the location and arrangement.</p></div>
+<div class="green-panel"><h3>🏭 The bad</h3><p>Mining still consumes a great deal of electricity, some powered by fossil fuels. Cambridge's survey-based estimate was about <strong>39.8 million tonnes of CO₂-equivalent emissions annually</strong>; a different modelling approach produced a much higher estimate. Mining hardware also creates electronic waste.</p></div>
+<div class="green-panel"><h3>⚖️ The complicated</h3><p>Using a renewable source does not automatically make mining harmless. Electricity used by a miner might otherwise have served a household or displaced fossil-fuel generation. The real impact depends on where and when electricity is consumed — and what would have happened without mining.</p></div>
+</div></section>
+<section class="card green-faq"><h2>💬 Questions your friends might ask</h2>
+<details><summary>Does Bitcoin really use more electricity than some countries?</summary><p>Yes. Cambridge estimated around 138 terawatt-hours each year, comparable with the annual electricity use of some countries. Comparisons show the scale, but not whether the electricity comes from clean or polluting sources.</p></details>
+<details><summary>Is Bitcoin mostly powered by renewables?</summary><p>Not in the 2025 Cambridge survey: renewables were 42.6%. The often-quoted 52.4% figure includes 9.8% nuclear, which is low-carbon but not renewable. The survey represented roughly 48% of mining computing power, not every miner worldwide.</p></details>
+<details><summary>Can Bitcoin mining help wind and solar farms?</summary><p>Potentially. Flexible demand can buy otherwise wasted renewable electricity or help some projects earn revenue. But it doesn't automatically reduce emissions: in some places it might divert cleaner electricity away from other users.</p></details>
+<details><summary>Does Bitcoin produce electronic waste?</summary><p>Yes. Mining machines become obsolete. Cambridge's report estimated approximately 2.3 kilotonnes of mining-related electronic waste in 2024, while noting resale, reuse and recycling of decommissioned machines.</p></details>
+<details><summary>Is Bitcoin getting greener?</summary><p>Some surveyed miners reported cleaner power mixes and more efficient equipment, but estimated total electricity consumption has also risen. Improving efficiency alone doesn't guarantee a smaller overall environmental footprint.</p></details>
+</section>
+<section class="card"><h2>🍻 Five pub facts</h2><ol class="green-facts">
+<li><strong>Bitcoin uses electricity:</strong> roughly 0.54% of global consumption in Cambridge's 2025 estimate.</li>
+<li><strong>Renewable is not the same as low-carbon:</strong> 42.6% renewables, or 52.4% including nuclear, among surveyed miners.</li>
+<li><strong>Fossil fuels still matter:</strong> natural gas was the largest single reported energy source at 38.2%.</li>
+<li><strong>Mining can switch off:</strong> some operators cut demand when grids are under pressure.</li>
+<li><strong>It's not an all-or-nothing story:</strong> the net impact depends on the source, location and alternatives for that electricity.</li>
+</ol><p class="green-note">These are short conversation starters rather than an environmental verdict. All figures reflect research published in April 2025.</p></section>
+<section class="card green-sources"><h2>🔎 Where the facts come from</h2>
+<p><a href="https://www.jbs.cam.ac.uk/faculty-research/centres/alternative-finance/publications/cambridge-digital-mining-industry-report/" target="_blank" rel="noopener noreferrer">University of Cambridge — Digital Mining Industry Report (April 2025) ↗</a></p>
+<p><a href="https://www.jbs.cam.ac.uk/2025/cambridge-study-sustainable-energy-rising-in-bitcoin-mining/" target="_blank" rel="noopener noreferrer">University of Cambridge — summary of mining energy and emissions findings ↗</a></p>
+<p class="green-note">Research date: April 2025. Page assembled October 2026. The estimates will change as electricity grids and mining activity change. This page is an educational overview, not a real-time environmental tracker.</p>
+<h2>So, is Bitcoin green?</h2><p class="green-conclusion">Not entirely — but not entirely dirty either. Bitcoin uses considerable electricity, and much of it still comes from fossil fuels. Some mining makes use of cleaner, flexible energy; other mining adds pollution or competes with other electricity users. A fair answer weighs <strong>where the power comes from, what it might otherwise have powered, and whether the benefits justify the costs.</strong></p>
+</section>
+<footer class="sitefoot">The Bitcoin Garden © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
+</main></body></html>
