@@ -24,6 +24,14 @@
 @media(max-width:750px){.buy-grid{grid-template-columns:1fr}}
 @media(max-width:640px){.garden-hero{grid-template-columns:clamp(88px,26vw,132px) minmax(0,1fr);gap:12px}.buy-title{font-size:clamp(23px,6vw,35px)}}
 @media(max-width:360px){.garden-hero{grid-template-columns:76px minmax(0,1fr);gap:9px}.buy-title{font-size:22px}}
+.buy-fee-scroll{overflow-x:auto;margin:18px 0;border-radius:12px;border:1px solid #497c58}
+.buy-fees{width:100%;min-width:590px;border-collapse:collapse;text-align:left}
+.buy-fees th,.buy-fees td{padding:15px;vertical-align:top;border-bottom:1px solid #416c4b;line-height:1.5}
+.buy-fees thead th{background:#24422e;color:#f7ce4d}
+.buy-fees tbody th{color:#f7ce4d;min-width:120px}
+.buy-fees tbody th small{font-size:12px;color:#c5d9c1;font-weight:400}
+.buy-fees tbody tr:last-child th,.buy-fees tbody tr:last-child td{border-bottom:0}
+@media(max-width:640px){.buy-fees th,.buy-fees td{padding:12px}}
 </style></head><body><main>
 <header class="garden-hero">
 <a class="garden-brand-mark" href="./" aria-label="Return to Bitcoin Garden home"><img class="garden-header-logo" src="./the_bitcoin_garden_app_icon.png?v=transparent-2" alt="The Bitcoin Garden tree logo" width="142" height="142"></a>
@@ -42,6 +50,19 @@
 <article class="buy-box"><h3>🐙 Kraken</h3><p>Established specialist crypto exchange. Offers UK Bitcoin purchasing and more advanced tools if you later want them. Check the fee and spread for the particular buying method.</p><p><a href="https://www.kraken.com/en-gb/buy/btc" target="_blank" rel="noopener noreferrer">Kraken Bitcoin guide ↗</a></p></article>
 </div>
 <p class="buy-note">No affiliate or referral links. “Established” does not mean risk-free or fully FCA-authorised for every service. Registration for anti-money-laundering supervision is not the same thing as FSCS protection.</p>
+</section>
+<section class="card" aria-labelledby="fee-heading">
+<h2 id="fee-heading">💷 What are the transaction fees?</h2>
+<p>The amount of Bitcoin you receive depends on <strong>trading fees plus the spread</strong> (the difference between quoted buy and sell prices). Here is a practical comparison for someone buying Bitcoin in the UK.</p>
+<div class="buy-fee-scroll" role="region" aria-label="Bitcoin buying fees comparison" tabindex="0">
+<table class="buy-fees"><thead><tr><th scope="col">Provider</th><th scope="col">Typical trading fee</th><th scope="col">Also check</th></tr></thead>
+<tbody>
+<tr><th scope="row">Revolut<br><small>Standard / Plus</small></th><td><strong>1.49%</strong> or a minimum fee, whichever is higher. For example, the published minimum for a £100–£150 trade is £2.49.</td><td>Quoted exchange rate, fair-usage fees where applicable, and BTC withdrawal charges. Higher-tier plans have different rates.</td></tr>
+<tr><th scope="row">Coinbase<br><small>Simple buy</small></th><td><strong>Varies by order</strong> — review the fee in your purchase preview.</td><td>A spread is included in the quoted Bitcoin price. Coinbase Advanced uses a separate maker/taker schedule.</td></tr>
+<tr><th scope="row">Kraken<br><small>Pro spot trading</small></th><td><strong>From about 0.40% maker / 0.80% taker</strong> at the entry tier, with lower fees at higher qualifying tiers.</td><td>Kraken's simple Instant Buy uses different pricing; compare the preview, payment method and Bitcoin withdrawal fee.</td></tr>
+</tbody></table></div>
+<p class="buy-note">Published rates checked October 2026. These examples are <strong>not guaranteed quotes</strong>: rates, tiers and products can change. A maker order sits on an order book; a taker order executes against an existing order. Check the final BTC received, not only the advertised fee.</p>
+<p class="buy-note">Official fee schedules: <a href="https://www.revolut.com/legal/exchangingcryptocurrenciespersonalfees/" target="_blank" rel="noopener noreferrer">Revolut ↗</a> · <a href="https://help.coinbase.com/en-gb/coinbase/trading-and-funding/pricing-and-fees/fees" target="_blank" rel="noopener noreferrer">Coinbase ↗</a> · <a href="https://www.kraken.com/features/fee-schedule" target="_blank" rel="noopener noreferrer">Kraken ↗</a>.</p>
 </section>
 <section class="card"><h2>🪙 Six simple steps</h2><ol class="buy-steps">
 <li><strong>Choose a provider.</strong> Use its official website or app-store listing — never an unsolicited link or advertisement.</li>
