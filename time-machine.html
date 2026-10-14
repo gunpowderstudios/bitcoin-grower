@@ -8,6 +8,15 @@
 <meta name="theme-color" content="#0c1d14">
 <link rel="stylesheet" href="./time-machine.css?v=1.14.4">
 <style>
+/* Consistent clickable Bitcoin Garden masthead across all public pages */
+.garden-hero{display:grid;grid-template-columns:clamp(128px,21vw,210px) minmax(0,1fr);gap:clamp(14px,3vw,32px);align-items:center}
+.garden-hero .garden-brand-mark{grid-column:1;grid-row:1;min-width:0;display:block;line-height:0;border-radius:12px}
+.garden-hero .garden-brand-mark:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+.garden-hero .garden-header-logo{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain;background:transparent;border:0;border-radius:0;box-shadow:none}
+.garden-hero .garden-header-copy{grid-column:2;grid-row:1;min-width:0}
+@media(max-width:640px){.garden-hero{grid-template-columns:clamp(88px,26vw,132px) minmax(0,1fr);gap:12px}.garden-hero h1{font-size:clamp(23px,6vw,35px);line-height:1.15}}
+@media(max-width:360px){.garden-hero{grid-template-columns:76px minmax(0,1fr);gap:9px}.garden-hero h1{font-size:22px}}
+
 /* Time Machine page heading hierarchy, matching the homepage */
 .tm-page-header h1{margin:0 0 9px;line-height:1.15}
 .tm-page-header h1 .vtag{vertical-align:middle;font-size:12px;white-space:nowrap}
@@ -30,8 +39,9 @@
 <body>
 <a class="skip" href="#plant-heading">Skip to the plant</a>
 <main>
-<header class="tm-page-header">
-  <div>
+<header class="tm-page-header garden-hero">
+  <a class="garden-brand-mark" href="./" aria-label="Return to Bitcoin Garden home"><img class="garden-header-logo" src="./the_bitcoin_garden_app_icon.png?v=transparent-2" alt="The Bitcoin Garden tree logo" width="142" height="142"></a>
+  <div class="garden-header-copy">
     <h1>Time Machine ⏳ <span class="vtag" id="version">v1.14.4</span></h1>
     <h2 class="tm-header-subtitle">SIMULATION · NO REAL MONEY OR TRADES</h2>
     <p class="tm-header-description">Travel back in time to see what really happened to pretend money, or forward to see the range of futures the past suggests.</p>
