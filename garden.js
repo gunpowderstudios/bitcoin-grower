@@ -1,17 +1,20 @@
+import {initCurrency,money,moneyShort,toGBP,currency,symbol} from './currency.js?v=1.14.4-c1';
 // The Bitcoin Garden — Today's Prices page controller. Simulation only; read-only public price data.
-import { VERSION, formatGBP, signedPct, addDays, dayNumber, describeData } from './time-machine-engine.js?v=1.14.4';
+import { VERSION, signedPct, addDays, dayNumber, describeData } from './time-machine-engine.js?v=1.14.4';
 import { loadHistory } from './price-data.js?v=1.14.4';
 import { fetchLive, fetchSeries } from './live-price.js?v=1.14.4';
 import { RANGES, RANGE_ORDER, historySeries, changeOver, trimToWindow, downsample, axisLabel, tooltipLabel } from './price-ranges.js?v=1.14.4';
 import { forecast, describe, changeSince, SINCE_CHOICES } from './forecast-engine.js?v=1.14.4';
 
 const $ = id => document.getElementById(id);
+await initCurrency();
+const formatGBP = money;
 const NS = 'http://www.w3.org/2000/svg';
 const svgEl = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const fmtDate = d => Number(d.slice(8)) + ' ' + MONTHS[Number(d.slice(5, 7)) - 1] + ' ' + d.slice(0, 4);
 const money0 = n => formatGBP(n).replace(/\.00$/, '');
-const axis = n => '£' + Math.round(n).toLocaleString('en-GB');
+const axis = n => symbol() + Math.round(n * (toGBP(1) ** -1)).toLocaleString('en-GB');
 
 $('version').textContent = 'v' + VERSION;
 const S = { points: null, live: null, price: null, horizon: 365, timer: 0, tick: 0, range: '1y', series: null, source: '', unavailable: {} };
@@ -24,7 +27,7 @@ function setChange(el, pct) {
 }
 function renderPrice() {
   const l = S.live, price = S.price;
-  $('price').textContent = Number.isFinite(price) ? formatGBP(price) : '£—';
+  $('price').textContent = Number.isFinite(price) ? formatGBP(price) : symbol()+'—';
   const ch = $('change');
   if (l && l.changePct != null) {
     const up = l.changePct > 0.05, down = l.changePct < -0.05;
@@ -68,7 +71,7 @@ function renderSeedText() {
   if (S.range !== '1y') { const c = changeOver(S.series || []); if (!c) return; pct = c.pct; ref = ''; }
   if (pct == null) return;
   const worth = 100 * (1 + pct / 100), diff = worth - 100;
-  $('seedText').textContent = '🌱 A £100 seed planted ' + AGO[S.range] + ref + ' would be worth ' + formatGBP(worth) + ' today — ' + (diff >= 0 ? 'up ' : 'down ') + formatGBP(Math.abs(diff)) + ' (' + signedPct(pct) + ').' + (S.range !== '1y' ? '' : '');
+  $('seedText').textContent = '🌱 A ' + money(100) + ' seed planted ' + AGO[S.range] + ref + ' would be worth ' + formatGBP(worth) + ' today — ' + (diff >= 0 ? 'up ' : 'down ') + formatGBP(Math.abs(diff)) + ' (' + signedPct(pct) + ').' + (S.range !== '1y' ? '' : '');
 }
 // ---------------------------------------------------------------- charts
 async function loadRange(key) {
@@ -103,13 +106,13 @@ function drawChart() {
   const ch = $('rangeChange');
   if (!S.series || S.series.length < 2) {
     ch.className = 'rangechg'; ch.textContent = S.unavailable[S.range] ? 'This view needs the live price feed, which isn’t reachable right now. Try 1W, 1M, 1Y or All.' : 'Loading…';
-    $('rangeLegend').textContent = 'Bitcoin’s price (£)'; return;
+    $('rangeLegend').textContent = 'Bitcoin’s price ('+currency()+')'; return;
   }
   renderSeedText();
   const series = S.series, chg = changeOver(series), up = chg.pct > 0.05, down = chg.pct < -0.05;
   ch.className = 'rangechg ' + (up ? 'up' : down ? 'down' : '');
   ch.textContent = (up ? '▲ ' : down ? '▼ ' : '■ ') + signedPct(chg.pct) + ' over ' + r.words;
-  $('rangeLegend').textContent = 'Bitcoin’s price over ' + r.words + ' (£) · from ' + S.source;
+  $('rangeLegend').textContent = 'Bitcoin’s price over ' + r.words + ' ('+currency()+') · from ' + S.source;
   $('yearChart').setAttribute('aria-label', 'Bitcoin price over ' + r.words + ': ' + signedPct(chg.pct) + ', from ' + money0(chg.from) + ' to ' + money0(chg.to));
   const X0 = 74, X1 = 688, Y0 = 14, Y1 = 192, d0 = series[0].x, d1 = series.at(-1).x, span = d1 - d0;
   let lo = Infinity, hi = -Infinity; for (const s of series) { lo = Math.min(lo, s.v); hi = Math.max(hi, s.v); }
@@ -166,7 +169,7 @@ function drawFan(f) {
 // Colour only the values that change with the selected amount or time period.
 function markForecastChanges(target, copy) {
   target.replaceChildren();
-  const pattern = /(£[\d,]+(?:\.\d+)?|\b\d+-year(?:\s+stretches?|\s+stretch)?|\b\d+\s+(?:months?|days?|years?)\b|\b\d+(?=\s+of every 100)|\b\d+(?=\s+completely separate))/g;
+  const pattern = /((?:£|C\$|A\$|\$|€)[\d,]+(?:\.\d+)?|\b\d+-year(?:\s+stretches?|\s+stretch)?|\b\d+\s+(?:months?|days?|years?)\b|\b\d+(?=\s+of every 100)|\b\d+(?=\s+completely separate))/g;
   let start = 0;
   for (const match of copy.matchAll(pattern)) {
     const at = match.index;
@@ -189,7 +192,7 @@ function animateForecastChange() {
 function renderForecast() {
   if (!S.points) return;
   $('error').hidden = true;
-  const amount = Number($('fAmount').value);
+  const amount = toGBP(Number($('fAmount').value));
   try {
     const f = forecast(S.points, { amount, horizonDays: S.horizon, since: SINCE_CHOICES[$('since').value] });
     const d = describe(f, money0);

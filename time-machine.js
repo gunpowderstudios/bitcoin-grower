@@ -1,7 +1,8 @@
+import {initCurrency,money,moneyShort,toGBP,currency,symbol} from './currency.js?v=1.14.4-c1';
 // Bitcoin Garden Time Machine — page controller (v1.14.4). Simulation only: no accounts, keys or trading.
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
-  addDays, addYears, dayNumber, formatGBP, signedGBP, signedPct
+  addDays, addYears, dayNumber, signedPct
 } from './time-machine-engine.js?v=1.14.4';
 import { createPlant } from './time-machine-plant.js?v=1.14.4-fruit-2';
 import { createSound } from './time-machine-sound.js?v=1.14.4';
@@ -10,6 +11,9 @@ import { createRace } from './time-machine-race.js?v=1.14.4-fruit-2';
 import { forecast, describe as describeForecast, futureFrames, cashInForecast, SINCE_CHOICES } from './forecast-engine.js?v=1.14.4';
 
 const $ = id => document.getElementById(id);
+await initCurrency();
+const formatGBP = money;
+const signedGBP = n => (n>0.004?'+':n< -0.004?'−':'')+money(Math.abs(n));
 const NS = 'http://www.w3.org/2000/svg';
 const DURATION = { slow: 70000, normal: 28000, fast: 10000 }; // how long a whole journey takes at each speed (ms)
 const MIN_FRAMES_PER_SEC = 4;
@@ -107,7 +111,7 @@ function updateDateHint() {
   if (yrs > 0 && from < '2014-01-01') $('dateHint').textContent += ' Heads up: prices before 2014 are sparse and less reliable, and Bitcoin was tiny then, so results can look enormous. Bitcoin began in 2009, but ' + fmtLong(S.data.first) + ' is the earliest day we have prices for.';
 }
 function readSettings() {
-  return validateSettings({ amount: $('amount').value === '' ? NaN : $('amount').value, strategy: 'hold' });
+  return validateSettings({ amount: $('amount').value === '' ? NaN : toGBP(Number($('amount').value)), strategy: 'hold' });
 }
 $('from').addEventListener('input', () => { showError(''); syncPresets(); updateDateHint(); });
 $('amount').addEventListener('input', () => { showError(''); if (S.state === 'idle') showIdleFigures(); });
@@ -115,7 +119,7 @@ $('amount').addEventListener('input', () => { showError(''); if (S.state === 'id
 // ---------------------------------------------------------------- idle (nothing running yet)
 function showIdleFigures() {
   const a = Number($('amount').value);
-  const v = Number.isFinite(a) && a > 0 ? a : DEFAULTS.amount;
+  const v = Number.isFinite(a) && a > 0 ? toGBP(a) : DEFAULTS.amount;
   $('figStart').textContent = formatGBP(v); $('figNow').textContent = formatGBP(v);
   setPnl(0, 0, true);
 }
@@ -470,7 +474,7 @@ window.addEventListener('resize', () => { if (window.innerWidth === lastW) retur
 const FW = { days: 365 };
 const money0 = n => formatGBP(n).replace(/\.00$/, '');
 function updateModeText() {
-  const cash = isCash(), a = Number($('fwAmount').value), amt = money0(Number.isFinite(a) && a > 0 ? a : DEFAULTS.amount);
+  const cash = isCash(), a = Number($('fwAmount').value), amt = money0(Number.isFinite(a) && a > 0 ? toGBP(a) : DEFAULTS.amount);
   $('fwCashStep').hidden = !cash; $('fwGoNum').textContent = cash ? '4' : '3';
   $('fw-heading').textContent = cash ? '✂️ Plant today, prune as it grows' : '🚀 Launch into the future';
   $('fwIntro').textContent = cash
@@ -502,7 +506,7 @@ for (const b of $('fwHorizons').querySelectorAll('button')) b.onclick = () => { 
 $('fwGo').onclick = () => {
   $('fwError').hidden = true;
   try {
-    const today = new Date().toISOString().slice(0, 10), amount = Number($('fwAmount').value);
+    const today = new Date().toISOString().slice(0, 10), amount = toGBP(Number($('fwAmount').value));
     $('fwCashSum').hidden = true;
     if (isCash()) { launchCashIn(amount, today); return; }
     const f = forecast(S.data.points, { amount, horizonDays: FW.days, since: SINCE_CHOICES[$('fwSince').value] });

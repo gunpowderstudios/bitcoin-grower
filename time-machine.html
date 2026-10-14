@@ -39,7 +39,7 @@
   #scene > svg.plant{margin-top:-24px}
 }
 </style>
-</head>
+<style>.currency-bar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:10px 0 18px;font-size:14px}.currency-bar label{font-weight:700}.currency-bar select{color:#14251b;background:#ffedac;border:1px solid #ddbb5d;padding:10px 12px;border-radius:9px;font:inherit;max-width:100%;min-height:44px}.currency-bar small{flex-basis:100%;color:#bbd1b9;line-height:1.5}</style></head>
 <body>
 <a class="skip" href="#plant-heading">Skip to the plant</a>
 <main>
@@ -57,6 +57,7 @@
   <a href="./green-garden.html">🌍 How Green Is Your Garden?</a>
 <a href="./bitcoin-chatter.html">🗞️ Bitcoin Chatter</a>
 </nav>
+<div class="currency-bar"><label for="currencySelect">Display currency</label><select id="currencySelect" aria-label="Display currency"><option value="GBP">🇬🇧 GBP — British pound</option><option value="USD">🇺🇸 USD — US dollar</option><option value="EUR">🇪🇺 EUR — Euro</option><option value="CAD">🇨🇦 CAD — Canadian dollar</option><option value="AUD">🇦🇺 AUD — Australian dollar</option></select><small id="currencyNote">Base currency: GBP.</small></div>
 
 <!-- ============ WHICH WAY? ============ -->
 <section class="card modes" aria-labelledby="mode-heading">
@@ -76,8 +77,8 @@
     <div class="step">
       <div class="num" aria-hidden="true">1</div>
       <label for="amount">How much money would you like to plant?</label>
-      <div class="money"><span aria-hidden="true">£</span><input id="amount" type="number" inputmode="decimal" min="1" max="1000000" step="any" value="100" autocomplete="off"></div>
-      <p class="hint">£100 is a good start. It's pretend money, so you can't lose a penny.</p>
+      <div class="money"><span aria-hidden="true" data-currency-symbol>£</span><input id="amount" type="number" inputmode="decimal" min="1" max="1000000" step="any" value="100" autocomplete="off"></div>
+      <p class="hint">100 in your chosen currency is a good start. It's pretend money, so you can't lose a penny.</p>
     </div>
     <div class="step">
       <div class="num" aria-hidden="true">2</div>
@@ -181,7 +182,7 @@
     <div class="step">
       <div class="num" aria-hidden="true">1</div>
       <label for="fwAmount">If you planted (or already own) this much today…</label>
-      <div class="money"><span aria-hidden="true">£</span><input id="fwAmount" type="number" inputmode="decimal" min="1" max="1000000" step="any" value="100" autocomplete="off"></div>
+      <div class="money"><span aria-hidden="true" data-currency-symbol>£</span><input id="fwAmount" type="number" inputmode="decimal" min="1" max="1000000" step="any" value="100" autocomplete="off"></div>
     </div>
     <div class="step">
       <div class="num" aria-hidden="true">2</div>
@@ -253,6 +254,6 @@
 </div>
 <footer class="sitefoot">The Bitcoin Garden © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
 </main>
-<script type="module" src="./time-machine.js?v=1.14.4-weather-1"></script>
+<script type="module" src="./time-machine.js?v=1.14.4-currency-1"></script>
 </body>
 </html>
