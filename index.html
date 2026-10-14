@@ -8,6 +8,13 @@
 <meta name="theme-color" content="#0c1d14">
 <link rel="stylesheet" href="./time-machine.css?v=1.14.3">
 <link rel="stylesheet" href="./garden.css?v=1.14.3">
+<style>
+/* Header logo — stays compact on phones */
+.garden-brand-mark{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-shrink:0}
+.garden-header-logo{display:block;width:clamp(88px,12vw,142px);height:auto;aspect-ratio:1;object-fit:contain;border-radius:14px}
+@media(max-width:640px){header:has(.garden-brand-mark){align-items:flex-start;gap:10px}.garden-brand-mark{flex-direction:column;align-items:flex-end;gap:6px}.garden-header-logo{width:88px}.garden-brand-mark .badge{font-size:10px;max-width:125px;text-align:center;white-space:normal}}
+@media(max-width:390px){.garden-header-logo{width:70px}.garden-brand-mark .badge{font-size:9px;max-width:95px}}
+</style>
 </head>
 <body>
 <main>
@@ -17,7 +24,7 @@
     <h1>Today’s Prices ☀️</h1>
     <div class="sub">Bitcoin’s price right now, how it’s moved over time, and a “weather forecast” of where it could go next.</div>
   </div>
-  <span class="badge">SIMULATION · NO REAL MONEY OR TRADES</span>
+  <div class="garden-brand-mark"><img class="garden-header-logo" src="./the_bitcoin_garden_app_icon.png" alt="The Bitcoin Garden logo: a tree with gold Bitcoin coins" width="142" height="142"><span class="badge">SIMULATION · NO REAL MONEY OR TRADES</span></div>
 </header>
 <nav aria-label="The Bitcoin Garden sections">
   <a class="active" href="./" aria-current="page">🌱 Today’s Prices</a>
