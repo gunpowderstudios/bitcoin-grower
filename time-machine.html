@@ -7,6 +7,19 @@
 <meta name="description" content="Plant an imaginary £100 in the past and watch it grow through real Bitcoin history. A friendly simulation — no real money, no real trades.">
 <meta name="theme-color" content="#0c1d14">
 <link rel="stylesheet" href="./time-machine.css?v=1.14.3">
+<style>
+/* Larger market weather and higher-positioned tree in Back in Time only. */
+#scene .garden-weather{top:24px;right:28px;width:160px;height:150px;opacity:1}
+#scene .garden-weather .weather-sun,#scene .garden-weather .weather-cloud{font-size:92px;right:14px;top:0;filter:drop-shadow(0 3px 6px rgba(0,0,0,.12))}
+#scene .garden-weather .weather-rain{top:75px;right:16px;width:112px;height:74px;background-size:30px 45px}
+#scene > svg.plant{margin-top:-55px}
+@media(max-width:640px){
+  #scene .garden-weather{top:16px;right:14px;width:110px;height:105px;transform:none}
+  #scene .garden-weather .weather-sun,#scene .garden-weather .weather-cloud{font-size:62px;right:8px}
+  #scene .garden-weather .weather-rain{top:52px;right:8px;width:78px;height:52px;background-size:23px 36px}
+  #scene > svg.plant{margin-top:-24px}
+}
+</style>
 </head>
 <body>
 <a class="skip" href="#plant-heading">Skip to the plant</a>
