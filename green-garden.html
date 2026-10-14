@@ -40,6 +40,14 @@
 .green-conclusion{font-size:18px;line-height:1.6}
 @media(max-width:640px){.garden-hero{grid-template-columns:clamp(88px,26vw,132px) minmax(0,1fr);gap:12px}.green-title{font-size:clamp(23px,6vw,35px)}.green-panels{grid-template-columns:1fr}.green-grid{grid-template-columns:1fr}}
 @media(max-width:360px){.garden-hero{grid-template-columns:76px minmax(0,1fr);gap:9px}.green-title{font-size:22px}}
+.energy-comparison{display:grid;gap:17px;margin:24px 0}
+.energy-comparison-row{display:grid;grid-template-columns:minmax(125px,210px) minmax(90px,1fr) 95px;align-items:center;gap:12px}
+.energy-comparison-row strong{font-size:14px;line-height:1.3}.energy-comparison-row em{font-weight:400;font-size:12px}
+.energy-comparison-row>b{color:#f7ce4d;text-align:right;white-space:nowrap}
+.energy-track{height:25px;background:#193623;border-radius:99px;overflow:hidden}
+.energy-bar{display:block;height:100%;border-radius:99px;min-width:4px}
+.energy-bitcoin{background:#f7ce4d}.energy-dc{background:#77bd8c}.energy-future{background:#b2a4e7}
+@media(max-width:640px){.energy-comparison-row{grid-template-columns:1fr 84px;gap:6px}.energy-comparison-row strong{grid-column:1/-1}.energy-track{grid-column:1}.energy-comparison-row>b{grid-column:2}}
 </style>
 </head>
 <body><main>
@@ -69,6 +77,34 @@
 <div class="green-panel"><h3>🏭 The bad</h3><p>Mining still consumes a great deal of electricity, some powered by fossil fuels. Cambridge's survey-based estimate was about <strong>39.8 million tonnes of CO₂-equivalent emissions annually</strong>; a different modelling approach produced a much higher estimate. Mining hardware also creates electronic waste.</p></div>
 <div class="green-panel"><h3>⚖️ The complicated</h3><p>Using a renewable source does not automatically make mining harmless. Electricity used by a miner might otherwise have served a household or displaced fossil-fuel generation. The real impact depends on where and when electricity is consumed — and what would have happened without mining.</p></div>
 </div></section>
+<section class="card" aria-labelledby="future-heading">
+<h2 id="future-heading">🔮 Greener tomorrow? What might power Bitcoin next?</h2>
+<p>There is <strong>no trustworthy single forecast</strong> for Bitcoin's renewable-energy share in 2030. Here's what could change — and what could hold it back. These are <strong>possibilities, not predictions</strong>.</p>
+<div class="green-panels">
+<div class="green-panel"><h3>☀️ More wind &amp; solar?</h3><p>Miners may move towards cheaper renewable power and operate mainly when plentiful energy is available. But mining needs to be genuinely flexible: electricity called “green” isn't automatically spare electricity.</p></div>
+<div class="green-panel"><h3>🔌 A flexible grid customer?</h3><p>Mining can shut down quickly during grid stress. Cambridge's surveyed miners reported <strong>888 GWh</strong> of curtailed load during 2023. That's evidence of flexibility, not proof that every operation makes a grid greener.</p></div>
+<div class="green-panel"><h3>♨️ Waste heat &amp; gas?</h3><p>Some projects seek to reuse mining heat, or run on gas that would otherwise be flared. The emissions benefit depends on what would otherwise happen — burning gas can still create CO₂, and methane leakage matters.</p></div>
+</div>
+<h3>Three possible futures — not numerical forecasts</h3>
+<div class="green-grid">
+<div class="green-stat"><strong>🌱 Greener route</strong><p>More truly surplus renewables, cleaner power grids, demand response and useful heat recovery could reduce emissions per unit of electricity used.</p></div>
+<div class="green-stat"><strong>🌧️ Dirtier route</strong><p>Rising mining demand, fossil-powered expansion and weak oversight could push absolute electricity use and emissions higher, even as machines become more efficient.</p></div>
+</div>
+<p class="green-note">A key twist: Cambridge found mining hardware efficiency improved around <strong>24% year-on-year</strong> by June 2024, while annualised network electricity consumption still rose around <strong>17%</strong>. More efficient machines don't guarantee less total electricity use. <a href="https://www.jbs.cam.ac.uk/faculty-research/centres/alternative-finance/publications/cambridge-digital-mining-industry-report/" target="_blank" rel="noopener noreferrer">Cambridge report ↗</a></p>
+</section>
+<section class="card" aria-labelledby="compare-heading">
+<h2 id="compare-heading">🏢 Bitcoin vs data centres — how much electricity?</h2>
+<p>To put Bitcoin in perspective, compare it with the much larger global data-centre sector. Data centres support cloud services, social media, streaming, ordinary websites and increasingly AI — <strong>not just social media</strong>.</p>
+<div class="energy-comparison" role="img" aria-label="Annualised Bitcoin mining electricity estimate 138 terawatt-hours; all global data centres consumed about 415 terawatt-hours in 2024; IEA projects 945 terawatt-hours for all data centres in 2030.">
+<div class="energy-comparison-row"><strong>Bitcoin mining</strong><div class="energy-track"><span class="energy-bar energy-bitcoin" style="width:14.6%"></span></div><b>138 TWh</b></div>
+<div class="energy-comparison-row"><strong>All data centres, 2024</strong><div class="energy-track"><span class="energy-bar energy-dc" style="width:43.9%"></span></div><b>415 TWh</b></div>
+<div class="energy-comparison-row"><strong>All data centres, 2030 <em>(IEA projection)</em></strong><div class="energy-track"><span class="energy-bar energy-future" style="width:100%"></span></div><b>945 TWh</b></div>
+</div>
+<p class="green-note">Sources: <a href="https://www.jbs.cam.ac.uk/2025/cambridge-study-sustainable-energy-rising-in-bitcoin-mining/" target="_blank" rel="noopener noreferrer">Cambridge (Bitcoin mining, 2025 annualised estimate) ↗</a> and <a href="https://www.iea.org/reports/energy-and-ai/executive-summary" target="_blank" rel="noopener noreferrer">IEA Energy and AI (data centres, 2024 actual estimate and 2030 projection) ↗</a>. These have different reporting periods and estimation methods; the categories may overlap depending on definitions. <strong>Do not add the bars together.</strong></p>
+<h3>What about social media, Netflix or AI?</h3>
+<p>There is no similarly robust, up-to-date <strong>global electricity figure for all social media alone</strong> in these sources. Social media, video streaming and AI share data-centre infrastructure, and users' phones, televisions, networks and home routers also consume electricity. Comparing a social-media estimate with the whole Bitcoin network without matching boundaries would be misleading.</p>
+<p><strong>One useful comparison:</strong> Bitcoin's 138 TWh annualised estimate was roughly <strong>one-third</strong> of the IEA's 415 TWh for all data centres in 2024. That's a comparison of scale, <em>not</em> a ranking of usefulness, carbon emissions or environmental harm.</p>
+</section>
 <section class="card green-faq"><h2>💬 Questions your friends might ask</h2>
 <details><summary>Does Bitcoin really use more electricity than some countries?</summary><p>Yes. Cambridge estimated around 138 terawatt-hours each year, comparable with the annual electricity use of some countries. Comparisons show the scale, but not whether the electricity comes from clean or polluting sources.</p></details>
 <details><summary>Is Bitcoin mostly powered by renewables?</summary><p>Not in the 2025 Cambridge survey: renewables were 42.6%. The often-quoted 52.4% figure includes 9.8% nuclear, which is low-carbon but not renewable. The survey represented roughly 48% of mining computing power, not every miner worldwide.</p></details>
@@ -86,7 +122,8 @@
 <section class="card green-sources"><h2>🔎 Where the facts come from</h2>
 <p><a href="https://www.jbs.cam.ac.uk/faculty-research/centres/alternative-finance/publications/cambridge-digital-mining-industry-report/" target="_blank" rel="noopener noreferrer">University of Cambridge — Digital Mining Industry Report (April 2025) ↗</a></p>
 <p><a href="https://www.jbs.cam.ac.uk/2025/cambridge-study-sustainable-energy-rising-in-bitcoin-mining/" target="_blank" rel="noopener noreferrer">University of Cambridge — summary of mining energy and emissions findings ↗</a></p>
-<p class="green-note">Research date: April 2025. Page assembled October 2026. The estimates will change as electricity grids and mining activity change. This page is an educational overview, not a real-time environmental tracker.</p>
+<p><a href="https://www.iea.org/reports/energy-and-ai/executive-summary" target="_blank" rel="noopener noreferrer">IEA — Energy and AI: data-centre electricity and 2030 projection (2025) ↗</a></p>
+<p class="green-note">Core Bitcoin research: April 2025. Comparative IEA research: 2025. Page updated October 2026. The estimates will change as electricity grids and mining activity change. This page is an educational overview, not a real-time environmental tracker.</p>
 <h2>So, is Bitcoin green?</h2><p class="green-conclusion">Not entirely — but not entirely dirty either. Bitcoin uses considerable electricity, and much of it still comes from fossil fuels. Some mining makes use of cleaner, flexible energy; other mining adds pollution or competes with other electricity users. A fair answer weighs <strong>where the power comes from, what it might otherwise have powered, and whether the benefits justify the costs.</strong></p>
 </section>
 <footer class="sitefoot">The Bitcoin Garden © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
