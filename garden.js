@@ -163,6 +163,29 @@ function drawFan(f) {
   }
   $('fanChart').setAttribute('aria-label', 'Range of possible values for ' + money0(f.amount) + ' after ' + H + ' days: 8 in 10 past cases ended between ' + money0(e.p10) + ' and ' + money0(e.p90));
 }
+// Colour only the values that change with the selected amount or time period.
+function markForecastChanges(target, copy) {
+  target.replaceChildren();
+  const pattern = /(£[\\d,]+(?:\\.\\d+)?|\\b\\d+-year(?:\\s+stretches?|\\s+stretch)?|\\b\\d+\\s+(?:months?|days?|years?)\\b|\\b\\d+(?=\\s+of every 100)|\\b\\d+(?=\\s+completely separate))/g;
+  let start = 0;
+  for (const match of copy.matchAll(pattern)) {
+    const at = match.index;
+    if (at > start) target.append(document.createTextNode(copy.slice(start, at)));
+    const changed = document.createElement('span');
+    changed.className = 'forecast-changing-value';
+    changed.textContent = match[0];
+    target.append(changed);
+    start = at + match[0].length;
+  }
+  if (start < copy.length) target.append(document.createTextNode(copy.slice(start)));
+}
+function animateForecastChange() {
+  const box = $('fResult');
+  box.classList.remove('forecast-updated');
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  void box.offsetWidth;
+  box.classList.add('forecast-updated');
+}
 function renderForecast() {
   if (!S.points) return;
   $('error').hidden = true;
@@ -170,13 +193,13 @@ function renderForecast() {
   try {
     const f = forecast(S.points, { amount, horizonDays: S.horizon, since: SINCE_CHOICES[$('since').value] });
     const d = describe(f, money0);
-    $('fHeadline').textContent = d.headline; $('fMiddle').textContent = d.middle; $('fUp').textContent = d.up;
-    $('fCaution').textContent = d.caution;
-    $('fExtremes').textContent = d.extremes + ' Based on ' + d.samples.toLocaleString('en-GB') + ' past planting days since ' + $('since').selectedOptions[0].textContent.split(' ')[0] + '.';
+    markForecastChanges($('fHeadline'), d.headline); markForecastChanges($('fMiddle'), d.middle); markForecastChanges($('fUp'), d.up);
+    markForecastChanges($('fCaution'), d.caution);
+    markForecastChanges($('fExtremes'), d.extremes + ' Based on ' + d.samples.toLocaleString('en-GB') + ' past planting days since ' + $('since').selectedOptions[0].textContent.split(' ')[0] + '.');
     drawFan(f);
   } catch (e) { $('fHeadline').textContent = e.message; $('fMiddle').textContent = $('fUp').textContent = $('fExtremes').textContent = $('fCaution').textContent = ''; $('fanChart').replaceChildren(); }
 }
-for (const b of $('horizons').querySelectorAll('button')) b.onclick = () => { S.horizon = Number(b.dataset.days); $('horizons').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); renderForecast(); };
+for (const b of $('horizons').querySelectorAll('button')) b.onclick = () => { const changed = S.horizon !== Number(b.dataset.days); S.horizon = Number(b.dataset.days); $('horizons').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); renderForecast(); if (changed && S.points) animateForecastChange(); };
 let deb = 0; $('fAmount').addEventListener('input', () => { clearTimeout(deb); deb = setTimeout(renderForecast, 150); });
 $('since').onchange = renderForecast;
 

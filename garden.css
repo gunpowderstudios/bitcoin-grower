@@ -37,3 +37,9 @@
 .tip{position:absolute;top:10px;left:84px;background:#0c1d14;border:1px solid #8cf06a;border-radius:10px;padding:6px 10px;font-size:13px;pointer-events:none;white-space:nowrap;z-index:2}
 #yearChart{touch-action:pan-y;cursor:crosshair}
 .nowgrid.single{grid-template-columns:1fr}
+
+/* Forecast: changing amounts and selected period share the selected button's gold. */
+#fResult .forecast-changing-value{color:#f7ce4d}
+#fResult.forecast-updated .forecast-changing-value{animation:forecast-highlight .55s ease-out both}
+@keyframes forecast-highlight{0%{background:rgba(247,206,77,.32);text-shadow:0 0 14px rgba(247,206,77,.75)}100%{background:transparent;text-shadow:none}}
+@media(prefers-reduced-motion:reduce){#fResult.forecast-updated .forecast-changing-value{animation:none}}
