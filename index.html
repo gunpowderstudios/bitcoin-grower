@@ -9,25 +9,26 @@
 <link rel="stylesheet" href="./time-machine.css?v=1.14.3">
 <link rel="stylesheet" href="./garden.css?v=1.14.3">
 <style>
-/* Homepage header: title left, transparent artwork right */
-header:has(.garden-brand-mark){display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
-header:has(.garden-brand-mark)>div:first-child{flex:1;min-width:0}
-.garden-brand-mark{display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;gap:8px;flex:0 0 auto}
-.garden-header-logo{display:block;width:clamp(118px,15vw,175px);height:auto;aspect-ratio:1;object-fit:contain;background:transparent;border:0;border-radius:0;box-shadow:none}
-.garden-brand-mark .badge{font-size:11px;text-align:center;white-space:normal;max-width:190px}
-@media(max-width:640px){header:has(.garden-brand-mark){gap:12px}.garden-header-logo{width:clamp(76px,23vw,112px)}.garden-brand-mark .badge{max-width:120px;font-size:9px}}
-@media(max-width:390px){.garden-header-logo{width:72px}.garden-brand-mark .badge{max-width:90px;font-size:8px}}
+/* Homepage hero: prominent transparent icon left, text right */
+header:has(.garden-brand-mark){display:grid;grid-template-columns:clamp(128px,21vw,210px) minmax(0,1fr);gap:clamp(14px,3vw,32px);align-items:center}
+.garden-brand-mark{grid-column:1;grid-row:1;min-width:0}
+.garden-header-logo{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain;background:transparent;border:0;border-radius:0;box-shadow:none}
+header:has(.garden-brand-mark)>.garden-header-copy{grid-column:2;grid-row:1;min-width:0}
+header:has(.garden-brand-mark) .badge{display:inline-block;margin-top:12px;white-space:normal;text-align:left}
+@media(max-width:640px){header:has(.garden-brand-mark){grid-template-columns:clamp(88px,26vw,132px) minmax(0,1fr);gap:12px;align-items:center}header:has(.garden-brand-mark) h1{font-size:clamp(23px,6vw,35px);line-height:1.15}header:has(.garden-brand-mark) .sub{font-size:12px}header:has(.garden-brand-mark) .badge{font-size:10px;margin-top:8px}}
+@media(max-width:360px){header:has(.garden-brand-mark){grid-template-columns:76px minmax(0,1fr);gap:9px}header:has(.garden-brand-mark) h1{font-size:22px}}
 </style>
 </head>
 <body>
 <main>
 <header>
-  <div>
+  <div class="garden-brand-mark"><img class="garden-header-logo" src="./the_bitcoin_garden_app_icon.png?v=transparent-2" alt="The Bitcoin Garden logo: a tree with gold Bitcoin coins" width="142" height="142"></div>
+  <div class="garden-header-copy">
     <div class="sub">🌱 THE BITCOIN GARDEN <span class="vtag" id="version">v1.14.3</span></div>
     <h1>Today’s Prices ☀️</h1>
     <div class="sub">Bitcoin’s price right now, how it’s moved over time, and a “weather forecast” of where it could go next.</div>
+    <span class="badge">SIMULATION · NO REAL MONEY OR TRADES</span>
   </div>
-  <div class="garden-brand-mark"><img class="garden-header-logo" src="./the_bitcoin_garden_app_icon.png?v=transparent-2" alt="The Bitcoin Garden logo: a tree with gold Bitcoin coins" width="142" height="142"><span class="badge">SIMULATION · NO REAL MONEY OR TRADES</span></div>
 </header>
 <nav aria-label="The Bitcoin Garden sections">
   <a class="active" href="./" aria-current="page">🌱 Today’s Prices</a>
