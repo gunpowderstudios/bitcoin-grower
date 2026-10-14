@@ -89,6 +89,17 @@ export function createPlant(svg, uid = 'tm') {
     t.textContent = '₿';
   }
 
+  // Fresh Bitcoin fruit remains visible in the canopy after milestone coins fall.
+  // Decorative only: it does not represent extra Bitcoin or change the calculator.
+  // Pruning gardens (opts.count) retain their own separate harvested-coin behaviour.
+  const canopyFruit = el('g', { class: 'tm-canopy-fruit' }, svg);
+  const freshFruit = [];
+  [[150, 177], [210, 177], [180, 125], [142, 103], [222, 102]].forEach(([x, y], i) => {
+    const g = el('g', { transform: `translate(${x} ${y})`, opacity: 0 }, canopyFruit);
+    coinShape(g, 9.5);
+    freshFruit.push(g);
+  });
+
   // ----- fruit: coins ripen on a leaf, then drop to the ground -----
   const pile = el('g', { class: 'tm-pile' }, svg);
   const pileLabel = el('text', { x: 180, y: 297, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, fill: '#ffe9a0', 'font-family': 'system-ui,sans-serif' }, svg);
@@ -96,7 +107,13 @@ export function createPlant(svg, uid = 'tm') {
   // Normally coins mark milestones (how many times what you planted the pot is worth). In cash-in mode the caller passes
   // opts.count (coins really pruned) and opts.label instead.
   function setFruit(ratio, animate = true, opts = {}) {
-    const total = Number.isFinite(opts.count) ? Math.max(0, opts.count) : coinsFor(ratio);
+    const isPruning = Number.isFinite(opts.count);
+    const total = isPruning ? Math.max(0, opts.count) : coinsFor(ratio);
+    // Historical/forecast trees stay fruitful after a drop; Pruning trees don't.
+    freshFruit.forEach((g, i) => {
+      const visible = !isPruning && stage > 0 && total > 0 && i < Math.min(5, total + 1);
+      g.setAttribute('opacity', visible ? '1' : '0');
+    });
     const n = Math.min(total, SLOT_DX.length);
     while (fallen.length > n) fallen.pop().remove();
     const before = fallen.length;
