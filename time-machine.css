@@ -210,3 +210,14 @@ code{background:#10261a;padding:1px 6px;border-radius:6px}
 .cashsum th:first-child,.cashsum td:first-child{text-align:left}
 .cashsum td.win{color:#8cf06a;font-weight:700}
 .cashsum p{margin:10px 0 0;color:#dde9d5}
+
+/* Back in Time: decorative 30-day market weather, never a trading signal */
+.garden-weather{position:absolute;top:12px;right:18px;z-index:2;pointer-events:none;width:94px;height:82px;opacity:.9}
+.garden-weather .weather-sun,.garden-weather .weather-cloud{position:absolute;top:0;right:9px;font-size:42px;line-height:1;opacity:0;transition:opacity .8s ease}
+.scene[data-weather="sun"] .weather-sun{opacity:1}
+.scene[data-weather="rain"] .weather-cloud,.scene[data-weather="neutral"] .weather-cloud{opacity:1}
+.weather-rain{position:absolute;top:32px;right:12px;width:67px;height:42px;opacity:0;background:repeating-linear-gradient(110deg,transparent 0 9px,rgba(186,224,255,.85) 10px 12px,transparent 13px 18px);background-size:22px 35px;mask-image:linear-gradient(180deg,transparent,black 12%,black 85%,transparent);animation:garden-rain .65s linear infinite}
+.scene[data-weather="rain"] .weather-rain{opacity:1}
+@keyframes garden-rain{to{background-position:-22px 35px}}
+@media(max-width:640px){.garden-weather{top:9px;right:8px;transform:scale(.7);transform-origin:top right}}
+@media(prefers-reduced-motion:reduce){.garden-weather .weather-sun,.garden-weather .weather-cloud{transition:none}.weather-rain{animation:none}}

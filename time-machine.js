@@ -121,7 +121,7 @@ function showIdleFigures() {
 }
 function resetToIdle() {
   stopLoop(); S.state = 'idle'; S.sim = null; S.steps = null; S.chart = null;
-  plant.reset(); S.lastStage = 0; $('stage').textContent = STAGES[0];
+  plant.reset(); $('scene').dataset.weather = 'neutral'; S.lastStage = 0; $('stage').textContent = STAGES[0];
   $('scene').classList.remove('playing');
   $('scene').style.setProperty('--sky1', '#1b1f4a'); $('scene').style.setProperty('--sky2', '#37306b');
   $('year').textContent = '⏳'; $('daymonth').textContent = 'Choose a date, then press the green button'; $('whenLabel').textContent = 'Ready to travel'; S.lastYear = '';
@@ -245,6 +245,11 @@ function setPnl(pnl, pct, idle = false) {
 function render({ instant = false, fast = false, quiet = false, steps = 1 } = {}) {
   const { frames, events, settings } = S.sim, f = frames[S.cursor], N = frames.length;
   const start = settings.amount, pnl = f.total - start, pct = 100 * (f.total / start - 1);
+  // Visual-only market weather: compare today's BTC price with 30 trading days earlier.
+  // A ±5% band keeps small daily wiggles neutral; never changes portfolio maths.
+  const prior = frames[Math.max(0, S.cursor - 30)];
+  const trend = prior.price > 0 ? f.price / prior.price - 1 : 0;
+  $('scene').dataset.weather = S.cursor < 30 ? 'neutral' : trend > 0.05 ? 'sun' : trend < -0.05 ? 'rain' : 'neutral';
   // date
   const p = parts(f.date);
   if (p.y !== S.lastYear) { S.lastYear = p.y; $('year').textContent = p.y; if (!instant && !reduceMotion()) { $('year').classList.remove('flip'); void $('year').offsetWidth; $('year').classList.add('flip'); } }

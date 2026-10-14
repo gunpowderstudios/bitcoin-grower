@@ -66,7 +66,8 @@
 <!-- ============ THE JOURNEY ============ -->
 <section aria-labelledby="plant-heading" id="journey">
   <h2 id="plant-heading" class="sr">Your journey through time</h2>
-  <div class="scene" id="scene">
+  <div class="scene" id="scene" data-weather="neutral">
+    <div class="garden-weather" aria-hidden="true"><span class="weather-sun">☀️</span><span class="weather-cloud">☁️</span><span class="weather-rain"></span></div>
     <div class="datebar">
       <svg class="clock" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21"/><line class="hr" x1="24" y1="24" x2="24" y2="12"/><line class="min" x1="24" y1="24" x2="24" y2="7"/></svg>
       <div class="when"><small id="whenLabel">Ready to travel</small><span class="year" id="year">—</span><span class="daymonth" id="daymonth"></span></div>
@@ -218,6 +219,6 @@
 </div>
 <footer class="sitefoot">The Bitcoin Garden © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
 </main>
-<script type="module" src="./time-machine.js?v=1.14.3-fruit-2"></script>
+<script type="module" src="./time-machine.js?v=1.14.3-weather-1"></script>
 </body>
 </html>
