@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bitcoin Chatter — The Bitcoin Garden</title>
+<meta name="description" content="Fresh Bitcoin stories and links from independent news publishers.">
+<meta name="theme-color" content="#0c1d14"><link rel="stylesheet" href="./time-machine.css?v=1.14.4">
+<style>
+.chatter-header h1{margin:0 0 10px}.chatter-header h2{font-size:clamp(15px,1.8vw,21px);margin:0 0 10px}.chatter-header p{color:var(--mute);margin:0}
+.chatter-top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.chatter-top h2{margin:0}.chatter-top .hint{margin:4px 0 0}
+.chatter-button{min-height:44px;padding:10px 18px;color:var(--ink);font:inherit;font-weight:700;border:1px solid var(--line);background:var(--card2);border-radius:24px;cursor:pointer}
+.chatter-button:focus-visible,.chatter-story a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.chatter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:14px}
+.chatter-story{display:flex;flex-direction:column;gap:10px;padding:18px;border:1px solid var(--line);background:var(--card2);border-radius:15px;min-width:0}
+.chatter-story h3{font-size:18px;line-height:1.35;margin:0}.chatter-story a{color:var(--ink);text-decoration:none;overflow-wrap:anywhere}.chatter-story a:hover{text-decoration:underline;color:var(--gold)}
+.chatter-story p{margin:0;color:var(--mute);font-size:14px;line-height:1.5}
+.chatter-meta{font-size:12px;color:var(--mute)}
+@media(max-width:640px){.chatter-story{padding:15px}}
+</style></head><body><main>
+<header class="chatter-header"><div><h1>Bitcoin Chatter 🗞️ <span class="vtag">v1.14.4</span></h1><h2>WHAT'S HAPPENING IN BITCOIN?</h2><p>Fresh Bitcoin headlines from around the web. Tap a story to read it at the source.</p></div></header>
+<nav aria-label="The Bitcoin Garden sections"><a href="./">🌱 Today’s Prices</a><a href="./time-machine.html">⏳ Time Machine</a><a class="active" href="./bitcoin-chatter.html" aria-current="page">🗞️ Bitcoin Chatter</a></nav>
+<section class="card"><div class="chatter-top"><div><h2>Latest Bitcoin stories</h2><p class="hint" id="chatter-status" role="status" aria-live="polite">Loading headlines…</p></div><button id="chatter-refresh" class="chatter-button" type="button">↻ Refresh stories</button></div>
+<div class="chatter-grid" id="chatter-grid"></div>
+<p class="hint" style="margin-top:22px">Headlines come from independent publishers. They are not investment advice or endorsements. The external news feed may occasionally be unavailable.</p>
+<p class="hint">More news: <a href="https://www.coindesk.com/" target="_blank" rel="noopener noreferrer">CoinDesk</a> · <a href="https://decrypt.co/bitcoin" target="_blank" rel="noopener noreferrer">Decrypt</a> · <a href="https://bitcoinmagazine.com/" target="_blank" rel="noopener noreferrer">Bitcoin Magazine</a></p>
+</section><footer class="sitefoot">The Bitcoin Garden © <a href="https://gunpowderstudios.co.uk" target="_blank" rel="noopener noreferrer">Gunpowder Studios</a> 2026</footer>
+</main><script type="module" src="./bitcoin-chatter.js?v=1.14.4"></script></body></html>

@@ -56,3 +56,6 @@ Future multi-user requirements: independently authenticated identities, separate
 - **1.9–1.10** Today's Prices forecast; sound on by default.
 - **1.8** Time Machine introduced.
 - **1.6–1.7** Cloudflare dashboard monitoring and shared navigation (the dashboard still says "Playground" in its nav; left alone).
+
+## v1.14.4 · Bitcoin Chatter
+Added a third public navigation tab after Time Machine. Displays up to 12 latest Bitcoin headlines from a public no-key, CORS-capable third-party news feed, linking to original publishers, with graceful failure handling. No Cloudflare deployment or trading logic changes.
