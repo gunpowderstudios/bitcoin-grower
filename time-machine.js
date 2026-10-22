@@ -1,14 +1,14 @@
-import {initCurrency,money,moneyShort,toGBP,currency,symbol} from './currency.js?v=1.14.6-c1';
-// Bitcoin Garden Time Machine — page controller (v1.14.6). Simulation only: no accounts, keys or trading.
+import {initCurrency,money,moneyShort,toGBP,currency,symbol} from './currency.js?v=1.14.7-c1';
+// Bitcoin Garden Time Machine — page controller (v1.14.7). Simulation only: no accounts, keys or trading.
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, signedPct
-} from './time-machine-engine.js?v=1.14.6';
-import { createPlant } from './time-machine-plant.js?v=1.14.6-fruit-2';
-import { createSound } from './time-machine-sound.js?v=1.14.6';
-import { loadHistory } from './price-data.js?v=1.14.6';
-import { createRace } from './time-machine-race.js?v=1.14.6-fruit-2';
-import { forecast, describe as describeForecast, futureFrames, cashInForecast, SINCE_CHOICES } from './forecast-engine.js?v=1.14.6';
+} from './time-machine-engine.js?v=1.14.7';
+import { createPlant } from './time-machine-plant.js?v=1.14.7-fruit-2';
+import { createSound } from './time-machine-sound.js?v=1.14.7';
+import { loadHistory } from './price-data.js?v=1.14.7';
+import { createRace } from './time-machine-race.js?v=1.14.7-fruit-2';
+import { forecast, describe as describeForecast, futureFrames, cashInForecast, SINCE_CHOICES } from './forecast-engine.js?v=1.14.7';
 
 const $ = id => document.getElementById(id);
 await initCurrency();
@@ -78,7 +78,7 @@ function acceptData(points, note) {
 function buildPresets() {
   const last = todayish();
   const monthsAgo = n => { const d = new Date(Date.parse(last + 'T00:00:00Z')); d.setUTCMonth(d.getUTCMonth() - n); return d.toISOString().slice(0, 10); };
-  const list = [['1 week ago', addDays(last, -7)], ['1 month ago', monthsAgo(1)], ['1 year ago', addYears(last, -1)], ['The very start (' + S.data.first.slice(0, 4) + ')', S.data.first], ['2017', '2017-01-01'], ['2020', '2020-01-01'], ['2022', '2022-01-01'], ['5 years ago', addYears(last, -5)]];
+  const list = [['1 week ago', addDays(last, -7)], ['1 month ago', monthsAgo(1)], ['1 year ago', addYears(last, -1)], ['5 years ago', addYears(last, -5)], ['The very start (' + S.data.first.slice(0, 4) + ')', S.data.first]];
   const box = $('presets'); box.replaceChildren();
   for (const [label, date] of list) {
     if (date < S.data.first || date > addDays(S.data.last, -7)) continue;

@@ -1,7 +1,7 @@
-// Bitcoin Garden Time Machine — pure simulation logic (v1.14.6).
+// Bitcoin Garden Time Machine — pure simulation logic (v1.14.7).
 // No DOM, no network, no credentials, no exchange access: this module only does
 // arithmetic on historical prices so it can be tested in Node and reused by the page.
-export const VERSION = '1.14.6';
+export const VERSION = '1.14.7';
 
 export const DEFAULTS = Object.freeze({
   amount: 100,   // £ planted at the start
