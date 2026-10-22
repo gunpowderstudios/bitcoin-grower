@@ -27,7 +27,7 @@ Open `index.html` in a browser, or enable **GitHub Pages** (repository **Setting
 ## Code layout
 Plain ES modules, no build step. Pure logic is unit tested (`npm test` in the repository root, Node 22): `time-machine-engine.js` (simulation: `hold`, `cashin`, plus an unused legacy `grow` rule; plant stages and coins), `forecast-engine.js` (percentile forecasts and `cashInForecast`), `price-data.js`, `live-price.js`, `price-ranges.js`. Page code: `garden.js` (Today's Prices), `time-machine.js`, `time-machine-plant.js`, `time-machine-race.js`, `time-machine-sound.js`. Bump the version in `version.json`, `package.json`, `bot/package.json`, `VERSION`, the HTML version tags, every `?v=` import query and the line below together.
 
-Version: **1.14.3** (displayed in the app from `version.json`).
+Version: **1.14.5** (displayed in the app from `version.json`).
 
 ## Sharing
 Share the GitHub Pages link; each visitor runs their own simulation in their own browser.
@@ -48,6 +48,7 @@ Future multi-user requirements: independently authenticated identities, separate
 
 ## Release notes (short)
 - **1.14.3** Tidy-up, no interface changes: removed the retired gardener, the old Grower strategy's hidden settings and the compare toggle from the site; fixed leftover wording; refreshed the browser tests and this README.
+- **1.14.5** Back in time: quick date choices for 1 week, 1 month and 1 year ago.
 - **1.14.2** Third tab renamed **Pruning**; coins are orange Bitcoin coins with a stem and leaf.
 - **1.14.1** The third tab looks forward from today rather than back.
 - **1.14.0** Third Time Machine tab added (then called Cash in).
