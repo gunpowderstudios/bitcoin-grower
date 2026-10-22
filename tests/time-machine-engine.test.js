@@ -209,7 +209,7 @@ test('signed money and percentages use real plus/minus signs', () => {
   assert.equal(formatGBP(1234567.5), '£1,234,567.50'); assert.equal(formatGBP(NaN), '—');
 });
 
-// ---------- v1.14.5 cash in (pick apples as the tree grows) ----------
+// ---------- v1.14.6 cash in (pick apples as the tree grows) ----------
 const mk = prices => prices.map((price, i) => ({ date: '2020-01-' + String(i + 1).padStart(2, '0'), price }));
 test('cash in sells what you planted each time the tree reaches the chosen multiple', () => {
   const r = simulate(mk([100, 100, 150, 200, 200, 400, 100]), { strategy: 'cashin', amount: 100, cashAt: 2, feePct: 0 });
@@ -236,14 +236,14 @@ test('cashAt is validated and defaults to 2x', () => {
 
 // ---------- project hygiene ----------
 const read = f => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
-test('version is 1.14.5 everywhere it should be', () => {
-  assert.equal(VERSION, '1.14.5');
-  assert.equal(JSON.parse(read('version.json')).version, '1.14.5');
-  assert.equal(JSON.parse(read('package.json')).version, '1.14.5');
-  assert.equal(JSON.parse(read('bot/package.json')).version, '1.14.5');
-  assert.match(read('time-machine.html'), /id="version">v1\.14\.5</);
-  assert.match(read('README.md'), /Version: \*\*1\.14\.5\*\*/);
-  assert.match(read('index.html'), /id="version">v1\.14\.5</);
+test('version is 1.14.6 everywhere it should be', () => {
+  assert.equal(VERSION, '1.14.6');
+  assert.equal(JSON.parse(read('version.json')).version, '1.14.6');
+  assert.equal(JSON.parse(read('package.json')).version, '1.14.6');
+  assert.equal(JSON.parse(read('bot/package.json')).version, '1.14.6');
+  assert.match(read('time-machine.html'), /id="version">v1\.14\.6</);
+  assert.match(read('README.md'), /Version: \*\*1\.14\.6\*\*/);
+  assert.match(read('index.html'), /id="version">v1\.14\.6</);
 });
 test('every element id the page script uses exists in the HTML', () => {
   for (const [page, script] of [['time-machine.html', 'time-machine.js'], ['time-machine.html', 'time-machine-race.js'], ['index.html', 'garden.js']]) {

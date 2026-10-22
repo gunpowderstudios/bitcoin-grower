@@ -1,14 +1,14 @@
-import {initCurrency,money,moneyShort,toGBP,currency,symbol} from './currency.js?v=1.14.5-c1';
-// Bitcoin Garden Time Machine — page controller (v1.14.5). Simulation only: no accounts, keys or trading.
+import {initCurrency,money,moneyShort,toGBP,currency,symbol} from './currency.js?v=1.14.6-c1';
+// Bitcoin Garden Time Machine — page controller (v1.14.6). Simulation only: no accounts, keys or trading.
 import {
   VERSION, DEFAULTS, parseCSV, describeData, validateSettings, selectRange, simulate, plantFor, STAGES,
   addDays, addYears, dayNumber, signedPct
-} from './time-machine-engine.js?v=1.14.5';
-import { createPlant } from './time-machine-plant.js?v=1.14.5-fruit-2';
-import { createSound } from './time-machine-sound.js?v=1.14.5';
-import { loadHistory } from './price-data.js?v=1.14.5';
-import { createRace } from './time-machine-race.js?v=1.14.5-fruit-2';
-import { forecast, describe as describeForecast, futureFrames, cashInForecast, SINCE_CHOICES } from './forecast-engine.js?v=1.14.5';
+} from './time-machine-engine.js?v=1.14.6';
+import { createPlant } from './time-machine-plant.js?v=1.14.6-fruit-2';
+import { createSound } from './time-machine-sound.js?v=1.14.6';
+import { loadHistory } from './price-data.js?v=1.14.6';
+import { createRace } from './time-machine-race.js?v=1.14.6-fruit-2';
+import { forecast, describe as describeForecast, futureFrames, cashInForecast, SINCE_CHOICES } from './forecast-engine.js?v=1.14.6';
 
 const $ = id => document.getElementById(id);
 await initCurrency();
@@ -69,7 +69,7 @@ function acceptData(points, note) {
   if (q.get('from')) $('from').value = q.get('from');
   if (q.get('amount')) $('amount').value = q.get('amount');
   if ($('from').value < info.first || $('from').value > $('from').max) $('from').value = info.first <= '2017-01-01' ? '2017-01-01' : addYears(info.last, -5);
-  syncPresets(); updateDateHint();
+  syncPresets(); updateDateHint(); updateReveal();
   $('go').disabled = false; $('fwGo').disabled = false; $('goHint').textContent = 'You’ll watch your plant grow as time moves forward. Nothing here uses real money.';
   resetToIdle();
 }
@@ -84,7 +84,7 @@ function buildPresets() {
     if (date < S.data.first || date > addDays(S.data.last, -7)) continue;
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'chip'; b.textContent = label; b.dataset.date = date; b.setAttribute('aria-pressed', 'false');
-    b.onclick = () => { $('from').value = date; showError(''); syncPresets(); updateDateHint(); };
+    b.onclick = () => { $('from').value = date; showError(''); syncPresets(); updateDateHint(); updateReveal(); };
     box.appendChild(b);
   }
 }
@@ -111,11 +111,32 @@ function updateDateHint() {
   if (day && dayNumber(day.date) - dayNumber(from) <= 3) $('dateHint').textContent += ' One Bitcoin cost ' + formatGBP(day.price) + ' on ' + (day.date === from ? 'that day' : fmtLong(day.date)) + '.';
   if (yrs > 0 && from < '2014-01-01') $('dateHint').textContent += ' Heads up: prices before 2014 are sparse and less reliable, and Bitcoin was tiny then, so results can look enormous. Bitcoin began in 2009, but ' + fmtLong(S.data.first) + ' is the earliest day we have prices for.';
 }
+// The facts: what the chosen amount, bought on the chosen day and held, is worth at the newest price. Real history, no strategy.
+function updateReveal() {
+  const box = $('reveal');
+  try {
+    if (!S.data?.points?.length || !$('from').value || $('amount').value === '') throw new Error('not ready');
+    const st = readSettings();
+    const steps = selectRange(S.data.points, $('from').value);
+    const sim = simulate(steps, st);
+    const s = sim.summary, first = steps[0], last = steps[steps.length - 1];
+    const up = s.profit > 0.004, down = s.profit < -0.004, x = s.end / s.start;
+    $('revBig').textContent = formatGBP(s.start) + ' planted on ' + fmtLong(first.date) + ' would be worth ' + formatGBP(s.end) + ' today (' + fmtLong(last.date) + ').';
+    $('revThen').textContent = formatGBP(first.price); $('revNow').textContent = formatGBP(last.price);
+    const btc = s.btc;
+    $('revBtc').textContent = btc.toFixed(btc < 0.01 ? 6 : 4) + ' BTC';
+    $('revX').textContent = '×' + (x >= 100 ? Math.round(x).toLocaleString('en-GB') : x.toFixed(2));
+    $('revPct').textContent = (up ? '▲ ' : down ? '▼ ' : '■ ') + signedPct(s.pct);
+    $('revBox').className = 'fig' + (up ? ' gain' : down ? ' loss' : '');
+    $('revFine').textContent = 'Bought once at that day’s closing price, held, never sold. Includes a ' + formatGBP(s.feesPaid) + ' purchase fee. Newest price in the data is from ' + fmtLong(last.date) + '. Tax is not included. Past results do not predict the future.';
+    box.hidden = false;
+  } catch (e) { box.hidden = true; }
+}
 function readSettings() {
   return validateSettings({ amount: $('amount').value === '' ? NaN : toGBP(Number($('amount').value)), strategy: 'hold' });
 }
-$('from').addEventListener('input', () => { showError(''); syncPresets(); updateDateHint(); });
-$('amount').addEventListener('input', () => { showError(''); if (S.state === 'idle') showIdleFigures(); });
+$('from').addEventListener('input', () => { showError(''); syncPresets(); updateDateHint(); updateReveal(); });
+$('amount').addEventListener('input', () => { showError(''); if (S.state === 'idle') showIdleFigures(); updateReveal(); });
 
 // ---------------------------------------------------------------- idle (nothing running yet)
 function showIdleFigures() {
